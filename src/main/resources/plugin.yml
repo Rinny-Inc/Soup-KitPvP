@@ -1,0 +1,18 @@
+main: us.noks.kitpvp.Main
+name: KitPvP
+version: 1.5
+author: Noksio
+commands:
+  abilitylist:
+  ping:
+    aliases: [ms]
+  shout:
+  report:
+  skull:
+  sponsor:
+  stats:
+  recraft:
+  build:
+  boot:
+    aliases: [ddos]
+  balance:
