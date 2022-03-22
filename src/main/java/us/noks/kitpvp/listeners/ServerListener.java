@@ -53,7 +53,7 @@ public class ServerListener implements Listener {
 	@EventHandler
 	public void onServerPing(ServerListPingEvent event) {
 		String line1 = ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "----------" + ChatColor.GRAY
-				+ ChatColor.BOLD + "( " + ChatColor.RED + ChatColor.BOLD + "SoupZone " + ChatColor.GRAY + ChatColor.BOLD
+				+ ChatColor.BOLD + "( " + ChatColor.RED + ChatColor.BOLD + "Rastacraft " + ChatColor.GRAY + ChatColor.BOLD
 				+ ")" + ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "---------------\n";
 		String line2 = ChatColor.DARK_AQUA.toString() + ChatColor.ITALIC + "- Home of soup pvp -";
 		event.setMotd(line1 + line2 + (Bukkit.hasWhitelist() ? (ChatColor.RED + " Whitelisted") : ""));
@@ -166,7 +166,9 @@ public class ServerListener implements Listener {
 
 	private void fillSponsor(Chest chest) {
 		Random random = new Random();
-
+		
+		ItemStack lighter = new ItemStack(Material.FLINT_AND_STEEL, 1);
+		lighter.setDurability((short) MathUtils.getInstance().getRandom(59, 63));
 		ItemStack[] items = { new ItemStack(Material.MUSHROOM_SOUP, MathUtils.getInstance().getRandom(3, 6)),
 				new ItemStack(Material.LEATHER_BOOTS),
 				new ItemStack(Material.BROWN_MUSHROOM, MathUtils.getInstance().getRandom(2, 9)),
@@ -177,13 +179,13 @@ public class ServerListener implements Listener {
 				new ItemStack(Material.GOLDEN_APPLE, MathUtils.getInstance().getRandom(1, 2)),
 				new ItemStack(Material.POTION, 1, (short) 16386),
 				ItemUtils.getInstance().getItemUnbreakable(Material.STONE_SWORD),
-				ItemUtils.getInstance().getItemUnbreakable(Material.IRON_SWORD) };
+				ItemUtils.getInstance().getItemUnbreakable(Material.IRON_SWORD), lighter,
+				new ItemStack(Material.EXP_BOTTLE, MathUtils.getInstance().getRandom(1, 3))};
 
 		Random r = new Random();
 		int rand = r.nextInt(4);
 		for (int i = 0; i < 4 + rand; i++) {
-			chest.getInventory().setItem((new Random()).nextInt(chest.getInventory().getSize()),
-					new ItemStack(items[random.nextInt(items.length)]));
+			chest.getInventory().setItem((new Random()).nextInt(chest.getInventory().getSize()), new ItemStack(items[random.nextInt(items.length)]));
 		}
 	}
 

@@ -7,6 +7,7 @@ import java.sql.SQLException;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+import us.noks.kitpvp.Main;
 import us.noks.kitpvp.managers.PlayerManager;
 import us.noks.kitpvp.managers.caches.Settings;
 
@@ -19,16 +20,16 @@ public class DBUtils {
 
 	private boolean connected = true;
 
-	private String address = "127.0.0.1";
-	private String name = "soupzone";
-	private String username = "root";
-	private String password = "ed0Qaog3DXHPctKI";
+	private String address = Main.getInstance().getConfig().getString("DATABASE.ADDRESS");
+	private String name = Main.getInstance().getConfig().getString("DATABASE.NAME");
+	private String username = Main.getInstance().getConfig().getString("DATABASE.USER");
+	private String password = Main.getInstance().getConfig().getString("DATABASE.PASSWORD");
 
 	private HikariDataSource hikari;
 
-	private static final String SAVE = "UPDATE players SET kills=?, death=?, bestks=?, hascompass=?, swordslot=?, itemslot=?, compassslot=?, money=? WHERE uuid=?";
-	private static final String INSERT = "INSERT INTO players VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE uuid=?";
-	private static final String SELECT = "SELECT kills,death,bestks,hascompass,swordslot,itemslot,compassslot,money FROM players WHERE uuid=?";
+	private final String SAVE = "UPDATE players SET kills=?, death=?, bestks=?, hascompass=?, swordslot=?, itemslot=?, compassslot=?, money=? WHERE uuid=?";
+	private final String INSERT = "INSERT INTO players VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE uuid=?";
+	private final String SELECT = "SELECT kills,death,bestks,hascompass,swordslot,itemslot,compassslot,money FROM players WHERE uuid=?";
 
 	public void connectDatabase() {
 		try {
@@ -59,8 +60,7 @@ public class DBUtils {
 		Connection connection = null;
 		try {
 			connection = this.hikari.getConnection();
-			PreparedStatement statement = connection.prepareStatement(
-					"INSERT INTO players VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE uuid=?");
+			PreparedStatement statement = connection.prepareStatement(INSERT);
 
 			statement.setString(1, pm.getPlayerUUID().toString());
 			statement.setInt(2, 0);
@@ -75,14 +75,12 @@ public class DBUtils {
 			statement.executeUpdate();
 			statement.close();
 
-			statement = connection.prepareStatement(
-					"SELECT kills,death,bestks,hascompass,swordslot,itemslot,compassslot,money FROM players WHERE uuid=?");
+			statement = connection.prepareStatement(SELECT);
 			statement.setString(1, pm.getPlayerUUID().toString());
 			ResultSet result = statement.executeQuery();
 			if (result.next()) {
 				pm.getStats().set(result.getInt("kills"), result.getInt("death"), result.getInt("bestks"));
-				pm.getSettings().set(result.getBoolean("hascompass"), result.getInt("swordslot"),
-						result.getInt("itemslot"), result.getInt("compassslot"));
+				pm.getSettings().set(result.getBoolean("hascompass"), result.getInt("swordslot"), result.getInt("itemslot"), result.getInt("compassslot"));
 				pm.getEconomy().set(result.getInt("money"));
 			}
 			statement.close();
@@ -108,8 +106,7 @@ public class DBUtils {
 		try {
 			connection = this.hikari.getConnection();
 			PreparedStatement statement = (PreparedStatement) connection.createStatement();
-			statement.executeUpdate(
-					"CREATE TABLE IF NOT EXISTS players(uuid varchar(36), kills int(11), death int(11), bestks int(11), hascompass boolean, swordslot int(11), itemslot int(11), compassslot int(11), money int(11), PRIMARY KEY(`uuid`), UNIQUE(`uuid`));");
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS players(uuid varchar(36), kills int(11), death int(11), bestks int(11), hascompass boolean, swordslot int(11), itemslot int(11), compassslot int(11), money int(11), PRIMARY KEY(`uuid`), UNIQUE(`uuid`));");
 			statement.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -131,8 +128,7 @@ public class DBUtils {
 		Connection connection = null;
 		try {
 			connection = this.hikari.getConnection();
-			PreparedStatement statement = connection.prepareStatement(
-					"UPDATE players SET kills=?, death=?, bestks=?, hascompass=?, swordslot=?, itemslot=?, compassslot=?, money=? WHERE uuid=?");
+			PreparedStatement statement = connection.prepareStatement(SAVE);
 
 			statement.setInt(1, pm.getStats().getKills());
 			statement.setInt(2, pm.getStats().getDeaths());

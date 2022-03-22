@@ -22,7 +22,7 @@ public class Land {
 
 	public Land(PlayerManager manager) {
 	    this.world = Bukkit.getWorld("world");
-	    this.locations = new Location[] { new Location(this.world, 657.0D, 158.0D, -707.0D, 150.0F, 0.0F), new Location(this.world, 558.0D, 158.0D, -739.0D, -132.0F, 0.0F), new Location(this.world, 517.0D, 165.0D, -869.0D, -49.0F, 0.0F), new Location(this.world, 662.0D, 162.0D, -861.0D, 34.0F, 0.0F), new Location(this.world, 445.0D, 165.0D, -809.0D, -90.0F, 0.0F) };
+	    this.locations = new Location[] { new Location(this.world, 100.0D, 134.0D, 738.0D, 42.0F, 0.0F), new Location(this.world, 82.0D, 130.0D, 932.0D, 136.0F, 0.0F), new Location(this.world, -107.0D, 130.0D, 911.0D, -130.0F, 0.0F), new Location(this.world, -78.0D, 130.0D, 741.0D, -44.0F, 0.0F), new Location(this.world, -24.0D, 130.0D, 708.0D, -10.0F, 0.0F) };
 	    this.manager = manager;
 	  }
 

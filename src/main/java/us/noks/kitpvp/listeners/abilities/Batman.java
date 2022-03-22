@@ -39,12 +39,12 @@ public class Batman implements Listener {
 				Arrow arrow = (Arrow) p.launchProjectile(Arrow.class);
 				arrow.setMetadata("batHook", new FixedMetadataValue(this.plugin, Boolean.valueOf(true)));
 				arrow.spigot().setDamage(0.0D);
-				Vector handle = p.getEyeLocation().getDirection().multiply(2.5D);
+				Vector handle = p.getEyeLocation().getDirection().multiply(3.0D);
 				arrow.setVelocity(handle);
-			} else {
-				double cooldown = ability.getAbilityCooldown().longValue() / 1000.0D;
-				p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
+				return;
 			}
+			double cooldown = ability.getAbilityCooldown().longValue() / 1000.0D;
+			p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 		}
 	}
 

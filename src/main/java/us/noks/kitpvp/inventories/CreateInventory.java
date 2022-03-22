@@ -158,11 +158,11 @@ public class CreateInventory {
 				if (inventory[1] == null)
 					continue;
 				inventory[1].addItem(new ItemStack[] { ItemUtils.getInstance().getItemStack(abilities.getIcon(),
-						abilities.getRarity().formatDyeColorToChatColor() + abilities.getName(),
+						abilities.getRarity().getColor() + abilities.getName(),
 						abilities.getLore()) });
 			}
 			inventory[0].addItem(new ItemStack[] { ItemUtils.getInstance().getItemStack(abilities.getIcon(),
-					abilities.getRarity().formatDyeColorToChatColor() + abilities.getName(), abilities.getLore()) });
+					abilities.getRarity().getColor() + abilities.getName(), abilities.getLore()) });
 			continue;
 		}
 	}
@@ -183,11 +183,11 @@ public class CreateInventory {
 			inventory.setItem(1,
 					ItemUtils.getInstance().getItemStack(lastAbility.getIcon(),
 							ChatColor.YELLOW + "Last used ability: "
-									+ lastAbility.getRarity().formatDyeColorToChatColor() + lastAbility.getName(),
+									+ lastAbility.getRarity().getColor() + lastAbility.getName(),
 							lastAbility.getLore()));
 		}
 		inventory.setItem(4, ItemUtils.getInstance().getItemMaterial(Material.BEACON, 0,
-				ChatColor.GRAY + "(" + ChatColor.RED + "SoupZone" + ChatColor.GRAY + ")"));
+				ChatColor.GRAY + "(" + ChatColor.RED + "Rastacraft" + ChatColor.GRAY + ")"));
 		inventory.setItem(7,
 				ItemUtils.getInstance().getItemMaterial(Material.NAME_TAG, ChatColor.DARK_AQUA + "Settings"));
 		inventory.setItem(8,
@@ -196,9 +196,7 @@ public class CreateInventory {
 		for (Rarity rarity : Rarity.values()) {
 			if (rarity != Rarity.USELESS) {
 				boolean hasPermission = (player.hasPermission(rarity.getPermission()) || player.hasPermission("kit.*"));
-				inventory.setItem(rarityStartSlot, ItemUtils.getInstance().getItemMaterial(Material.STAINED_GLASS_PANE,
-						hasPermission ? rarity.getColorId() : 14,
-						(hasPermission ? rarity.formatDyeColorToChatColor() : ChatColor.RED) + rarity.getName()));
+				inventory.setItem(rarityStartSlot, ItemUtils.getInstance().getItemMaterial(Material.STAINED_GLASS_PANE, hasPermission ? rarity.getColorId() : 14, (hasPermission ? rarity.getColor() : ChatColor.RED) + rarity.getName()));
 				rarityStartSlot++;
 			}
 		}

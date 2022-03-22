@@ -16,6 +16,7 @@ import us.noks.kitpvp.commands.SkullCommand;
 import us.noks.kitpvp.commands.SponsorCommand;
 import us.noks.kitpvp.commands.StatisticCommand;
 import us.noks.kitpvp.database.DBUtils;
+import us.noks.kitpvp.listeners.ChatListener;
 import us.noks.kitpvp.listeners.InventoryListener;
 import us.noks.kitpvp.listeners.PlayerListener;
 import us.noks.kitpvp.listeners.ServerListener;
@@ -64,7 +65,7 @@ public class Main extends JavaPlugin {
 
 	public void onEnable() {
 		instance = this;
-		DBUtils.getInstance().connectDatabase();
+		//DBUtils.getInstance().connectDatabase();
 
 		try {
 			FeastTask.getInstance().doFeast();
@@ -92,6 +93,7 @@ public class Main extends JavaPlugin {
 		new PlayerListener(this);
 		new ServerListener(this);
 		new InventoryListener(this);
+		new ChatListener(this);
 
 		new Anchor(this);
 		new Archer(this);

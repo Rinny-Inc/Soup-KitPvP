@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -21,12 +22,13 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import us.noks.kitpvp.Main;
-import us.noks.kitpvp.database.DBUtils;
 import us.noks.kitpvp.enums.AbilitiesEnum;
 import us.noks.kitpvp.inventories.CreateInventory;
 import us.noks.kitpvp.managers.PlayerManager;
@@ -61,8 +63,9 @@ public class PlayerListener implements Listener {
 		player.setAllowFlight(false);
 		player.setFlying(false);
 		player.sendMessage((Messages.getInstance()).WELCOME_MESSAGE);
+		player.setPlayerListName((player.isOp() ? ChatColor.RED : ChatColor.RESET) + player.getName());
 		PlayerManager.get(player.getUniqueId()).giveMainItem();
-		DBUtils.getInstance().loadPlayer(PlayerManager.get(player.getUniqueId()));
+		//DBUtils.getInstance().loadPlayer(PlayerManager.get(player.getUniqueId()));
 	}
 
 	@EventHandler
@@ -81,7 +84,7 @@ public class PlayerListener implements Listener {
 			Bukkit.broadcastMessage("(WANTED) " + player.getName() + " killed himself!");
 			this.wantedPlayer = null;
 		}
-		DBUtils.getInstance().savePlayer(pm);
+		//DBUtils.getInstance().savePlayer(pm);
 		pm.remove();
 	}
 
@@ -209,8 +212,7 @@ public class PlayerListener implements Listener {
 
 	private void launchWantedEvent(Player wanted, int kill) {
 		this.wantedPlayer = wanted;
-		Bukkit.broadcastMessage(
-				"(WANTED) " + wanted.getName() + " is now wanted due to murder of " + kill + " people!");
+		Bukkit.broadcastMessage( "(WANTED) " + wanted.getName() + " is now wanted due to murder of " + kill + " people!");
 		wanted.sendMessage("(WANTED) You are the wanted player!");
 	}
 
@@ -226,19 +228,20 @@ public class PlayerListener implements Listener {
 		PlayerManager.get(player.getUniqueId()).giveMainItem();
 	}
 
-	@EventHandler
+	@EventHandler(priority=EventPriority.HIGH)
 	public void onPlayerInteractSoup(PlayerInteractEvent event) {
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-			Player player = event.getPlayer();
-			if (!player.isDead() && player.getItemInHand().getType() == Material.MUSHROOM_SOUP
-					&& player.getHealth() < player.getMaxHealth()) {
-				Ability ability = PlayerManager.get(player.getUniqueId()).getAbility();
-				double newHealth = Math.min(player.getHealth() + 7.0D, player.getMaxHealth());
+			final Player player = event.getPlayer();
+			if (!player.isDead() && player.getItemInHand().getType() == Material.MUSHROOM_SOUP && player.getHealth() < player.getMaxHealth()) {
+				final Ability ability = PlayerManager.get(player.getUniqueId()).getAbility();
+				final double newHealth = Math.min(player.getHealth() + 7.0D, player.getMaxHealth());
 				player.setHealth(newHealth);
+				//
 				if (!ability.hasAbility(AbilitiesEnum.QUICKDROPPER)) {
 					player.getItemInHand().setType(Material.BOWL);
 				} else {
 					player.getItemInHand().setAmount(0);
+					player.getItemInHand().setType(null);
 				}
 				player.updateInventory();
 			}
@@ -248,9 +251,7 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void onAbilitySelectorClick(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
-		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
-				&& player.getItemInHand().getType() == Material.BOOK && player.getItemInHand().getItemMeta()
-						.getDisplayName().toLowerCase().equals(ChatColor.GRAY + "your abilities")) {
+		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && player.getItemInHand().getType() == Material.BOOK && player.getItemInHand().getItemMeta().getDisplayName().toLowerCase().equals(ChatColor.GRAY + "your abilities")) {
 			player.openInventory(CreateInventory.getInstance().loadKitsInventory(player));
 		}
 	}
@@ -279,22 +280,19 @@ public class PlayerListener implements Listener {
 	public void onDamageByEntity(EntityDamageByEntityEvent event) {
 		if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
 			Player damager = (Player) event.getDamager();
-			double damage = event.getDamage();
 			ItemStack handItem = damager.getItemInHand();
 			if (handItem.getType() == Material.MUSHROOM_SOUP) {
 				return;
 			}
-			if (handItem.getType() == Material.AIR
-					&& PlayerManager.get(damager.getUniqueId()).getAbility().hasAbility(AbilitiesEnum.BOXER))
+			double damage = event.getDamage();
+			if (handItem.getType() == Material.AIR && PlayerManager.get(damager.getUniqueId()).getAbility().hasAbility(AbilitiesEnum.BOXER))
 				damage += 2.0D;
-			if (handItem.getType() == Material.WOOD_SWORD)
-				damage -= 2.0D;
-			if (handItem.getType() == Material.STONE_SWORD)
+			if (handItem.getType() == Material.WOOD_SWORD || handItem.getType() == Material.STONE_SWORD)
 				damage -= 2.0D;
 			if (handItem.getType() == Material.IRON_SWORD)
 				damage -= 2.5D;
 			if (handItem.containsEnchantment(Enchantment.DAMAGE_ALL))
-				damage += handItem.getEnchantmentLevel(Enchantment.DAMAGE_ALL) + 0.5D;
+				damage += (handItem.getEnchantmentLevel(Enchantment.DAMAGE_ALL) / 2) + 0.25D;
 			event.setDamage(damage);
 		}
 	}
@@ -314,8 +312,7 @@ public class PlayerListener implements Listener {
 
 	@EventHandler
 	public void onWantRefill(PlayerInteractEvent event) {
-		if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENDER_CHEST
-				&& event.getClickedBlock().getRelative(BlockFace.DOWN).getType() == Material.GLOWSTONE) {
+		if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENDER_CHEST && event.getClickedBlock().getRelative(BlockFace.DOWN).getType() == Material.GLOWSTONE) {
 			Player player = event.getPlayer();
 
 			if (PlayerManager.get(player.getUniqueId()).getAbility().hasAbility()) {
@@ -329,17 +326,14 @@ public class PlayerListener implements Listener {
 	public void onUseTracker(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 
-		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
-				&& player.getItemInHand().getType() == Material.COMPASS && player.getItemInHand().getItemMeta()
-						.getDisplayName().toLowerCase().equals(ChatColor.YELLOW + "tracker")) {
+		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && player.getItemInHand().getType() == Material.COMPASS && player.getItemInHand().getItemMeta().getDisplayName().toLowerCase().equals(ChatColor.YELLOW + "tracker")) {
 			Player nearest = null;
 			double distance = 200.0D;
 			for (Player onlineWorld : player.getWorld().getPlayers()) {
 				double calc = player.getLocation().distance(onlineWorld.getLocation());
 				if (calc > 1.0D && calc < distance) {
 					distance = calc;
-					if (onlineWorld == player || !player.canSee(onlineWorld) || !onlineWorld.canSee(player)
-							|| onlineWorld.getGameMode() != GameMode.SURVIVAL || onlineWorld.isDead())
+					if (onlineWorld == player || !player.canSee(onlineWorld) || !onlineWorld.canSee(player) || onlineWorld.getGameMode() != GameMode.SURVIVAL || onlineWorld.isDead())
 						continue;
 					nearest = onlineWorld;
 				}
@@ -347,9 +341,19 @@ public class PlayerListener implements Listener {
 			if (nearest == null) {
 				return;
 			}
-			player.sendMessage(ChatColor.YELLOW + "Compass pointing at " + nearest.getName() + " (" + ChatColor.GOLD
-					+ (new DecimalFormat("#.#")).format(distance) + ChatColor.YELLOW + ")");
+			player.sendMessage(ChatColor.YELLOW + "Compass pointing at " + nearest.getName() + " (" + ChatColor.GOLD + (new DecimalFormat("#.#")).format(distance) + ChatColor.YELLOW + ")");
 			player.setCompassTarget(nearest.getLocation());
+		}
+	}
+	
+	@EventHandler(priority=EventPriority.LOWEST)
+	public void onWalkOnSponge(PlayerMoveEvent event) {
+		Block block = event.getTo().getBlock().getRelative(BlockFace.DOWN);
+		
+		if (block.getType() == Material.SPONGE) {
+			final Player player = event.getPlayer();
+			double boost = block.getRelative(BlockFace.DOWN).getType() == Material.SPONGE ? 2.5D : 2.15D;
+			player.setVelocity(new Vector(0.0D, boost, 0.0D));
 		}
 	}
 }

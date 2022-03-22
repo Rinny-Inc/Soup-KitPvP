@@ -110,10 +110,7 @@ public class InventoryListener implements Listener {
 					List<String> abilities = Lists.newArrayList();
 
 					for (AbilitiesEnum abilitiesEnum : AbilitiesEnum.values()) {
-						if (abilitiesEnum.getRarity() != Rarity.USELESS
-								&& (player.hasPermission("kit." + abilitiesEnum.getName().toLowerCase())
-										|| player.hasPermission(abilitiesEnum.getRarity().getPermission())
-										|| player.hasPermission("kit.*")))
+						if (abilitiesEnum.getRarity() != Rarity.USELESS && (player.hasPermission("kit." + abilitiesEnum.getName().toLowerCase()) || player.hasPermission(abilitiesEnum.getRarity().getPermission()) || player.hasPermission("kit.*")))
 							abilities.add(abilitiesEnum.getName());
 					}
 					if (abilities.isEmpty()) {
@@ -122,9 +119,7 @@ public class InventoryListener implements Listener {
 					player.closeInventory();
 					int random = (new Random()).nextInt(abilities.size());
 					pm.getAbility().setAbility(AbilitiesEnum.getAbilityFromName((String) abilities.get(random)));
-					player.sendMessage(ChatColor.GRAY + "You have chosen "
-							+ pm.getAbility().getAbility().getRarity().formatDyeColorToChatColor()
-							+ pm.getAbility().getAbility().getName() + ChatColor.GRAY + " ability.");
+					player.sendMessage(ChatColor.GRAY + "You've chosen " + pm.getAbility().getAbility().getRarity().getColor() + pm.getAbility().getAbility().getName() + ChatColor.GRAY + " ability.");
 					map.giveEquipment(pm.getAbility().getAbility());
 					map.teleportToMap();
 					abilities.clear();
@@ -135,8 +130,8 @@ public class InventoryListener implements Listener {
 				}
 				player.closeInventory();
 				pm.getAbility().setAbility(AbilitiesEnum.getAbilityFromName(correctItemName));
-				player.sendMessage(ChatColor.GRAY + "You have chosen "
-						+ pm.getAbility().getAbility().getRarity().formatDyeColorToChatColor()
+				player.sendMessage(ChatColor.GRAY + "You've chosen "
+						+ pm.getAbility().getAbility().getRarity().getColor()
 						+ pm.getAbility().getAbility().getName() + ChatColor.GRAY + " ability.");
 				map.giveEquipment(pm.getAbility().getAbility());
 				map.teleportToMap();

@@ -80,7 +80,7 @@ public class Jumper implements Listener {
 		}
 	}
 
-	@EventHandler
+	/*@EventHandler
 	public void onEnderpearlCollideWithJumper(ProjectileCollideEvent event) {
 		if (event.getCollidedWith() instanceof Player && event.getEntity() instanceof EnderPearl) {
 			Player shooter = (Player) event.getCollidedWith();
@@ -105,7 +105,7 @@ public class Jumper implements Listener {
 				}
 			}
 		}
-	}
+	}*/
 
 	@EventHandler
 	public void onKill(PlayerDeathEvent event) {

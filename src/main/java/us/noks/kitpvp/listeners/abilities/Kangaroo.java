@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerOnGroundEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.Vector;
 
@@ -32,11 +33,9 @@ public class Kangaroo implements Listener {
 	@EventHandler
 	public void onKangarooInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
-		if (player.getItemInHand().getType() != null && player.getItemInHand().getType() == Material.FIREWORK
-				&& PlayerManager.get(player.getUniqueId()).getAbility().hasAbility(AbilitiesEnum.KANGAROO)) {
+		if (player.getItemInHand().getType() != null && player.getItemInHand().getType() == Material.FIREWORK && PlayerManager.get(player.getUniqueId()).getAbility().hasAbility(AbilitiesEnum.KANGAROO)) {
 			event.setCancelled(true);
-			if (!this.used.containsKey(player.getUniqueId())
-					|| !((Boolean) this.used.get(player.getUniqueId())).booleanValue()) {
+			if (!this.used.containsKey(player.getUniqueId()) || !((Boolean) this.used.get(player.getUniqueId())).booleanValue()) {
 				boolean sneak = player.isSneaking();
 				float multiplier = !sneak ? 0.6F : 1.5F;
 				float vertical = !sneak ? 0.8F : 0.5F;
@@ -54,8 +53,7 @@ public class Kangaroo implements Listener {
 			return;
 		}
 		Player player = event.getPlayer();
-		if (this.used.containsKey(player.getUniqueId())
-				&& ((Boolean) this.used.get(player.getUniqueId())).booleanValue()) {
+		if (this.used.containsKey(player.getUniqueId()) && ((Boolean) this.used.get(player.getUniqueId())).booleanValue()) {
 			this.used.put(player.getUniqueId(), Boolean.valueOf(false));
 		}
 	}

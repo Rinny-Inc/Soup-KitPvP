@@ -17,8 +17,7 @@ public class AbilityListCommand implements CommandExecutor {
 		}
 		StringJoiner ability = new StringJoiner(ChatColor.RESET + ", ");
 		for (AbilitiesEnum abilities : AbilitiesEnum.values()) {
-			if (abilities.getRarity() != Rarity.USELESS)
-				ability.add(abilities.getRarity().formatDyeColorToChatColor() + abilities.getName());
+			if (abilities.getRarity() != Rarity.USELESS) ability.add(abilities.getRarity().getColor() + abilities.getName());
 		}
 		sender.sendMessage("List of ability: " + ability.toString());
 		return true;

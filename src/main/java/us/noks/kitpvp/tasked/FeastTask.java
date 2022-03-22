@@ -64,6 +64,8 @@ public class FeastTask {
 	private void fillFeast(Chest chest) {
 		Random random = new Random();
 
+		ItemStack lighter = new ItemStack(Material.FLINT_AND_STEEL, 1);
+		lighter.setDurability((short) MathUtils.getInstance().getRandom(59, 63));
 		ItemStack[] items = { new ItemStack(Material.MUSHROOM_SOUP, MathUtils.getInstance().getRandom(1, 6)),
 				new ItemStack(Material.LEATHER_BOOTS), new ItemStack(Material.BOW),
 				new ItemStack(Material.ARROW, MathUtils.getInstance().getRandom(2, 6)),
@@ -74,7 +76,7 @@ public class FeastTask {
 				new ItemStack(Material.BOWL, MathUtils.getInstance().getRandom(3, 9)),
 				new ItemStack(Material.GOLDEN_APPLE, MathUtils.getInstance().getRandom(1, 2)),
 				new ItemStack(Material.POTION, 1, (short) 16386), new ItemStack(Material.GOLD_HELMET),
-				new ItemStack(Material.FLINT_AND_STEEL) };
+				lighter, new ItemStack(Material.EXP_BOTTLE, MathUtils.getInstance().getRandom(1, 3)) };
 
 		for (int i = 0; i < (new Random()).nextInt(5) + 1 + 3; i++) {
 			chest.getInventory().setItem((new Random()).nextInt(chest.getInventory().getSize()),

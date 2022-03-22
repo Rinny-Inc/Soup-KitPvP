@@ -3,6 +3,7 @@ package us.noks.kitpvp.listeners.abilities;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -35,8 +36,10 @@ public class Gladiator implements Listener {
 	public Gladiator(Main main) {
 		this.gladiators = Maps.newHashMap();
 		this.gladiatorZones = new Location[] {
-				new Location(Bukkit.getWorld("world"), 603.5D, 215.5D, -796.5D, -44.0F, 0.0F),
-				new Location(Bukkit.getWorld("world"), 619.5D, 215.5D, -780.5D, 135.0F, 0.0F) };
+				new Location(Bukkit.getWorld("world"), -50.5D, 170.5D, 775.5D, 135.0F, 0.0F),
+				new Location(Bukkit.getWorld("world"), -68.5D, 170.5D, 756.5D, -45.0F, 0.0F),
+				new Location(Bukkit.getWorld("world"), 58.5D, 177.5D, 788.5D, -135.0F, 0.0F),
+				new Location(Bukkit.getWorld("world"), 77.5D, 177.5D, 769.5D, 42.0F, 0.0F)};
 
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
@@ -172,8 +175,9 @@ public class Gladiator implements Listener {
 			gladiator.hidePlayer(allPlayers);
 			target.hidePlayer(allPlayers);
 		}
-		gladiator.teleport(this.gladiatorZones[0]);
-		target.teleport(this.gladiatorZones[1]);
+		int random = new Random().nextInt(1);
+		gladiator.teleport(this.gladiatorZones[(random == 0 ? 0 : 2)]);
+		target.teleport(this.gladiatorZones[(random == 0 ? 1 : 3)]);
 		gladiator.showPlayer(target);
 		target.showPlayer(gladiator);
 		gladiator.setNoDamageTicks(75);

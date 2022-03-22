@@ -22,7 +22,7 @@ public enum AbilitiesEnum {
 	ANTIGLADIATOR("AntiGladiator", getItemStack(Material.LADDER), getItemStack(Material.MUSHROOM_SOUP), null, Rarity.UNIQUE, Long.valueOf(0L), new String[] { ChatColor.AQUA + "Cancel Gladiator ability" }),
 	HULK("Hulk", getItemStack(Material.SLIME_BALL), getItemStack(Material.MUSHROOM_SOUP), null, Rarity.UNCOMMON, Long.valueOf(3L), new String[] { ChatColor.AQUA + "Launch the player in your hand" }),
 	GRANDPA("Grandpa", getEnchantedItemStack(Material.STICK, Enchantment.KNOCKBACK, 2), getEnchantedItemStack(Material.STICK, Enchantment.KNOCKBACK, 2), "Grandpa Stick", Rarity.COMMON, Long.valueOf(0L), new String[] { ChatColor.AQUA + "Protect the tower" }),
-	JUMPER("Jumper", getItemStack(Material.ENDER_PEARL), getItemStack(Material.ENDER_PEARL, 5), "Evasion Pearl", Rarity.UNIQUE, Long.valueOf(14L), new String[] { ChatColor.AQUA + "Evade yourself from a bad situation" }),
+	JUMPER("Jumper", getItemStack(Material.ENDER_PEARL), getItemStack(Material.ENDER_PEARL, 5), "Evasion Pearl", Rarity.USELESS, Long.valueOf(14L), new String[] { ChatColor.AQUA + "Evade yourself from a bad situation" }),
 	KANGAROO("Kangaroo", getItemStack(Material.FIREWORK), getItemStack(Material.FIREWORK), "Kangaroo Rocket", Rarity.UNIQUE, Long.valueOf(0L), new String[] { ChatColor.AQUA + "Jump like a kangaroo" }),
 	MONK("Monk", getItemStack(Material.BLAZE_ROD), getItemStack(Material.BLAZE_ROD), "Monk Staff", Rarity.UNCOMMON, Long.valueOf(15L), new String[] { ChatColor.AQUA + "Switch your opponent sword", ChatColor.AQUA + "with another item in his", ChatColor.AQUA + "inventory" }),
 	NINJA("Ninja", getItemStackData(Material.WOOL, (short) 15), getItemStack(Material.MUSHROOM_SOUP), null, Rarity.LEGENDARY, Long.valueOf(20L), new String[] { ChatColor.AQUA + "Teleport yourself behind your opponent" }),
@@ -49,7 +49,7 @@ public enum AbilitiesEnum {
 	GANJAMAN("Ganjaman", getItemStack(Material.WHEAT), getItemStack(Material.WHEAT, 6), "Ganja", Rarity.LEGENDARY, Long.valueOf(25L), new String[] { ChatColor.AQUA + "Smoke ganja everyday" }),
 	JELLYFISH("Jellyfish", getItemStack(Material.WATER_BUCKET), getItemStack(Material.MUSHROOM_SOUP), null, Rarity.COMMON, Long.valueOf(0L), new String[] { ChatColor.AQUA + "Make a easy MLG when", ChatColor.AQUA + "you're falling" }),
 	FLASH("Flash", getItemStack(Material.REDSTONE_TORCH_ON), getItemStack(Material.REDSTONE_TORCH_ON), "Flash", Rarity.RARE, Long.valueOf(30L), new String[] { ChatColor.AQUA + "Go far away" }),
-	QUICKDROPPER("Quickdropper", getItemStack(Material.BOWL), getItemStack(Material.MUSHROOM_SOUP), null, Rarity.COMMON, Long.valueOf(0L), new String[] { ChatColor.AQUA + "You're directly dropping your bowls" }),
+	QUICKDROPPER("Quickdropper", getItemStack(Material.BOWL), getItemStack(Material.MUSHROOM_SOUP), null, Rarity.USELESS, Long.valueOf(0L), new String[] { ChatColor.AQUA + "You're directly dropping your bowls" }),
 	DIGGER("Digger", getItemStack(Material.DIRT), getItemStack(Material.DIRT), "Direct Dig", Rarity.BETA, Long.valueOf(20L), new String[] { ChatColor.RED + "In coding" });
 
 	private String name;

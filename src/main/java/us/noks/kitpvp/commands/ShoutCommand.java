@@ -9,7 +9,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class ShoutCommand implements CommandExecutor {
-	private String voice = ChatColor.GRAY + "(" + ChatColor.RED + "SoupZone" + ChatColor.GRAY + ") " + ChatColor.GOLD + ChatColor.BOLD;
+	private String voice = ChatColor.GRAY + "(" + ChatColor.RED + "Rastacraft" + ChatColor.GRAY + ") " + ChatColor.GOLD + ChatColor.BOLD;
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!sender.hasPermission("command.shout")) {

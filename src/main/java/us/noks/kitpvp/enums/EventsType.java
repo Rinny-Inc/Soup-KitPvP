@@ -5,7 +5,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
 public enum EventsType {
-	FEAST("Feast", toLocation(-612.0D, 159.0D, -787.0D), 9600, org.bukkit.block.Chest.class),
+	FEAST("Feast", toLocation(-24.0D, 127.0D, 855.0D), 9600, org.bukkit.block.Chest.class),
 	GOLEM("Fallen Golem", toLocation(0.0D, 0.0D, 0.0D), 9600, org.bukkit.entity.IronGolem.class);
 
 	private String name;

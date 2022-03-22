@@ -4,12 +4,10 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import com.google.common.collect.Maps;
 
-import net.minecraft.server.EntityPlayer;
 import us.noks.kitpvp.managers.caches.Ability;
 import us.noks.kitpvp.managers.caches.Economy;
 import us.noks.kitpvp.managers.caches.Settings;
@@ -57,10 +55,6 @@ public class PlayerManager {
 
 	public Player getPlayer() {
 		return this.player;
-	}
-
-	public EntityPlayer getCraftPlayer() {
-		return ((CraftPlayer) getPlayer()).getHandle();
 	}
 
 	public UUID getPlayerUUID() {

@@ -12,11 +12,11 @@ public class Messages {
 	public final String[] WELCOME_MESSAGE = {
 			ChatColor.DARK_GRAY.toString() + ChatColor.STRIKETHROUGH
 					+ "----------------------------------------------------",
-			ChatColor.GRAY + "Welcome on " + ChatColor.RED.toString() + ChatColor.BOLD + "SoupZone" + ChatColor.GRAY
+			ChatColor.GRAY + "Welcome on " + ChatColor.RED.toString() + ChatColor.BOLD + "Rastacraft" + ChatColor.GRAY
 					+ " the home of soup!",
-			"", ChatColor.GRAY + "Our Discord -> " + ChatColor.RED + "discord.soupzone.eu",
-			ChatColor.GRAY + "Our Website -> " + ChatColor.RED + "soupzone.eu",
-			ChatColor.GRAY + "Our Twitter -> " + ChatColor.RED + "twitter.soupzone.eu",
+			"", ChatColor.GRAY + "Our Discord -> " + ChatColor.RED + "discord.rastacraft.eu",
+			ChatColor.GRAY + "Our Website -> " + ChatColor.RED + "rastacraft.eu",
+			ChatColor.GRAY + "Our Twitter -> " + ChatColor.RED + "twitter.rastacraft.eu",
 			ChatColor.RED + "-> Keep in mind this is a beta ^^", ChatColor.DARK_GRAY
 
 					.toString() + ChatColor.STRIKETHROUGH + "----------------------------------------------------" };
