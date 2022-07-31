@@ -14,7 +14,7 @@ public class Messages {
 					+ "----------------------------------------------------",
 			ChatColor.GRAY + "Welcome on " + ChatColor.RED.toString() + ChatColor.BOLD + "Rastacraft" + ChatColor.GRAY
 					+ " the home of soup!",
-			"", ChatColor.GRAY + "Our Discord -> " + ChatColor.RED + "discord.rastacraft.eu",
+			"", ChatColor.GRAY + "Our Discord -> " + ChatColor.RED + "https://discord.gg/CXx2u3phWn",
 			ChatColor.GRAY + "Our Website -> " + ChatColor.RED + "rastacraft.eu",
 			ChatColor.GRAY + "Our Twitter -> " + ChatColor.RED + "twitter.rastacraft.eu",
 			ChatColor.RED + "-> Keep in mind this is a beta ^^", ChatColor.DARK_GRAY
