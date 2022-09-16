@@ -1,4 +1,4 @@
-main: us.noks.kitpvp.Main
+main: io.noks.kitpvp.Main
 name: KitPvP
 version: 1.5
 author: Noksio
