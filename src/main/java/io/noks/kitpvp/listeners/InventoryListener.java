@@ -101,7 +101,7 @@ public class InventoryListener implements Listener {
 					String split = itemName.split(": ")[1];
 					correctItemName = split.substring(2, split.length());
 				}
-				final Land map = new Land();
+				final Land map = new Land(pm);
 				if (!map.hasValidLocation()) {
 					player.sendMessage(ChatColor.RED + "Failed to teleport! (Invalid map locations)");
 					return;
@@ -120,8 +120,8 @@ public class InventoryListener implements Listener {
 					int random = (new Random()).nextInt(abilities.size());
 					pm.getAbility().set(AbilitiesEnum.getAbilityFromName((String) abilities.get(random)));
 					player.sendMessage(ChatColor.GRAY + "You've chosen " + pm.getAbility().get().getRarity().getColor() + pm.getAbility().get().getName() + ChatColor.GRAY + " ability.");
-					map.giveEquipment(player, pm.getAbility().get());
-					map.teleportToMap(player);
+					map.giveEquipment(pm.getAbility().get());
+					map.teleportToMap();
 					abilities.clear();
 					return;
 				}
@@ -133,8 +133,8 @@ public class InventoryListener implements Listener {
 				player.sendMessage(ChatColor.GRAY + "You've chosen "
 						+ pm.getAbility().get().getRarity().getColor()
 						+ pm.getAbility().get().getName() + ChatColor.GRAY + " ability.");
-				map.giveEquipment(player, pm.getAbility().get());
-				map.teleportToMap(player);
+				map.giveEquipment(pm.getAbility().get());
+				map.teleportToMap();
 			}
 			return;
 		}

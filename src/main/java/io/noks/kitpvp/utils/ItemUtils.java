@@ -1,13 +1,14 @@
 package io.noks.kitpvp.utils;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import com.google.common.collect.Lists;
 
 public class ItemUtils {
 	private static ItemUtils instance = new ItemUtils();
@@ -19,8 +20,7 @@ public class ItemUtils {
 		ItemStack i = item;
 		ItemMeta im = i.getItemMeta();
 		im.setDisplayName(name);
-		if (lore != null)
-			im.setLore(Lists.newArrayList(lore));
+		if (lore != null) im.setLore(Arrays.asList(lore));
 		i.setItemMeta(im);
 		return i;
 	}
@@ -63,6 +63,6 @@ public class ItemUtils {
 	}
 
 	public ItemStack getAbilitiesSelector() {
-		return getItemMaterial(Material.BOOK, ChatColor.GRAY + "Your abilities");
+		return getItemStack(new ItemStack(Material.BOOK), ChatColor.GRAY + "Your abilities", new String[] {ChatColor.GRAY + "Choose your ability to fight other players"});
 	}
 }

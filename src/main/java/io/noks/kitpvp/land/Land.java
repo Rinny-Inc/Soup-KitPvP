@@ -18,25 +18,31 @@ import io.noks.kitpvp.managers.caches.Settings;
 import io.noks.kitpvp.utils.ItemUtils;
 
 public class Land {
-	protected World world = Bukkit.getWorld("customjava8");
+	private World world = Bukkit.getWorld("customjava8");
 	private Location[] locations = new Location[] { new Location(this.world, 100.0D, 134.0D, 738.0D, 42.0F, 0.0F), new Location(this.world, 82.0D, 130.0D, 932.0D, 136.0F, 0.0F), new Location(this.world, -107.0D, 130.0D, 911.0D, -130.0F, 0.0F), new Location(this.world, -78.0D, 130.0D, 741.0D, -44.0F, 0.0F), new Location(this.world, -24.0D, 130.0D, 708.0D, -10.0F, 0.0F) };;
-
+	private PlayerManager playerManager;
+	
+	public Land(PlayerManager pm) {
+		this.playerManager = pm;
+	}
+	
 	public boolean hasValidLocation() {
 		return (this.locations.length > 0);
 	}
 
-	public void teleportToMap(Player player) {
+	public void teleportToMap() {
+		Player player = this.playerManager.getPlayer();
 		player.setNoDamageTicks(100);
 		player.setHealth(20.0D);
 		player.setFoodLevel(20);
 		player.setSaturation(10000.0F);
 		player.teleport(this.locations[(new Random()).nextInt(this.locations.length)]);
 		player.setItemOnCursor(null);
-		PlayerManager.get(player.getUniqueId()).setAllowBuild(false);
+		this.playerManager.setAllowBuild(false);
 	}
 
-	public void giveEquipment(Player player, AbilitiesEnum ability) {
-		PlayerManager pm = PlayerManager.get(player.getUniqueId());
+	public void giveEquipment(AbilitiesEnum ability) {
+		Player player = this.playerManager.getPlayer();
 		player.setGameMode(GameMode.SURVIVAL);
 		PlayerInventory inv = player.getInventory();
 		inv.clear();
@@ -44,7 +50,7 @@ public class Land {
 		inv.setItem(14, new ItemStack(Material.BOWL, 32));
 		inv.setItem(13, new ItemStack(Material.RED_MUSHROOM, 32));
 		inv.setItem(15, new ItemStack(Material.BROWN_MUSHROOM, 32));
-		Settings settings = pm.getSettings();
+		Settings settings = this.playerManager.getSettings();
 		inv.setItem(settings.getSlot(Settings.SlotType.SWORD), new ItemStack(ItemUtils.getInstance()
 				.getItemUnbreakable((ability == AbilitiesEnum.BOXER) ? Material.WOOD_SWORD : Material.STONE_SWORD)));
 		if (ability.getSpecialItem().getType() != Material.MUSHROOM_SOUP)
@@ -60,5 +66,4 @@ public class Land {
 			inv.setItem(9, new ItemStack(Material.ARROW, 18));
 		player.updateInventory();
 	}
-
 }

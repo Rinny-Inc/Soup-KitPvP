@@ -2,7 +2,9 @@ package io.noks.kitpvp.listeners.abilities;
 
 import java.util.Random;
 
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -15,19 +17,19 @@ import io.noks.kitpvp.managers.PlayerManager;
 
 public class Reaper implements Listener {
 	private Main plugin;
-
 	public Reaper(Main main) {
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}
 
 	@EventHandler
-	public void Damage(EntityDamageByEntityEvent event) {
-		if (event.getDamager() instanceof org.bukkit.entity.Player
-				&& event.getEntity() instanceof org.bukkit.entity.Player
-				&& PlayerManager.get(event.getDamager().getUniqueId()).getAbility().hasAbility(AbilitiesEnum.REAPER)) {
-			double rand = Math.random() * 100.0D;
-			if (rand > 20.0D) {
+	public void onDamage(EntityDamageByEntityEvent event) {
+		if (event.getDamager() instanceof org.bukkit.entity.Player && event.getEntity() instanceof org.bukkit.entity.Player && PlayerManager.get(event.getDamager().getUniqueId()).getAbility().hasAbility(AbilitiesEnum.REAPER)) {
+			if (((Player)event.getDamager()).getItemInHand().getType() != Material.WOOD_HOE) {
+				return;
+			}
+			final int rand = new Random().nextInt(100);
+			if (rand <= 33) {
 				return;
 			}
 			LivingEntity living = null;

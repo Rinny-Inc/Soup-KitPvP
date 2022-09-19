@@ -1,6 +1,8 @@
 package io.noks.kitpvp.inventories;
 
 import java.text.DecimalFormat;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -19,6 +21,7 @@ import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.managers.caches.Settings;
 import io.noks.kitpvp.utils.ItemUtils;
+import net.minecraft.util.com.google.common.collect.Lists;
 import net.minecraft.util.org.apache.commons.lang3.text.WordUtils;
 
 public class CreateInventory {
@@ -144,7 +147,12 @@ public class CreateInventory {
 	}
 
 	private void sortPlayersKitsByRarity(Player player, Inventory[] inventory, @Nullable Rarity rarity) {
+		List<AbilitiesEnum> list = Lists.newArrayList();
 		for (AbilitiesEnum abilities : AbilitiesEnum.values()) {
+			list.add(abilities);
+		}
+		list.sort(Comparator.comparing(AbilitiesEnum::getRarity));
+		for (AbilitiesEnum abilities : list) {
 			if (abilities.getRarity() == Rarity.USELESS || (!player.hasPermission("kit." + abilities.getName().toLowerCase()) && !player.hasPermission(abilities.getRarity().getPermission()) && !player.hasPermission("kit.*")) || (rarity != null && abilities.getRarity() != rarity))
 				continue;
 			if (inventory[0].firstEmpty() == -1) {

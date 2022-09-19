@@ -27,8 +27,8 @@ public class Snail implements Listener {
 				&& event.getEntity() instanceof org.bukkit.entity.Player
 				&& PlayerManager.get(event.getDamager().getUniqueId()).getAbility().hasAbility(AbilitiesEnum.SNAIL)
 				&& !PlayerManager.get(event.getEntity().getUniqueId()).getAbility().hasAbility(AbilitiesEnum.CONTRE)) {
-			double rand = Math.random() * 100.0D;
-			if (rand > 20.0D) {
+			final int rand = new Random().nextInt(100);
+			if (rand <= 33) {
 				return;
 			}
 			LivingEntity living = null;

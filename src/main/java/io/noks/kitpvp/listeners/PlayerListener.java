@@ -34,6 +34,7 @@ import io.noks.kitpvp.inventories.CreateInventory;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.managers.caches.Economy;
+import io.noks.kitpvp.managers.caches.Economy.MoneyType;
 import io.noks.kitpvp.managers.caches.Stats;
 import io.noks.kitpvp.utils.Messages;
 
@@ -107,7 +108,7 @@ public class PlayerListener implements Listener {
 				for (ItemStack items : killed.getInventory().getContents()) {
 					if (items != null) {
 						if (items.getType() == Material.MUSHROOM_SOUP)
-							killedStuff[0] = killedStuff[0] + 1;
+							killedStuff[0]++;
 						if (items.getType() == Material.BOWL)
 							killedStuff[1] = killedStuff[1] + items.getAmount();
 						if (items.getType() == Material.BROWN_MUSHROOM)
@@ -120,7 +121,7 @@ public class PlayerListener implements Listener {
 				for (ItemStack items : killer.getInventory().getContents()) {
 					if (items != null) {
 						if (items.getType() == Material.MUSHROOM_SOUP)
-							killerStuff[0] = killerStuff[0] + 1;
+							killerStuff[0]++;
 						if (items.getType() == Material.BOWL)
 							killerStuff[1] = killerStuff[1] + items.getAmount();
 						if (items.getType() == Material.BROWN_MUSHROOM)
@@ -164,7 +165,7 @@ public class PlayerListener implements Listener {
 
 					Economy killerEconomy = km.getEconomy();
 					int moneyToAdd = ((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 2 : 1);
-					killerEconomy.add(moneyToAdd, Economy.MoneyType.BRONZE);
+					killerEconomy.add(moneyToAdd, MoneyType.BRONZE);
 
 					if (this.wantedPlayer == null && killerStats.getKillStreak() >= 8) {
 						int wantedKill = (new Random()).nextInt(30 + killerStats.getKillStreak() - 8) + 8;
@@ -173,8 +174,7 @@ public class PlayerListener implements Listener {
 						}
 					}
 					if (this.wantedPlayer == killed) {
-						Bukkit.broadcastMessage(
-								"(WANTED) " + killer.getName() + " got the prime for killed the wanted player!");
+						Bukkit.broadcastMessage("(WANTED) " + killer.getName() + " got the prime for killed the wanted player!");
 						this.wantedPlayer = null;
 					}
 
@@ -208,7 +208,7 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	private void launchWantedEvent(Player wanted, int kill) {
+	protected void launchWantedEvent(Player wanted, int kill) {
 		this.wantedPlayer = wanted;
 		Bukkit.broadcastMessage( "(WANTED) " + wanted.getName() + " is now wanted due to murder of " + kill + " people!");
 		wanted.sendMessage("(WANTED) You are the wanted player!");
@@ -217,6 +217,7 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onRespawn(PlayerRespawnEvent event) {
 		Player player = event.getPlayer();
+		event.setRespawnLocation(player.getWorld().getSpawnLocation());
 		player.getInventory().clear();
 		player.getInventory().setArmorContents(null);
 		player.setHealth(20.0D);
@@ -256,9 +257,8 @@ public class PlayerListener implements Listener {
 
 	@EventHandler
 	public void onDrop(PlayerDropItemEvent event) {
-		Player player = event.getPlayer();
-		PlayerManager pm = PlayerManager.get(player.getUniqueId());
-
+		final Player player = event.getPlayer();
+		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 		if (player.getGameMode() == GameMode.CREATIVE && pm.isAllowBuild()) {
 			return;
 		}
@@ -267,10 +267,23 @@ public class PlayerListener implements Listener {
 			return;
 		}
 		if (pm.getAbility().hasAbility()) {
-			if (pm.getAbility().get().getSpecialItem().getType() == Material.MUSHROOM_SOUP)
-				return;
-			if (event.getItemDrop().getItemStack().getType() == pm.getAbility().get().getSpecialItem().getType())
+			if (pm.getAbility().get().getSpecialItem().getType() == Material.MUSHROOM_SOUP) return;
+			final ItemStack dropppedItem = event.getItemDrop().getItemStack();
+			if (dropppedItem.getType() == pm.getAbility().get().getSpecialItem().getType()) {
 				event.setCancelled(true);
+				return;
+			}
+			if (dropppedItem.getType().toString().toLowerCase().contains("sword")) {
+				int swords = 0;
+				for (ItemStack item : player.getInventory().getContents()) {
+					if (item.getType().toString().toLowerCase().contains("sword")) {
+						swords++;
+					}
+				}
+				if (swords == 1) {
+					event.setCancelled(true);
+				}
+			}
 		}
 	}
 

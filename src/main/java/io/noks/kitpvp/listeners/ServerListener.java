@@ -7,11 +7,14 @@ import java.util.Random;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -53,10 +56,9 @@ public class ServerListener implements Listener {
 
 	@EventHandler
 	public void onServerPing(ServerListPingEvent event) {
-		String line1 = ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "----------" + ChatColor.GRAY
-				+ ChatColor.BOLD + "( " + ChatColor.RED + ChatColor.BOLD + "Rivu " + ChatColor.GRAY + ChatColor.BOLD
+		String line1 = ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "----------" + ChatColor.GRAY + ChatColor.BOLD + "( " + ChatColor.DARK_AQUA + ChatColor.BOLD + "Rivu " + ChatColor.GRAY + ChatColor.BOLD
 				+ ")" + ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "---------------\n";
-		String line2 = ChatColor.DARK_AQUA.toString() + ChatColor.ITALIC + "- Home of soup pvp -";
+		String line2 = ChatColor.GOLD.toString() + ChatColor.ITALIC + "- Home of soup pvp -";
 		event.setMotd(line1 + line2 + (Bukkit.hasWhitelist() ? (ChatColor.RED + " Whitelisted") : ""));
 	}
 
@@ -226,8 +228,16 @@ public class ServerListener implements Listener {
 		return (((Long) this.blockCooldown.get(location)).longValue() > System.currentTimeMillis());
 	}
 	
-	@EventHandler
+	/*@EventHandler
 	public void onItemDespawn(ItemDespawnEvent event) {
-		// TODO: Effect on despawn
-	}
+		final Entity entity = event.getEntity();
+		for (Player player : event.getEntity().getWorld().getPlayers()) {
+			if (!(entity instanceof Item)) return;
+			final Item item = (Item) entity;
+			if (!(item.getOwner() instanceof Player)) return;
+			final Player owner = (Player) item.getOwner();
+			if (!player.canSee(owner)) continue;
+			player.playEffect(entity.getLocation().add(0, 0.2, 0), Effect.SMOKE, null);
+		}
+	}*/
 }

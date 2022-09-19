@@ -7,6 +7,8 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffectType;
 
 public enum AbilitiesEnum {
 	NONE("None", null, null, null, Rarity.USELESS, Long.valueOf(0L), new String[] { ChatColor.AQUA + "None" }),
@@ -28,15 +30,15 @@ public enum AbilitiesEnum {
 	NINJA("Ninja", getItemStackData(Material.WOOL, (short) 15), getItemStack(Material.MUSHROOM_SOUP), null, Rarity.LEGENDARY, Long.valueOf(20L), new String[] { ChatColor.AQUA + "Teleport yourself behind your opponent" }),
 	PHANTOM("Phantom", getItemStack(Material.FEATHER), getItemStack(Material.FEATHER), "Phantom Feather", Rarity.RARE, Long.valueOf(30L), new String[] { ChatColor.AQUA + "Fly for 5 seconds" }),
 	POSEIDON("Poseidon", getItemStack(Material.WATER_BUCKET), getItemStack(Material.MUSHROOM_SOUP), null, Rarity.UNCOMMON, Long.valueOf(0L), new String[] { ChatColor.AQUA + "You're a god when you are in water" }),
-	REAPER("Reaper", getItemStack(Material.WOOD_HOE), getItemStack(Material.MUSHROOM_SOUP), null, Rarity.RARE, Long.valueOf(0L),new String[] { ChatColor.AQUA + "33% chance to give wither II", ChatColor.AQUA + "to your opponents" }),
-	SNAIL("Snail", getItemStack(Material.SOUL_SAND), getItemStack(Material.MUSHROOM_SOUP), null, Rarity.RARE, Long.valueOf(0L), new String[] { ChatColor.AQUA + "33% chance to give slowness II", ChatColor.AQUA + "to your opponents" }),
+	REAPER("Reaper", getItemStack(Material.WOOD_HOE), getItemStack(Material.WOOD_HOE), null, Rarity.RARE, Long.valueOf(0L),new String[] { ChatColor.AQUA + "33% chance to give wither II", ChatColor.AQUA + "to your opponents" }),
+	SNAIL("Snail", createPotion(PotionEffectType.SLOW), getItemStack(Material.MUSHROOM_SOUP), null, Rarity.RARE, Long.valueOf(0L), new String[] { ChatColor.AQUA + "33% chance to give slowness II", ChatColor.AQUA + "to your opponents" }),
 	SPECTRE("Spectre", getItemStack(Material.SUGAR), getItemStack(Material.SUGAR), "Invisible Power", Rarity.COMMON, Long.valueOf(40L), new String[] { ChatColor.AQUA + "Be invisible for 15 seconds" }),
 	STOMPER("Stomper", getItemStack(Material.ANVIL), getItemStack(Material.MUSHROOM_SOUP), null, Rarity.UNIQUE, Long.valueOf(0L), new String[] { ChatColor.AQUA + "transfer fall damages to your opponents", ChatColor.AQUA + "while jumping on them" }),
 	ANTISTOMPER("AntiStomper", getItemStack(Material.ENCHANTMENT_TABLE), getItemStack(Material.MUSHROOM_SOUP), null, Rarity.RARE, Long.valueOf(0L), new String[] { ChatColor.AQUA + "Cancel Stomper ability" }),
 	SWITCHER("Switcher", getItemStack(Material.SNOW_BALL), getItemStack(Material.SNOW_BALL, 6), "Switcher Ball", Rarity.UNIQUE, Long.valueOf(0L), new String[] { ChatColor.AQUA + "Switch your position with another player" }),
 	TIMELORD("TimeLord", getItemStack(Material.WATCH), getItemStack(Material.WATCH), "Time Stopper", Rarity.LEGENDARY, Long.valueOf(45L), new String[] { ChatColor.AQUA + "Stop the time around you" }),
 	TURTLE("Turtle", getItemStack(Material.OBSIDIAN), getItemStack(Material.MUSHROOM_SOUP), null, Rarity.UNCOMMON, Long.valueOf(0L), new String[] { ChatColor.AQUA + "When you're blocking with your sword,", ChatColor.AQUA + "you only take 0,5 heart" }),
-	VIPER("Viper", getItemStack(Material.FLINT), getItemStack(Material.MUSHROOM_SOUP), null, Rarity.RARE, Long.valueOf(0L), new String[] { ChatColor.AQUA + "33% chance to give poison II", ChatColor.AQUA + "to your opponents" }),
+	VIPER("Viper", createPotion(PotionEffectType.POISON), getItemStack(Material.MUSHROOM_SOUP), null, Rarity.RARE, Long.valueOf(0L), new String[] { ChatColor.AQUA + "33% chance to give poison II", ChatColor.AQUA + "to your opponents" }),
 	ZEUS("Zeus", getItemStack(Material.WOOD_AXE), getUnbreakableItemStack(Material.WOOD_AXE), "Zeus Axe", Rarity.RARE, Long.valueOf(15L), new String[] { ChatColor.AQUA + "Invoke the thunder" }),
 	SPECIALIST("Specialist", getItemStack(Material.ENCHANTED_BOOK), getItemStack(Material.ENCHANTED_BOOK), "Enchant Book", Rarity.LEGENDARY, Long.valueOf(0L), new String[] { ChatColor.AQUA + "Enchantment table in a book" }),
 	COOKIEMONSTER("Cookiemonster", getItemStack(Material.COOKIE), getItemStack(Material.COOKIE, 8), "Cookie", Rarity.UNCOMMON, Long.valueOf(0L), new String[] { ChatColor.AQUA + "COOKIE" }),
@@ -125,6 +127,14 @@ public enum AbilitiesEnum {
 		ItemStack item = new ItemStack(material);
 		item.addUnsafeEnchantment(enchantment, enchantmentLevel);
 		return item;
+	}
+	
+	public static ItemStack createPotion(PotionEffectType type) {
+		ItemStack i = new ItemStack(Material.POTION);
+		PotionMeta pm = (PotionMeta) i.getItemMeta();
+		pm.setMainEffect(type);
+		i.setItemMeta(pm);
+		return i;
 	}
 
 	public static AbilitiesEnum getAbilityFromName(String name) {
