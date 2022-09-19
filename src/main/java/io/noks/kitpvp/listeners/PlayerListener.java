@@ -18,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -266,14 +267,13 @@ public class PlayerListener implements Listener {
 			event.setCancelled(true);
 			return;
 		}
-		if (pm.getAbility().hasAbility()) {
-			if (pm.getAbility().get().getSpecialItem().getType() == Material.MUSHROOM_SOUP) return;
-			final ItemStack dropppedItem = event.getItemDrop().getItemStack();
-			if (dropppedItem.getType() == pm.getAbility().get().getSpecialItem().getType()) {
-				event.setCancelled(true);
-				return;
-			}
-			if (dropppedItem.getType().toString().toLowerCase().contains("sword")) {
+		final ItemStack dropppedItem = event.getItemDrop().getItemStack();
+		if (dropppedItem.getType() == Material.MUSHROOM_SOUP) return;
+		if (dropppedItem.getType() == pm.getAbility().get().getSpecialItem().getType()) {
+			event.setCancelled(true);
+			return;
+		}
+			/*if (dropppedItem.getType().toString().toLowerCase().contains("sword")) {
 				int swords = 0;
 				for (ItemStack item : player.getInventory().getContents()) {
 					if (item.getType().toString().toLowerCase().contains("sword")) {
@@ -283,15 +283,15 @@ public class PlayerListener implements Listener {
 				if (swords == 1) {
 					event.setCancelled(true);
 				}
-			}
-		}
+			}*/
 	}
 
+	// TODO: remake with critical damage and enchantment
 	@EventHandler
 	public void nerfDamage(EntityDamageByEntityEvent event) {
 		if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
-			Player damager = (Player) event.getDamager();
-			ItemStack handItem = damager.getItemInHand();
+			final Player damager = (Player) event.getDamager();
+			final ItemStack handItem = damager.getItemInHand();
 			if (handItem.getType() == Material.MUSHROOM_SOUP) {
 				return;
 			}
@@ -314,7 +314,7 @@ public class PlayerListener implements Listener {
 			Player player = (Player) event.getEntity();
 			if (!PlayerManager.get(player.getUniqueId()).getAbility().hasAbility()) {
 				event.setCancelled(true);
-				if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+				if (event.getCause() == DamageCause.VOID) {
 					player.teleport(player.getWorld().getSpawnLocation());
 				}
 			}

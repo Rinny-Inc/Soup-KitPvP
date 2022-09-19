@@ -5,18 +5,18 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
 public enum EventsType {
-	FEAST("Feast", toLocation(-24.0D, 127.0D, 855.0D), 9600, org.bukkit.block.Chest.class),
-	GOLEM("Fallen Golem", toLocation(0.0D, 0.0D, 0.0D), 9600, org.bukkit.entity.IronGolem.class);
+	FEAST("Feast", toLocation(-24.0D, 127.0D, 855.0D), 8, org.bukkit.block.Chest.class),
+	GOLEM("Fallen Golem", toLocation(0.0D, 0.0D, 0.0D), 8, org.bukkit.entity.IronGolem.class);
 
 	private String name;
 	private Location position;
 	private int countdown;
 	private Class entityClass;
 
-	EventsType(String name, Location position, int countdown, Class entityClass) {
+	EventsType(String name, Location position, int countdownInMinute, Class entityClass) {
 		this.name = name;
 		this.position = position;
-		this.countdown = countdown;
+		this.countdown = countdownInMinute;
 		this.entityClass = entityClass;
 	}
 

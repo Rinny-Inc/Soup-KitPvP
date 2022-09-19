@@ -8,6 +8,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public enum AbilitiesEnum {
@@ -133,6 +134,7 @@ public enum AbilitiesEnum {
 		ItemStack i = new ItemStack(Material.POTION);
 		PotionMeta pm = (PotionMeta) i.getItemMeta();
 		pm.setMainEffect(type);
+		pm.addCustomEffect(new PotionEffect(type, 20, 0), true);
 		i.setItemMeta(pm);
 		return i;
 	}

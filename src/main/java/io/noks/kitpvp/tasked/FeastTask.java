@@ -17,13 +17,12 @@ import io.noks.kitpvp.utils.MathUtils;
 
 public class FeastTask {
 	private static FeastTask instance = new FeastTask();
-
 	public static FeastTask getInstance() {
 		return instance;
 	}
 
-	private World world = Bukkit.getWorld("world");
-	private int countdown = EventsType.FEAST.getCountdown();
+	private World world = Bukkit.getWorld("customjava8");
+	private int countdown = (EventsType.FEAST.getCountdown() * 20) * 60;
 	private String prefix = EventsType.FEAST.getPrefix(ChatColor.GOLD);
 
 	private boolean spawned;
@@ -52,13 +51,15 @@ public class FeastTask {
 			fillFeast(chest);
 		}
 
-		(new BukkitRunnable() {
+		new BukkitRunnable() {
+			
+			@Override
 			public void run() {
-				FeastTask.this.countdown = 8400;
+				FeastTask.this.countdown = EventsType.FEAST.getCountdown();
 				Bukkit.broadcastMessage(FeastTask.this.prefix + ChatColor.RED + "The feast just disappear!");
 				FeastTask.this.doFeast();
 			}
-		}).runTaskLater(Main.getInstance(), 2400L);
+		}.runTaskLater(Main.getInstance(), 2400L);
 	}
 
 	private void fillFeast(Chest chest) {

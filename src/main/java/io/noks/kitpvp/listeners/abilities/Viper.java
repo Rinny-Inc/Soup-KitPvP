@@ -28,17 +28,11 @@ public class Viper implements Listener {
 				&& PlayerManager.get(event.getDamager().getUniqueId()).getAbility().hasAbility(AbilitiesEnum.VIPER)
 				&& !PlayerManager.get(event.getEntity().getUniqueId()).getAbility().hasAbility(AbilitiesEnum.CONTRE)) {
 			final int rand = new Random().nextInt(100);
-			if (rand <= 33) {
+			if (rand > 33) {
 				return;
 			}
-			LivingEntity living = null;
-			if (!PlayerManager.get(event.getEntity().getUniqueId()).getAbility().hasAbility(AbilitiesEnum.CONTRE)) {
-				living = (LivingEntity) event.getEntity();
-				living.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, (new Random()).nextInt(1)));
-			} else {
-				living = (LivingEntity) event.getDamager();
-				living.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, (new Random()).nextInt(1)));
-			}
+			LivingEntity living = (LivingEntity) (!PlayerManager.get(event.getEntity().getUniqueId()).getAbility().hasAbility(AbilitiesEnum.CONTRE) ? event.getEntity() : event.getDamager());
+			living.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, (new Random()).nextInt(1)));
 		}
 	}
 }

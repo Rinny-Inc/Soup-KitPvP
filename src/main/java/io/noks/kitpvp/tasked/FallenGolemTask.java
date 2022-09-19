@@ -17,15 +17,15 @@ import org.bukkit.scheduler.BukkitRunnable;
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.enums.EventsType;
 import io.noks.kitpvp.managers.PlayerManager;
+import io.noks.kitpvp.managers.caches.Economy.MoneyType;
 
 public class FallenGolemTask implements Listener {
 	private static FallenGolemTask instance = new FallenGolemTask();
-
 	public static FallenGolemTask getInstance() {
 		return instance;
 	}
 
-	private World world = Bukkit.getWorld("world");
+	private World world = Bukkit.getWorld("customjava8");
 	private int countdown = EventsType.GOLEM.getCountdown();
 	private String prefix = EventsType.GOLEM.getPrefix(ChatColor.RED);
 
@@ -93,8 +93,10 @@ public class FallenGolemTask implements Listener {
 
 			if (golem.getCustomName().toLowerCase().contains("fallen") && golem.getKiller() != null) {
 				this.countdown = 8400;
-				Bukkit.broadcastMessage(this.prefix + ChatColor.RED + "The fallen golem has been killed by "
-						+ golem.getKiller().getName());
+				final Player killer = golem.getKiller();
+				Bukkit.broadcastMessage(this.prefix + ChatColor.RED + "The fallen golem has been killed by " + killer.getName());
+				PlayerManager.get(killer.getUniqueId()).getEconomy().add(85, MoneyType.BRONZE);
+				// TODO: DROP STUFF
 				doFallenGolem();
 			}
 		}
@@ -111,8 +113,7 @@ public class FallenGolemTask implements Listener {
 					event.setCancelled(true);
 					return;
 				}
-				if (golem.getTarget() != player)
-					golem.setTarget(player);
+				if (new Random().nextInt(11) == 10 && golem.getTarget() != player) golem.setTarget(player);
 			}
 		}
 	}
