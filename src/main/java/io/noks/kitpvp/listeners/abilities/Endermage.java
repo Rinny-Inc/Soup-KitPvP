@@ -41,8 +41,8 @@ public class Endermage implements Listener {
 			if (block.getType() != Material.ENDER_PORTAL_FRAME) {
 				return;
 			}
-			if (ability.hasAbilityCooldown()) {
-				double cooldown = ability.getAbilityCooldown().longValue() / 1000.0D;
+			if (ability.hasActiveCooldown()) {
+				double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
 				player.sendMessage(ChatColor.RED + "You can use your ability in "
 						+ (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 				return;
@@ -61,7 +61,7 @@ public class Endermage implements Listener {
 							+ ", you're invincible for 5 seconds!");
 					nearby.getPlayer().sendMessage(ChatColor.RED
 							+ "You have been teleported by an Endermage! You're invincible for 5 seconds!");
-					ability.setAbilityCooldown();
+					ability.applyCooldown();
 				}
 			}
 		}

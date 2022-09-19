@@ -24,6 +24,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -53,7 +54,7 @@ public class ServerListener implements Listener {
 	@EventHandler
 	public void onServerPing(ServerListPingEvent event) {
 		String line1 = ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "----------" + ChatColor.GRAY
-				+ ChatColor.BOLD + "( " + ChatColor.RED + ChatColor.BOLD + "Rastacraft " + ChatColor.GRAY + ChatColor.BOLD
+				+ ChatColor.BOLD + "( " + ChatColor.RED + ChatColor.BOLD + "Rivu " + ChatColor.GRAY + ChatColor.BOLD
 				+ ")" + ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "---------------\n";
 		String line2 = ChatColor.DARK_AQUA.toString() + ChatColor.ITALIC + "- Home of soup pvp -";
 		event.setMotd(line1 + line2 + (Bukkit.hasWhitelist() ? (ChatColor.RED + " Whitelisted") : ""));
@@ -168,19 +169,19 @@ public class ServerListener implements Listener {
 		Random random = new Random();
 		
 		ItemStack lighter = new ItemStack(Material.FLINT_AND_STEEL, 1);
-		lighter.setDurability((short) MathUtils.getInstance().getRandom(59, 63));
-		ItemStack[] items = { new ItemStack(Material.MUSHROOM_SOUP, MathUtils.getInstance().getRandom(3, 6)),
+		lighter.setDurability((short) MathUtils.getRandom(59, 63));
+		ItemStack[] items = { new ItemStack(Material.MUSHROOM_SOUP, MathUtils.getRandom(3, 6)),
 				new ItemStack(Material.LEATHER_BOOTS),
-				new ItemStack(Material.BROWN_MUSHROOM, MathUtils.getInstance().getRandom(2, 9)),
+				new ItemStack(Material.BROWN_MUSHROOM, MathUtils.getRandom(2, 9)),
 				new ItemStack(Material.LEATHER_LEGGINGS), new ItemStack(Material.LEATHER_CHESTPLATE),
-				new ItemStack(Material.RED_MUSHROOM, MathUtils.getInstance().getRandom(2, 9)),
+				new ItemStack(Material.RED_MUSHROOM, MathUtils.getRandom(2, 9)),
 				new ItemStack(Material.LEATHER_HELMET),
-				new ItemStack(Material.BOWL, MathUtils.getInstance().getRandom(3, 12)),
-				new ItemStack(Material.GOLDEN_APPLE, MathUtils.getInstance().getRandom(1, 2)),
+				new ItemStack(Material.BOWL, MathUtils.getRandom(3, 12)),
+				new ItemStack(Material.GOLDEN_APPLE, MathUtils.getRandom(1, 2)),
 				new ItemStack(Material.POTION, 1, (short) 16386),
 				ItemUtils.getInstance().getItemUnbreakable(Material.STONE_SWORD),
 				ItemUtils.getInstance().getItemUnbreakable(Material.IRON_SWORD), lighter,
-				new ItemStack(Material.EXP_BOTTLE, MathUtils.getInstance().getRandom(1, 3))};
+				new ItemStack(Material.EXP_BOTTLE, MathUtils.getRandom(1, 3))};
 
 		Random r = new Random();
 		int rand = r.nextInt(4);
@@ -223,5 +224,10 @@ public class ServerListener implements Listener {
 		if (!this.blockCooldown.containsKey(location))
 			return false;
 		return (((Long) this.blockCooldown.get(location)).longValue() > System.currentTimeMillis());
+	}
+	
+	@EventHandler
+	public void onItemDespawn(ItemDespawnEvent event) {
+		// TODO: Effect on despawn
 	}
 }

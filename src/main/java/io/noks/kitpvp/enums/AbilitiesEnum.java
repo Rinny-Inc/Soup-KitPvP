@@ -49,8 +49,7 @@ public enum AbilitiesEnum {
 	GANJAMAN("Ganjaman", getItemStack(Material.WHEAT), getItemStack(Material.WHEAT, 6), "Ganja", Rarity.LEGENDARY, Long.valueOf(25L), new String[] { ChatColor.AQUA + "Smoke ganja everyday" }),
 	JELLYFISH("Jellyfish", getItemStack(Material.WATER_BUCKET), getItemStack(Material.MUSHROOM_SOUP), null, Rarity.COMMON, Long.valueOf(0L), new String[] { ChatColor.AQUA + "Make a easy MLG when", ChatColor.AQUA + "you're falling" }),
 	FLASH("Flash", getItemStack(Material.REDSTONE_TORCH_ON), getItemStack(Material.REDSTONE_TORCH_ON), "Flash", Rarity.RARE, Long.valueOf(30L), new String[] { ChatColor.AQUA + "Go far away" }),
-	QUICKDROPPER("Quickdropper", getItemStack(Material.BOWL), getItemStack(Material.MUSHROOM_SOUP), null, Rarity.USELESS, Long.valueOf(0L), new String[] { ChatColor.AQUA + "You're directly dropping your bowls" }),
-	DIGGER("Digger", getItemStack(Material.DIRT), getItemStack(Material.DIRT), "Direct Dig", Rarity.BETA, Long.valueOf(20L), new String[] { ChatColor.RED + "In coding" });
+	QUICKDROPPER("Quickdropper", getItemStack(Material.BOWL), getItemStack(Material.MUSHROOM_SOUP), null, Rarity.USELESS, Long.valueOf(0L), new String[] { ChatColor.AQUA + "You're directly dropping your bowls" });
 
 	private String name;
 	private ItemStack icon;

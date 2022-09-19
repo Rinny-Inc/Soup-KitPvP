@@ -49,13 +49,13 @@ public class Ninja implements Listener {
 				return;
 			PlayerManager pm = PlayerManager.get(player.getUniqueId());
 			if (pm.getAbility().hasAbility(AbilitiesEnum.NINJA)) {
-				if (pm.getAbility().hasAbilityCooldown()) {
-					double cooldown = pm.getAbility().getAbilityCooldown().longValue() / 1000.0D;
+				if (pm.getAbility().hasActiveCooldown()) {
+					double cooldown = pm.getAbility().getActiveCooldown().longValue() / 1000.0D;
 					player.sendMessage(ChatColor.RED + "You can use your ability in "
 							+ (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 					return;
 				}
-				pm.getAbility().setAbilityCooldown();
+				pm.getAbility().applyCooldown();
 				float nang = target.getLocation().getYaw() + 90.0F;
 				if (nang < 0.0F)
 					nang += 360.0F;

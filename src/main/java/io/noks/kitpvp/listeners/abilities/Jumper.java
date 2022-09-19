@@ -117,12 +117,12 @@ public class Jumper implements Listener {
 				if (player.getInventory().firstEmpty() == -1 && !player.getInventory().contains(Material.ENDER_PEARL)) {
 					player.getWorld().dropItem(player.getLocation(),
 							ItemUtils.getInstance().getItemStack(new ItemStack(Material.ENDER_PEARL, 2),
-									ChatColor.RED + pm.getAbility().getAbility().getSpecialItemName(), null));
+									ChatColor.RED + pm.getAbility().get().getSpecialItemName(), null));
 				} else {
 					player.getInventory()
 							.addItem(new ItemStack[] {
 									ItemUtils.getInstance().getItemStack(new ItemStack(Material.ENDER_PEARL, 2),
-											ChatColor.RED + pm.getAbility().getAbility().getSpecialItemName(), null) });
+											ChatColor.RED + pm.getAbility().get().getSpecialItemName(), null) });
 				}
 			}
 		}

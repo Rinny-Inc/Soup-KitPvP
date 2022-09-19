@@ -1,7 +1,8 @@
 main: io.noks.kitpvp.Main
-name: KitPvP
+name: KitPvPSoup
 version: 1.5
 author: Noksio
+website: github.com/iamnoksio/KitPvP-Soup
 commands:
   abilitylist:
   ping:

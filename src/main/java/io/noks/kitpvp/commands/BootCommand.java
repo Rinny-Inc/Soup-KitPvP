@@ -21,7 +21,7 @@ public class BootCommand implements CommandExecutor {
 		Player target = Bukkit.getPlayer(args[0]);
 
 		if (target == null) {
-			sender.sendMessage((Messages.getInstance()).PLAYER_NOT_ONLINE);
+			sender.sendMessage(Messages.PLAYER_NOT_ONLINE);
 			return false;
 		}
 		Player player = (Player) sender;

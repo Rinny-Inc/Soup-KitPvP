@@ -16,7 +16,7 @@ public class BuildCommand implements CommandExecutor {
 			return false;
 		}
 		if (!sender.hasPermission("command.build")) {
-			sender.sendMessage((Messages.getInstance()).NO_PERMISSION);
+			sender.sendMessage(Messages.NO_PERMISSION);
 			return false;
 		}
 		if (args.length > 1) {
@@ -29,7 +29,7 @@ public class BuildCommand implements CommandExecutor {
 			Player target = Bukkit.getPlayer(args[0]);
 
 			if (target == null) {
-				player.sendMessage((Messages.getInstance()).PLAYER_NOT_ONLINE);
+				player.sendMessage(Messages.PLAYER_NOT_ONLINE);
 				return false;
 			}
 			PlayerManager tm = PlayerManager.get(target.getUniqueId());

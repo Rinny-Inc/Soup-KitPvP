@@ -34,8 +34,8 @@ public class Batman implements Listener {
 		Action action = e.getAction();
 		Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();
 		if (action == Action.RIGHT_CLICK_AIR && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.WOOD_SPADE && ability.hasAbility(AbilitiesEnum.BATMAN)) {
-			if (!ability.hasAbilityCooldown()) {
-				ability.setAbilityCooldown();
+			if (!ability.hasActiveCooldown()) {
+				ability.applyCooldown();
 				Arrow arrow = (Arrow) p.launchProjectile(Arrow.class);
 				arrow.setMetadata("batHook", new FixedMetadataValue(this.plugin, Boolean.valueOf(true)));
 				arrow.spigot().setDamage(0.0D);
@@ -43,7 +43,7 @@ public class Batman implements Listener {
 				arrow.setVelocity(handle);
 				return;
 			}
-			double cooldown = ability.getAbilityCooldown().longValue() / 1000.0D;
+			double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
 			p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 		}
 	}

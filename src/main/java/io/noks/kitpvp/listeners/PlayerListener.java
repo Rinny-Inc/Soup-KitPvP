@@ -50,8 +50,8 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onJoin(PlayerJoinEvent event) {
 		event.setJoinMessage(null);
-		Player player = event.getPlayer();
-		PlayerManager.create(player.getUniqueId());
+		final Player player = event.getPlayer();
+		final PlayerManager pm = new PlayerManager(player.getUniqueId());
 		player.getInventory().clear();
 		player.getInventory().setArmorContents(null);
 		player.setHealth(20.0D);
@@ -62,18 +62,17 @@ public class PlayerListener implements Listener {
 		player.teleport(player.getWorld().getSpawnLocation());
 		player.setAllowFlight(false);
 		player.setFlying(false);
-		player.sendMessage((Messages.getInstance()).WELCOME_MESSAGE);
-		player.setPlayerListName((player.isOp() ? ChatColor.RED : ChatColor.RESET) + player.getName());
-		PlayerManager.get(player.getUniqueId()).giveMainItem();
+		player.sendMessage(Messages.WELCOME_MESSAGE);
+		pm.giveMainItem();
 		//DBUtils.getInstance().loadPlayer(PlayerManager.get(player.getUniqueId()));
 	}
 
 	@EventHandler
 	public void onQuit(PlayerQuitEvent event) {
 		event.setQuitMessage(null);
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 
-		PlayerManager pm = PlayerManager.get(player.getUniqueId());
+		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 		if (player.getLastDamage() > 0.0D)
 			pm.getStats().addDeaths();
 		if (pm.getStats().getKillStreak() > pm.getStats().getBestKillStreak()) {
@@ -93,13 +92,12 @@ public class PlayerListener implements Listener {
 		event.setDroppedExp(0);
 		event.setDeathMessage(null);
 		if (event.getEntity() instanceof Player) {
-			Player killed = event.getEntity();
-			PlayerManager pm = PlayerManager.get(killed.getUniqueId());
-			Ability killedAbility = pm.getAbility();
+			final Player killed = event.getEntity();
+			final PlayerManager pm = PlayerManager.get(killed.getUniqueId());
+			final Ability killedAbility = pm.getAbility();
 
 			if (!killedAbility.hasAbility()) {
 				event.getDrops().clear();
-
 				return;
 			}
 			if (killed.getKiller() instanceof Player) {
@@ -135,8 +133,8 @@ public class PlayerListener implements Listener {
 				int recraftDiff = Math.abs((killedStuff[1] + killedStuff[2] + killedStuff[3]) / 3
 						- (killerStuff[1] + killerStuff[2] + killerStuff[3]) / 3);
 				String message = ChatColor.GRAY + killer.getName() + "(" + ChatColor.RED
-						+ km.getAbility().getAbility().getName() + ChatColor.GRAY + ") killed " + killed.getName() + "("
-						+ ChatColor.RED + killedAbility.getAbility().getName() + ChatColor.GRAY + ") " + ChatColor.BLUE
+						+ km.getAbility().get().getName() + ChatColor.GRAY + ") killed " + killed.getName() + "("
+						+ ChatColor.RED + killedAbility.get().getName() + ChatColor.GRAY + ") " + ChatColor.BLUE
 						+ "[Soup Diff: " + soupDiff + "; Recraft Diff: " + recraftDiff + "]";
 
 				killed.sendMessage(message);
@@ -186,7 +184,7 @@ public class PlayerListener implements Listener {
 				this.wantedPlayer = null;
 			}
 
-			if (killedAbility.getAbility().getSpecialItem().getType() != Material.MUSHROOM_SOUP) {
+			if (killedAbility.get().getSpecialItem().getType() != Material.MUSHROOM_SOUP) {
 				Iterator<ItemStack> dropsIt = event.getDrops().iterator();
 				while (dropsIt.hasNext()) {
 					ItemStack loot = (ItemStack) dropsIt.next();
@@ -201,7 +199,7 @@ public class PlayerListener implements Listener {
 			if (killedStats.getKillStreak() > killedStats.getBestKillStreak()) {
 				killedStats.updateBestKillStreak();
 			}
-			killedAbility.removeAbility();
+			killedAbility.remove();
 			if (pm.hasUseSponsor())
 				pm.setUseSponsor(false);
 			if (pm.hasUseRecraft())
@@ -269,15 +267,15 @@ public class PlayerListener implements Listener {
 			return;
 		}
 		if (pm.getAbility().hasAbility()) {
-			if (pm.getAbility().getAbility().getSpecialItem().getType() == Material.MUSHROOM_SOUP)
+			if (pm.getAbility().get().getSpecialItem().getType() == Material.MUSHROOM_SOUP)
 				return;
-			if (event.getItemDrop().getItemStack().getType() == pm.getAbility().getAbility().getSpecialItem().getType())
+			if (event.getItemDrop().getItemStack().getType() == pm.getAbility().get().getSpecialItem().getType())
 				event.setCancelled(true);
 		}
 	}
 
 	@EventHandler
-	public void onDamageByEntity(EntityDamageByEntityEvent event) {
+	public void nerfDamage(EntityDamageByEntityEvent event) {
 		if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
 			Player damager = (Player) event.getDamager();
 			ItemStack handItem = damager.getItemInHand();
@@ -288,7 +286,7 @@ public class PlayerListener implements Listener {
 			if (handItem.getType() == Material.AIR && PlayerManager.get(damager.getUniqueId()).getAbility().hasAbility(AbilitiesEnum.BOXER))
 				damage += 2.0D;
 			if (handItem.getType() == Material.WOOD_SWORD || handItem.getType() == Material.STONE_SWORD)
-				damage -= 2.0D;
+				damage -= 2.5D;
 			if (handItem.getType() == Material.IRON_SWORD)
 				damage -= 2.5D;
 			if (handItem.containsEnchantment(Enchantment.DAMAGE_ALL))

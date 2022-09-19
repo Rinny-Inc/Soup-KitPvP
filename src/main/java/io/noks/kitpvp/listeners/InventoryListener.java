@@ -101,7 +101,7 @@ public class InventoryListener implements Listener {
 					String split = itemName.split(": ")[1];
 					correctItemName = split.substring(2, split.length());
 				}
-				Land map = new Land(pm);
+				final Land map = new Land();
 				if (!map.hasValidLocation()) {
 					player.sendMessage(ChatColor.RED + "Failed to teleport! (Invalid map locations)");
 					return;
@@ -118,10 +118,10 @@ public class InventoryListener implements Listener {
 					}
 					player.closeInventory();
 					int random = (new Random()).nextInt(abilities.size());
-					pm.getAbility().setAbility(AbilitiesEnum.getAbilityFromName((String) abilities.get(random)));
-					player.sendMessage(ChatColor.GRAY + "You've chosen " + pm.getAbility().getAbility().getRarity().getColor() + pm.getAbility().getAbility().getName() + ChatColor.GRAY + " ability.");
-					map.giveEquipment(pm.getAbility().getAbility());
-					map.teleportToMap();
+					pm.getAbility().set(AbilitiesEnum.getAbilityFromName((String) abilities.get(random)));
+					player.sendMessage(ChatColor.GRAY + "You've chosen " + pm.getAbility().get().getRarity().getColor() + pm.getAbility().get().getName() + ChatColor.GRAY + " ability.");
+					map.giveEquipment(player, pm.getAbility().get());
+					map.teleportToMap(player);
 					abilities.clear();
 					return;
 				}
@@ -129,12 +129,12 @@ public class InventoryListener implements Listener {
 					return;
 				}
 				player.closeInventory();
-				pm.getAbility().setAbility(AbilitiesEnum.getAbilityFromName(correctItemName));
+				pm.getAbility().set(AbilitiesEnum.getAbilityFromName(correctItemName));
 				player.sendMessage(ChatColor.GRAY + "You've chosen "
-						+ pm.getAbility().getAbility().getRarity().getColor()
-						+ pm.getAbility().getAbility().getName() + ChatColor.GRAY + " ability.");
-				map.giveEquipment(pm.getAbility().getAbility());
-				map.teleportToMap();
+						+ pm.getAbility().get().getRarity().getColor()
+						+ pm.getAbility().get().getName() + ChatColor.GRAY + " ability.");
+				map.giveEquipment(player, pm.getAbility().get());
+				map.teleportToMap(player);
 			}
 			return;
 		}

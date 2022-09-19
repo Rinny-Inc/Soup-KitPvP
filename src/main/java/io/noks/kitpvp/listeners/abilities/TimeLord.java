@@ -43,8 +43,8 @@ public class TimeLord implements Listener {
 		if (action == Action.RIGHT_CLICK_AIR && player.getItemInHand().getType() != null
 				&& player.getItemInHand().getType() == Material.WATCH
 				&& pm.getAbility().hasAbility(AbilitiesEnum.TIMELORD)) {
-			if (!pm.getAbility().hasAbilityCooldown()) {
-				pm.getAbility().setAbilityCooldown();
+			if (!pm.getAbility().hasActiveCooldown()) {
+				pm.getAbility().applyCooldown();
 				player.sendMessage(ChatColor.GREEN + "You just stopped the time around you!");
 				for (Entity nearbyEntity : player.getNearbyEntities(15.0D, 2.0D, 15.0D)) {
 					if (nearbyEntity instanceof Player) {
@@ -63,7 +63,7 @@ public class TimeLord implements Listener {
 					}
 				}
 			} else {
-				double cooldown = pm.getAbility().getAbilityCooldown().longValue() / 1000.0D;
+				double cooldown = pm.getAbility().getActiveCooldown().longValue() / 1000.0D;
 				player.sendMessage(ChatColor.RED + "You can use your ability in "
 						+ (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 			}

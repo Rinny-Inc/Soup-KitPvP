@@ -35,12 +35,12 @@ public class Hulk implements Listener {
 			if (p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.AIR
 					&& ability.hasAbility(AbilitiesEnum.HULK) && !p.isInsideVehicle() && p.getPassenger() == null
 					&& r.getPassenger() == null) {
-				if (!ability.hasAbilityCooldown()) {
+				if (!ability.hasActiveCooldown()) {
 					p.setPassenger(r);
 					r.sendMessage(ChatColor.GREEN + p.getName() + " just picked you up! Press SHIFT to dismount!");
-					ability.setAbilityCooldown();
+					ability.applyCooldown();
 				} else {
-					double cooldown = ability.getAbilityCooldown().longValue() / 1000.0D;
+					double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
 					p.sendMessage(ChatColor.RED + "You can use your ability in "
 							+ (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 				}

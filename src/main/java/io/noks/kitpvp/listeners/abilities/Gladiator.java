@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -31,22 +32,21 @@ import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Ability;
 
 public class Gladiator implements Listener {
+	private Map<UUID, Gladiators> gladiators;
+	private Location[] gladiatorZones;
 	private Main plugin;
-
 	public Gladiator(Main main) {
 		this.gladiators = Maps.newHashMap();
+		final World world = Bukkit.getWorld("world");
 		this.gladiatorZones = new Location[] {
-				new Location(Bukkit.getWorld("world"), -50.5D, 170.5D, 775.5D, 135.0F, 0.0F),
-				new Location(Bukkit.getWorld("world"), -68.5D, 170.5D, 756.5D, -45.0F, 0.0F),
-				new Location(Bukkit.getWorld("world"), 58.5D, 177.5D, 788.5D, -135.0F, 0.0F),
-				new Location(Bukkit.getWorld("world"), 77.5D, 177.5D, 769.5D, 42.0F, 0.0F)};
+				new Location(world, -50.5D, 170.5D, 775.5D, 135.0F, 0.0F),
+				new Location(world, -68.5D, 170.5D, 756.5D, -45.0F, 0.0F),
+				new Location(world, 58.5D, 177.5D, 788.5D, -135.0F, 0.0F),
+				new Location(world, 77.5D, 177.5D, 769.5D, 42.0F, 0.0F)};
 
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}
-
-	private Map<UUID, Gladiators> gladiators;
-	private Location[] gladiatorZones;
 
 	@EventHandler
 	public void onGladiator(PlayerInteractEntityEvent e) {
@@ -56,8 +56,8 @@ public class Gladiator implements Listener {
 			Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();
 			if (p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.IRON_FENCE
 					&& ability.hasAbility(AbilitiesEnum.GLADIATOR)) {
-				if (ability.hasAbilityCooldown()) {
-					double cooldown = ability.getAbilityCooldown().longValue() / 1000.0D;
+				if (ability.hasActiveCooldown()) {
+					double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
 					p.sendMessage(ChatColor.RED + "You can use your ability in "
 							+ (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 					return;
@@ -67,7 +67,7 @@ public class Gladiator implements Listener {
 				}
 				Ability clickedAbility = PlayerManager.get(r.getUniqueId()).getAbility();
 				if (clickedAbility.hasAbility(AbilitiesEnum.ANTIGLADIATOR)) {
-					ability.setAbilityCooldown();
+					ability.applyCooldown();
 					return;
 				}
 				setupGladiatorsDuel(p, r);
@@ -105,7 +105,7 @@ public class Gladiator implements Listener {
 				}
 				if (enemy.hasMetadata("Gladiator")) {
 					enemy.removeMetadata("Gladiator", this.plugin);
-					PlayerManager.get(enemy.getUniqueId()).getAbility().setAbilityCooldown();
+					PlayerManager.get(enemy.getUniqueId()).getAbility().applyCooldown();
 				}
 			}
 		}
@@ -134,7 +134,7 @@ public class Gladiator implements Listener {
 			}
 			if (enemy.hasMetadata("Gladiator")) {
 				enemy.removeMetadata("Gladiator", this.plugin);
-				PlayerManager.get(enemy.getUniqueId()).getAbility().setAbilityCooldown();
+				PlayerManager.get(enemy.getUniqueId()).getAbility().applyCooldown();
 			}
 		}
 	}

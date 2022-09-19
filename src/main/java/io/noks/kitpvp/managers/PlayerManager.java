@@ -36,10 +36,7 @@ public class PlayerManager {
 		this.stats = new Stats();
 		this.settings = new Settings();
 		this.economy = new Economy();
-	}
-
-	public static void create(UUID uuid) {
-		players.putIfAbsent(uuid, new PlayerManager(uuid));
+		players.putIfAbsent(playerUUID, this);
 	}
 
 	public static PlayerManager get(UUID playerUUID) {

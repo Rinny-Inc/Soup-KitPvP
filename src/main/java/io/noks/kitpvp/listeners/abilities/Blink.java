@@ -35,27 +35,29 @@ public class Blink implements Listener {
 		Action action = e.getAction();
 		Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();
 		if (action == Action.RIGHT_CLICK_AIR && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.NETHER_STAR && ability.hasAbility(AbilitiesEnum.BLINK))
-			if (!ability.hasAbilityCooldown()) {
+			if (!ability.hasActiveCooldown()) {
 				final Block block = p.getTargetBlock(null, 10);
 				if (block.getType() != Material.AIR)
 					return;
-				ability.addAbilityUseTime();
+				ability.addUseTime();
 				block.setType(Material.LEAVES_2);
 				p.teleport(new Location(block.getWorld(), block.getX() + 0.5D, block.getY() + 1.5D, block.getZ() + 0.5D,
 						p.getLocation().getYaw(), p.getLocation().getPitch()));
 				p.getWorld().spawnEntity(p.getLocation(), EntityType.FIREWORK);
 				p.setFallDistance(0.0F);
-				(new BukkitRunnable() {
+				new BukkitRunnable() {
+					
+					@Override
 					public void run() {
 						block.setType(Material.AIR);
 					}
-				}).runTaskLaterAsynchronously(this.plugin, 100L);
-				if (ability.getAbilityUseTime() == this.maxUseTime) {
-					ability.setAbilityCooldown();
-					ability.resetAbilityUseTime();
+				}.runTaskLaterAsynchronously(this.plugin, 100L);
+				if (ability.getUseTime() == this.maxUseTime) {
+					ability.applyCooldown();
+					ability.resetUseTime();
 				}
 			} else {
-				double cooldown = ability.getAbilityCooldown().longValue() / 1000.0D;
+				double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
 				p.sendMessage(ChatColor.RED + "You can use your ability in "
 						+ (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 			}

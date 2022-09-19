@@ -52,11 +52,11 @@ public class Switcher implements Listener {
 				if (player.getInventory().firstEmpty() == -1 && !player.getInventory().contains(Material.SNOW_BALL)) {
 					player.getWorld().dropItem(player.getLocation(),
 							ItemUtils.getInstance().getItemStack(new ItemStack(Material.SNOW_BALL, 2),
-									ChatColor.RED + pm.getAbility().getAbility().getSpecialItemName(), null));
+									ChatColor.RED + pm.getAbility().get().getSpecialItemName(), null));
 				} else {
 					player.getInventory().addItem(
 							new ItemStack[] { ItemUtils.getInstance().getItemStack(new ItemStack(Material.SNOW_BALL, 2),
-									ChatColor.RED + pm.getAbility().getAbility().getSpecialItemName(), null) });
+									ChatColor.RED + pm.getAbility().get().getSpecialItemName(), null) });
 				}
 		}
 	}

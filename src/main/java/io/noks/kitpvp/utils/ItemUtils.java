@@ -11,7 +11,6 @@ import com.google.common.collect.Lists;
 
 public class ItemUtils {
 	private static ItemUtils instance = new ItemUtils();
-
 	public static ItemUtils getInstance() {
 		return instance;
 	}

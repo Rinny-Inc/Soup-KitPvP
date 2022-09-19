@@ -31,13 +31,13 @@ public class Monk implements Listener {
 		PlayerManager pm = PlayerManager.get(player.getUniqueId());
 		if (pm.getAbility().hasAbility(AbilitiesEnum.MONK) && event.getRightClicked() instanceof Player
 				&& item.getType() == Material.BLAZE_ROD) {
-			if (pm.getAbility().hasAbilityCooldown()) {
-				double cooldown = pm.getAbility().getAbilityCooldown().longValue() / 1000.0D;
+			if (pm.getAbility().hasActiveCooldown()) {
+				double cooldown = pm.getAbility().getActiveCooldown().longValue() / 1000.0D;
 				player.sendMessage(ChatColor.RED + "You can use your ability in "
 						+ (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 				return;
 			}
-			pm.getAbility().setAbilityCooldown();
+			pm.getAbility().applyCooldown();
 			Player rightClicked = (Player) event.getRightClicked();
 			PlayerInventory inv = rightClicked.getInventory();
 			int slot = (new Random()).nextInt(inv.getSize());

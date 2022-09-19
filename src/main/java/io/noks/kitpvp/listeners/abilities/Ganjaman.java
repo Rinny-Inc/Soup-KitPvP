@@ -39,8 +39,8 @@ public class Ganjaman implements Listener {
 		Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();
 		if (action == Action.RIGHT_CLICK_AIR && p.getItemInHand().getType() != null
 				&& p.getItemInHand().getType() == Material.WHEAT && ability.hasAbility(AbilitiesEnum.GANJAMAN)) {
-			if (ability.hasAbilityCooldown()) {
-				double cooldown = ability.getAbilityCooldown().longValue() / 1000.0D;
+			if (ability.hasActiveCooldown()) {
+				double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
 				p.sendMessage(ChatColor.RED + "You can use your ability in "
 						+ (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 				return;
@@ -49,14 +49,14 @@ public class Ganjaman implements Listener {
 				p.sendMessage(ChatColor.RED + "You will badtrip if you take another puff!");
 				return;
 			}
+			ability.applyCooldown();
 			p.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 300, 1));
 			p.getItemInHand().setAmount(p.getItemInHand().getAmount() - 1);
 			p.setHealth(Math.min(p.getHealth() * 2.0D, p.getMaxHealth()));
 			p.updateInventory();
 			p.sendMessage(ChatColor.GREEN + "You are now high to the sky.");
 			p.playSound(p.getLocation(), Sound.FIRE_IGNITE, 0.85F, 0.9F);
-			p.getWorld().spigot().playEffect(p.getEyeLocation(), Effect.PARTICLE_SMOKE, 17, 0, 0.0F, 0.0F, 0.0F, 0.0F,
-					32, 5);
+			p.getWorld().spigot().playEffect(p.getEyeLocation(), Effect.PARTICLE_SMOKE, 17, 0, 0.0F, 0.0F, 0.0F, 0.0F,32, 5);
 		}
 	}
 
@@ -95,11 +95,11 @@ public class Ganjaman implements Listener {
 				if (player.getInventory().firstEmpty() == -1 && !player.getInventory().contains(Material.WHEAT)) {
 					player.getWorld().dropItem(player.getLocation(),
 							ItemUtils.getInstance().getItemStack(new ItemStack(Material.WHEAT, 2),
-									ChatColor.RED + ability.getAbility().getSpecialItemName(), null));
+									ChatColor.RED + ability.get().getSpecialItemName(), null));
 				} else {
 					player.getInventory().addItem(
 							new ItemStack[] { ItemUtils.getInstance().getItemStack(new ItemStack(Material.WHEAT, 2),
-									ChatColor.RED + ability.getAbility().getSpecialItemName(), null) });
+									ChatColor.RED + ability.get().getSpecialItemName(), null) });
 				}
 		}
 	}

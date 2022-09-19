@@ -1,26 +1,25 @@
 package io.noks.kitpvp.managers.caches;
 
 import java.util.Map;
-
-import com.google.common.collect.Maps;
+import java.util.WeakHashMap;
 
 import io.noks.kitpvp.enums.AbilitiesEnum;
 
 public class Ability {
 	private AbilitiesEnum ability = AbilitiesEnum.NONE;
-	private Map<AbilitiesEnum, Long> abilityCooldown = Maps.newHashMap();
+	private Map<AbilitiesEnum, Long> abilityCooldown = new WeakHashMap<AbilitiesEnum, Long>();
 	private int abilityUseTime = 0;
 	private AbilitiesEnum lastAbility = AbilitiesEnum.NONE;
 
-	public AbilitiesEnum getAbility() {
+	public AbilitiesEnum get() {
 		return this.ability;
 	}
 
-	public AbilitiesEnum getLastAbility() {
+	public AbilitiesEnum getLastUsed() {
 		return this.lastAbility;
 	}
 
-	public void setAbility(AbilitiesEnum ability) {
+	public void set(AbilitiesEnum ability) {
 		this.ability = ability;
 	}
 
@@ -32,49 +31,47 @@ public class Ability {
 		return (this.ability == ability);
 	}
 
-	public void removeAbility() {
-		removeAbilityCooldown();
+	public void remove() {
+		removeCooldown();
 		this.abilityUseTime = 0;
 		if (this.lastAbility != this.ability)
 			this.lastAbility = this.ability;
 		this.ability = AbilitiesEnum.NONE;
 	}
 
-	public Long getAbilityCooldown() {
-		if (this.abilityCooldown.containsKey(this.ability))
-			return Long.valueOf(Math.max(0L,
+	public Long getActiveCooldown() {
+		if (this.abilityCooldown.containsKey(this.ability)) return Long.valueOf(Math.max(0L,
 					((Long) this.abilityCooldown.get(this.ability)).longValue() - System.currentTimeMillis()));
 		return Long.valueOf(0L);
 	}
 
-	public void setAbilityCooldown() {
-		if (!this.ability.hasCooldown())
-			return;
+	public void applyCooldown() {
+		if (!this.ability.hasCooldown()) return;
 		this.abilityCooldown.put(this.ability,
 				Long.valueOf(System.currentTimeMillis() + this.ability.getCooldown().longValue() * 1000L));
 	}
 
-	public boolean hasAbilityCooldown() {
+	public boolean hasActiveCooldown() {
 		if (!this.abilityCooldown.containsKey(this.ability))
 			return false;
 		return (((Long) this.abilityCooldown.get(this.ability)).longValue() > System.currentTimeMillis());
 	}
 
-	public void removeAbilityCooldown() {
+	public void removeCooldown() {
 		if (!this.abilityCooldown.containsKey(this.ability))
 			return;
 		this.abilityCooldown.remove(this.ability);
 	}
 
-	public int getAbilityUseTime() {
+	public int getUseTime() {
 		return this.abilityUseTime;
 	}
 
-	public void resetAbilityUseTime() {
+	public void resetUseTime() {
 		this.abilityUseTime = 0;
 	}
 
-	public void addAbilityUseTime() {
+	public void addUseTime() {
 		this.abilityUseTime++;
 	}
 }

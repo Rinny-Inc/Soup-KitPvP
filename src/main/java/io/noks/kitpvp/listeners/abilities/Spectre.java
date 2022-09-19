@@ -32,12 +32,12 @@ public class Spectre implements Listener {
 				&& p.getItemInHand().getType() == Material.SUGAR
 				&& PlayerManager.get(p.getUniqueId()).getAbility().hasAbility(AbilitiesEnum.SPECTRE)) {
 			PlayerManager pm = PlayerManager.get(p.getUniqueId());
-			if (!pm.getAbility().hasAbilityCooldown()) {
-				pm.getAbility().setAbilityCooldown();
+			if (!pm.getAbility().hasActiveCooldown()) {
+				pm.getAbility().applyCooldown();
 				p.sendMessage(ChatColor.GREEN + "You are now invisible!");
 				p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 300, 1));
 			} else {
-				double cooldown = pm.getAbility().getAbilityCooldown().longValue() / 1000.0D;
+				double cooldown = pm.getAbility().getActiveCooldown().longValue() / 1000.0D;
 				p.sendMessage(ChatColor.RED + "You can use your ability in "
 						+ (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 			}

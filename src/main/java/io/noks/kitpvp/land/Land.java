@@ -18,38 +18,25 @@ import io.noks.kitpvp.managers.caches.Settings;
 import io.noks.kitpvp.utils.ItemUtils;
 
 public class Land {
-	private final World world;
-
-	public Land(PlayerManager manager) {
-	    this.world = Bukkit.getWorld("world");
-	    this.locations = new Location[] { new Location(this.world, 100.0D, 134.0D, 738.0D, 42.0F, 0.0F), new Location(this.world, 82.0D, 130.0D, 932.0D, 136.0F, 0.0F), new Location(this.world, -107.0D, 130.0D, 911.0D, -130.0F, 0.0F), new Location(this.world, -78.0D, 130.0D, 741.0D, -44.0F, 0.0F), new Location(this.world, -24.0D, 130.0D, 708.0D, -10.0F, 0.0F) };
-	    this.manager = manager;
-	  }
-
-	private final Location[] locations;
-	private PlayerManager manager;
-
-	public PlayerManager getManager() {
-		return this.manager;
-	}
+	protected World world = Bukkit.getWorld("customjava8");
+	private Location[] locations = new Location[] { new Location(this.world, 100.0D, 134.0D, 738.0D, 42.0F, 0.0F), new Location(this.world, 82.0D, 130.0D, 932.0D, 136.0F, 0.0F), new Location(this.world, -107.0D, 130.0D, 911.0D, -130.0F, 0.0F), new Location(this.world, -78.0D, 130.0D, 741.0D, -44.0F, 0.0F), new Location(this.world, -24.0D, 130.0D, 708.0D, -10.0F, 0.0F) };;
 
 	public boolean hasValidLocation() {
 		return (this.locations.length > 0);
 	}
 
-	public void teleportToMap() {
-		Player player = this.manager.getPlayer();
+	public void teleportToMap(Player player) {
 		player.setNoDamageTicks(100);
 		player.setHealth(20.0D);
 		player.setFoodLevel(20);
 		player.setSaturation(10000.0F);
 		player.teleport(this.locations[(new Random()).nextInt(this.locations.length)]);
 		player.setItemOnCursor(null);
-		this.manager.setAllowBuild(false);
+		PlayerManager.get(player.getUniqueId()).setAllowBuild(false);
 	}
 
-	public void giveEquipment(AbilitiesEnum ability) {
-		Player player = this.manager.getPlayer();
+	public void giveEquipment(Player player, AbilitiesEnum ability) {
+		PlayerManager pm = PlayerManager.get(player.getUniqueId());
 		player.setGameMode(GameMode.SURVIVAL);
 		PlayerInventory inv = player.getInventory();
 		inv.clear();
@@ -57,7 +44,7 @@ public class Land {
 		inv.setItem(14, new ItemStack(Material.BOWL, 32));
 		inv.setItem(13, new ItemStack(Material.RED_MUSHROOM, 32));
 		inv.setItem(15, new ItemStack(Material.BROWN_MUSHROOM, 32));
-		Settings settings = this.manager.getSettings();
+		Settings settings = pm.getSettings();
 		inv.setItem(settings.getSlot(Settings.SlotType.SWORD), new ItemStack(ItemUtils.getInstance()
 				.getItemUnbreakable((ability == AbilitiesEnum.BOXER) ? Material.WOOD_SWORD : Material.STONE_SWORD)));
 		if (ability.getSpecialItem().getType() != Material.MUSHROOM_SOUP)

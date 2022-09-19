@@ -32,14 +32,14 @@ public class Zeus implements Listener {
 				&& p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.WOOD_AXE
 				&& pm.getAbility().hasAbility(AbilitiesEnum.ZEUS)) {
 			e.setCancelled(true);
-			if (!pm.getAbility().hasAbilityCooldown()) {
-				pm.getAbility().setAbilityCooldown();
+			if (!pm.getAbility().hasActiveCooldown()) {
+				pm.getAbility().applyCooldown();
 				p.getWorld().strikeLightning(p.getLocation().add(3.0D, 0.0D, 0.0D));
 				p.getWorld().strikeLightning(p.getLocation().add(-3.0D, 0.0D, 0.0D));
 				p.getWorld().strikeLightning(p.getLocation().add(0.0D, 0.0D, 3.0D));
 				p.getWorld().strikeLightning(p.getLocation().add(0.0D, 0.0D, -3.0D));
 			} else {
-				double cooldown = pm.getAbility().getAbilityCooldown().longValue() / 1000.0D;
+				double cooldown = pm.getAbility().getActiveCooldown().longValue() / 1000.0D;
 				p.sendMessage(ChatColor.RED + "You can use your ability in "
 						+ (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 			}

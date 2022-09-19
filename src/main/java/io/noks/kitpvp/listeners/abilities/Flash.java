@@ -32,19 +32,19 @@ public class Flash implements Listener {
 		Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();
 		if (action == Action.RIGHT_CLICK_AIR && p.getItemInHand().getType() != null
 				&& p.getItemInHand().getType() == Material.REDSTONE_TORCH_ON && ability.hasAbility(AbilitiesEnum.FLASH))
-			if (!ability.hasAbilityCooldown()) {
+			if (!ability.hasActiveCooldown()) {
 				Block block = p.getTargetBlock(null, 85);
 				if (block.getType() != Material.AIR)
 					block = p.getTargetBlock(null, 45);
 				if (block.getType() != Material.AIR)
 					return;
-				ability.setAbilityCooldown();
+				ability.applyCooldown();
 				Location loc = block.getLocation();
 				p.teleport(loc);
 				p.setFallDistance(0.0F);
 				p.getWorld().strikeLightningEffect(loc);
 			} else {
-				double cooldown = ability.getAbilityCooldown().longValue() / 1000.0D;
+				double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
 				p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 			}
 	}

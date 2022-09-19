@@ -46,8 +46,8 @@ public class Phantom implements Listener {
 				&& p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.FEATHER
 				&& PlayerManager.get(p.getUniqueId()).getAbility().hasAbility(AbilitiesEnum.PHANTOM)) {
 			PlayerManager pm = PlayerManager.get(p.getUniqueId());
-			if (!pm.getAbility().hasAbilityCooldown()) {
-				pm.getAbility().setAbilityCooldown();
+			if (!pm.getAbility().hasActiveCooldown()) {
+				pm.getAbility().applyCooldown();
 				for (Entity n : p.getNearbyEntities(20.0D, 20.0D, 20.0D)) {
 					if (n instanceof Player) {
 						Player nearby = (Player) n;
@@ -74,7 +74,7 @@ public class Phantom implements Listener {
 					}
 				}).runTaskLater(this.plugin, 120L);
 			} else {
-				double cooldown = pm.getAbility().getAbilityCooldown().longValue() / 1000.0D;
+				double cooldown = pm.getAbility().getActiveCooldown().longValue() / 1000.0D;
 				p.sendMessage(ChatColor.RED + "You can use your ability in "
 						+ (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 			}

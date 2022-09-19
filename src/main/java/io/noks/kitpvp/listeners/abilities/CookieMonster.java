@@ -66,11 +66,11 @@ public class CookieMonster implements Listener {
 				if (player.getInventory().firstEmpty() == -1 && !player.getInventory().contains(Material.COOKIE)) {
 					player.getWorld().dropItem(player.getLocation(),
 							ItemUtils.getInstance().getItemStack(new ItemStack(Material.COOKIE, 2),
-									ChatColor.RED + ability.getAbility().getSpecialItemName(), null));
+									ChatColor.RED + ability.get().getSpecialItemName(), null));
 				} else {
 					player.getInventory().addItem(
 							new ItemStack[] { ItemUtils.getInstance().getItemStack(new ItemStack(Material.COOKIE, 2),
-									ChatColor.RED + ability.getAbility().getSpecialItemName(), null) });
+									ChatColor.RED + ability.get().getSpecialItemName(), null) });
 				}
 		}
 	}

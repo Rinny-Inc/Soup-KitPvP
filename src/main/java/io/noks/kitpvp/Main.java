@@ -16,7 +16,6 @@ import io.noks.kitpvp.commands.SkullCommand;
 import io.noks.kitpvp.commands.SponsorCommand;
 import io.noks.kitpvp.commands.StatisticCommand;
 import io.noks.kitpvp.database.DBUtils;
-import io.noks.kitpvp.listeners.ChatListener;
 import io.noks.kitpvp.listeners.InventoryListener;
 import io.noks.kitpvp.listeners.PlayerListener;
 import io.noks.kitpvp.listeners.ServerListener;
@@ -93,7 +92,6 @@ public class Main extends JavaPlugin {
 		new PlayerListener(this);
 		new ServerListener(this);
 		new InventoryListener(this);
-		new ChatListener(this);
 
 		new Anchor(this);
 		new Archer(this);
@@ -126,6 +124,7 @@ public class Main extends JavaPlugin {
 		new Jellyfish(this);
 		new Flash(this);
 		new Ganjaman(this);
+		new Flash(this);
 		getServer().getPluginManager().registerEvents(new FallenGolemTask(), this);
 	}
 

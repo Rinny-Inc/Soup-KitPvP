@@ -23,7 +23,6 @@ import net.minecraft.util.org.apache.commons.lang3.text.WordUtils;
 
 public class CreateInventory {
 	public static CreateInventory instance = new CreateInventory();
-
 	public static CreateInventory getInstance() {
 		return instance;
 	}
@@ -37,21 +36,17 @@ public class CreateInventory {
 	}
 
 	public Inventory loadKitsInventory(Player player, @Nullable Rarity rarity, int page) {
-		Inventory[] inventories = { Bukkit.createInventory(player, 54, "-> Your abilities"),
-				Bukkit.createInventory(player, 54) };
+		Inventory[] inventories = { Bukkit.createInventory(player, 54, "-> Your abilities"), Bukkit.createInventory(player, 54) };
 		for (Inventory inventory : inventories) {
 			fill(inventory, player);
 		}
 		sortPlayersKitsByRarity(player, inventories, rarity);
 		if (inventories[0].firstEmpty() == -1 && inventories[1] != null) {
-			inventories[0].setItem(inventories[0].getSize() - 1, new ItemStack(ItemUtils.getInstance()
-					.getItemStack(new ItemStack(Material.ARROW, page + 1), ChatColor.YELLOW + "Next page", null)));
-			inventories[1].setItem(inventories[1].getSize() - 9, new ItemStack(ItemUtils.getInstance()
-					.getItemStack(new ItemStack(Material.ARROW, page - 1), ChatColor.YELLOW + "Previous page", null)));
+			inventories[0].setItem(inventories[0].getSize() - 1, new ItemStack(ItemUtils.getInstance().getItemStack(new ItemStack(Material.ARROW, page + 1), ChatColor.YELLOW + "Next page", null)));
+			inventories[1].setItem(inventories[1].getSize() - 9, new ItemStack(ItemUtils.getInstance().getItemStack(new ItemStack(Material.ARROW, page - 1), ChatColor.YELLOW + "Previous page", null)));
 		}
 		if (rarity != null)
-			inventories[0].setItem(inventories[0].getSize() - 9, new ItemStack(ItemUtils.getInstance()
-					.getItemMaterial(Material.PAPER, 0, ChatColor.YELLOW + "Your whole abilities")));
+			inventories[0].setItem(inventories[0].getSize() - 9, new ItemStack(ItemUtils.getInstance().getItemMaterial(Material.PAPER, 0, ChatColor.YELLOW + "Your whole abilities")));
 		return inventories[page - 1];
 	}
 
@@ -101,8 +96,7 @@ public class CreateInventory {
 		inv.clear();
 		for (int i = 0; i < inv.getSize(); i++) {
 			int correctedI = i + 1;
-			inv.setItem(i, ItemUtils.getInstance().getItemMaterial(Material.STAINED_GLASS_PANE, correctedI,
-					formatIntToColor(correctedI).toString() + correctedI));
+			inv.setItem(i, ItemUtils.getInstance().getItemMaterial(Material.STAINED_GLASS_PANE, correctedI, formatIntToColor(correctedI).toString() + correctedI));
 		}
 		Settings settings = PlayerManager.get(player.getUniqueId()).getSettings();
 		inv.setItem(settings.getSlot(Settings.SlotType.SWORD),
@@ -138,7 +132,6 @@ public class CreateInventory {
 		case 9:
 			return ChatColor.BLUE;
 		}
-
 		return ChatColor.RESET;
 	}
 
@@ -155,15 +148,10 @@ public class CreateInventory {
 			if (abilities.getRarity() == Rarity.USELESS || (!player.hasPermission("kit." + abilities.getName().toLowerCase()) && !player.hasPermission(abilities.getRarity().getPermission()) && !player.hasPermission("kit.*")) || (rarity != null && abilities.getRarity() != rarity))
 				continue;
 			if (inventory[0].firstEmpty() == -1) {
-				if (inventory[1] == null)
-					continue;
-				inventory[1].addItem(new ItemStack[] { ItemUtils.getInstance().getItemStack(abilities.getIcon(),
-						abilities.getRarity().getColor() + abilities.getName(),
-						abilities.getLore()) });
+				if (inventory[1] == null) continue;
+				inventory[1].addItem(new ItemStack[] { ItemUtils.getInstance().getItemStack(abilities.getIcon(), abilities.getRarity().getColor() + abilities.getName(), abilities.getLore()) });
 			}
-			inventory[0].addItem(new ItemStack[] { ItemUtils.getInstance().getItemStack(abilities.getIcon(),
-					abilities.getRarity().getColor() + abilities.getName(), abilities.getLore()) });
-			continue;
+			inventory[0].addItem(new ItemStack[] { ItemUtils.getInstance().getItemStack(abilities.getIcon(), abilities.getRarity().getColor() + abilities.getName(), abilities.getLore()) });
 		}
 	}
 
@@ -175,23 +163,15 @@ public class CreateInventory {
 		for (int i = inventory.getSize() - 9; i < inventory.getSize(); i++) {
 			inventory.setItem(i, ItemUtils.getInstance().getItemMaterial(Material.STAINED_GLASS_PANE, 15, " "));
 		}
-		inventory.setItem(0,
-				ItemUtils.getInstance().getItemMaterial(Material.WATCH, 0, ChatColor.YELLOW + "Random Abilities"));
+		inventory.setItem(0, ItemUtils.getInstance().getItemMaterial(Material.WATCH, 0, ChatColor.YELLOW + "Random Abilities"));
 		Ability ability = PlayerManager.get(player.getUniqueId()).getAbility();
-		if (ability.getLastAbility() != AbilitiesEnum.NONE) {
-			AbilitiesEnum lastAbility = ability.getLastAbility();
-			inventory.setItem(1,
-					ItemUtils.getInstance().getItemStack(lastAbility.getIcon(),
-							ChatColor.YELLOW + "Last used ability: "
-									+ lastAbility.getRarity().getColor() + lastAbility.getName(),
-							lastAbility.getLore()));
+		if (ability.getLastUsed() != AbilitiesEnum.NONE) {
+			AbilitiesEnum lastAbility = ability.getLastUsed();
+			inventory.setItem(1, ItemUtils.getInstance().getItemStack(lastAbility.getIcon(), ChatColor.YELLOW + "Last used ability: " + lastAbility.getRarity().getColor() + lastAbility.getName(), lastAbility.getLore()));
 		}
-		inventory.setItem(4, ItemUtils.getInstance().getItemMaterial(Material.BEACON, 0,
-				ChatColor.GRAY + "(" + ChatColor.RED + "Rastacraft" + ChatColor.GRAY + ")"));
-		inventory.setItem(7,
-				ItemUtils.getInstance().getItemMaterial(Material.NAME_TAG, ChatColor.DARK_AQUA + "Settings"));
-		inventory.setItem(8,
-				ItemUtils.getInstance().getItemMaterial(Material.STAINED_GLASS_PANE, 14, ChatColor.RED + "Leave"));
+		inventory.setItem(4, ItemUtils.getInstance().getItemMaterial(Material.MUSHROOM_SOUP, 0, ChatColor.DARK_GRAY + "(" + ChatColor.DARK_AQUA + "Rivu" + ChatColor.DARK_GRAY + ")"));
+		inventory.setItem(7, ItemUtils.getInstance().getItemMaterial(Material.NAME_TAG, ChatColor.DARK_AQUA + "Settings"));
+		inventory.setItem(8, ItemUtils.getInstance().getItemMaterial(Material.STAINED_GLASS_PANE, 14, ChatColor.RED + "Leave"));
 		int rarityStartSlot = inventory.getSize() - 8;
 		for (Rarity rarity : Rarity.values()) {
 			if (rarity != Rarity.USELESS) {
