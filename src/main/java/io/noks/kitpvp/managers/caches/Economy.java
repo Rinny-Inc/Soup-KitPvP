@@ -8,9 +8,9 @@ public class Economy {
 	private int silver;
 	private int gold;
 
-	public void set(int money) {
+	public void update(int money) {
 		this.coins = money;
-		update();
+		calculate();
 	}
 
 	public int getMoney() {
@@ -31,15 +31,15 @@ public class Economy {
 
 	public void add(int amount, MoneyType type) {
 		this.coins += amount * type.getDivider() / 100;
-		update();
+		calculate();
 	}
 
 	public void remove(int amount, MoneyType type) {
 		this.coins -= amount * type.getDivider() / 100;
-		update();
+		calculate();
 	}
 
-	private void update() {
+	private void calculate() {
 		this.bronze = this.coins % MoneyType.BRONZE.getDivider();
 		this.silver = this.coins % MoneyType.SILVER.getDivider() / MoneyType.BRONZE.getDivider();
 		this.gold = this.coins % MoneyType.GOLD.getDivider() / MoneyType.SILVER.getDivider();

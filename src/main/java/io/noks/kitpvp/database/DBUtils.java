@@ -79,9 +79,9 @@ public class DBUtils {
 			statement.setString(1, pm.getPlayerUUID().toString());
 			ResultSet result = statement.executeQuery();
 			if (result.next()) {
-				pm.getStats().set(result.getInt("kills"), result.getInt("death"), result.getInt("bestks"));
-				pm.getSettings().set(result.getBoolean("hascompass"), result.getInt("swordslot"), result.getInt("itemslot"), result.getInt("compassslot"));
-				pm.getEconomy().set(result.getInt("money"));
+				pm.getStats().update(result.getInt("kills"), result.getInt("death"), result.getInt("bestks"));
+				pm.getSettings().update(result.getBoolean("hascompass"), result.getInt("swordslot"), result.getInt("itemslot"), result.getInt("compassslot"));
+				pm.getEconomy().update(result.getInt("money"));
 			}
 			statement.close();
 			result.close();

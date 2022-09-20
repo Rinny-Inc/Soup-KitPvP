@@ -12,7 +12,7 @@ public class Settings {
 	private int itemSlot = 1;
 	private int compassSlot = 8;
 
-	public void set(boolean compass, int sword, int item, int compassS) {
+	public void update(boolean compass, int sword, int item, int compassS) {
 		this.compass = compass;
 		this.swordSlot = sword;
 		this.itemSlot = item;

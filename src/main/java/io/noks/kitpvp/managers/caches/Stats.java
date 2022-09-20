@@ -11,7 +11,7 @@ public class Stats {
 	private int bestKillStreak;
 	private boolean paused;
 
-	public void set(int kill, int death, int bestKS) {
+	public void update(int kill, int death, int bestKS) {
 		this.kills = kill;
 		this.deaths = death;
 		this.bestKillStreak = bestKS;
