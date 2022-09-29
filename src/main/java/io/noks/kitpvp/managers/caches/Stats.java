@@ -11,7 +11,14 @@ public class Stats {
 	private int bestKillStreak;
 	private boolean paused;
 
-	public void update(int kill, int death, int bestKS) {
+	public Stats() {
+		this.kills = 0;
+		this.deaths = 0;
+		this.bestKillStreak = 0;
+		this.killStreak = 0;
+		this.paused = false;
+	}
+	public Stats(int kill, int death, int bestKS) {
 		this.kills = kill;
 		this.deaths = death;
 		this.bestKillStreak = bestKS;

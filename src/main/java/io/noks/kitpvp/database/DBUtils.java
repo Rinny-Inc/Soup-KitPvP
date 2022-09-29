@@ -4,21 +4,23 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import com.zaxxer.hikari.HikariDataSource;
 
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.managers.PlayerManager;
+import io.noks.kitpvp.managers.caches.Economy;
 import io.noks.kitpvp.managers.caches.Settings;
+import io.noks.kitpvp.managers.caches.Stats;
 
 public class DBUtils {
 	public static DBUtils instance = new DBUtils();
-
 	public static DBUtils getInstance() {
 		return instance;
 	}
 
-	private boolean connected = true;
+	private boolean connected = false;
 
 	private String address = Main.getInstance().getConfig().getString("DATABASE.ADDRESS");
 	private String name = Main.getInstance().getConfig().getString("DATABASE.NAME");
@@ -48,13 +50,15 @@ public class DBUtils {
 			this.hikari.addDataSourceProperty("cacheResultSetMetadata", Boolean.valueOf(true));
 			this.hikari.setMaximumPoolSize(20);
 			this.hikari.setConnectionTimeout(30000L);
+			this.connected = true;
 			createTable();
 		} catch (Exception exception) {
 		}
 	}
 
-	public void loadPlayer(PlayerManager pm) {
+	public void loadPlayer(UUID uuid) {
 		if (!isConnected()) {
+			new PlayerManager(uuid).giveMainItem();
 			return;
 		}
 		Connection connection = null;
@@ -62,7 +66,7 @@ public class DBUtils {
 			connection = this.hikari.getConnection();
 			PreparedStatement statement = connection.prepareStatement(INSERT);
 
-			statement.setString(1, pm.getPlayerUUID().toString());
+			statement.setString(1, uuid.toString());
 			statement.setInt(2, 0);
 			statement.setInt(3, 0);
 			statement.setInt(4, 0);
@@ -71,17 +75,18 @@ public class DBUtils {
 			statement.setInt(7, 1);
 			statement.setInt(8, 8);
 			statement.setInt(9, 0);
-			statement.setString(10, pm.getPlayerUUID().toString());
+			statement.setString(10, uuid.toString());
 			statement.executeUpdate();
 			statement.close();
 
 			statement = connection.prepareStatement(SELECT);
-			statement.setString(1, pm.getPlayerUUID().toString());
+			statement.setString(1, uuid.toString());
 			ResultSet result = statement.executeQuery();
 			if (result.next()) {
-				pm.getStats().update(result.getInt("kills"), result.getInt("death"), result.getInt("bestks"));
-				pm.getSettings().update(result.getBoolean("hascompass"), result.getInt("swordslot"), result.getInt("itemslot"), result.getInt("compassslot"));
-				pm.getEconomy().update(result.getInt("money"));
+				new PlayerManager(uuid, 
+						new Stats(result.getInt("kills"), result.getInt("death"), result.getInt("bestks")), 
+						new Settings(result.getBoolean("hascompass"), result.getInt("swordslot"), result.getInt("itemslot"), result.getInt("compassslot")), 
+						new Economy(result.getInt("money"))).giveMainItem();
 			}
 			statement.close();
 			result.close();

@@ -1,22 +1,22 @@
 package io.noks.kitpvp.managers.caches;
 
 public class Settings {
-	private static Settings instance = new Settings();
+	private boolean compass;
+	private int swordSlot;
+	private int itemSlot;
+	private int compassSlot;
 
-	public static Settings getInstance() {
-		return instance;
+	public Settings() {
+		this.compass = true;
+		this.swordSlot = 0;
+		this.itemSlot = 1;
+		this.compassSlot = 8;
 	}
-
-	private boolean compass = true;
-	private int swordSlot = 0;
-	private int itemSlot = 1;
-	private int compassSlot = 8;
-
-	public void update(boolean compass, int sword, int item, int compassS) {
-		this.compass = compass;
+	public Settings(boolean compassEnabled, int sword, int item, int compass) {
+		this.compass = compassEnabled;
 		this.swordSlot = sword;
 		this.itemSlot = item;
-		this.compassSlot = compassS;
+		this.compassSlot = compass;
 	}
 
 	public boolean hasCompass() {

@@ -7,10 +7,16 @@ public class Economy {
 	private int bronze;
 	private int silver;
 	private int gold;
-
+	
+	public Economy() {
+		this.coins = 0;
+	}
+	public Economy(int money) {
+		this.coins = money;
+		this.calculate();
+	}
 	public void update(int money) {
 		this.coins = money;
-		calculate();
 	}
 
 	public int getMoney() {
@@ -31,12 +37,12 @@ public class Economy {
 
 	public void add(int amount, MoneyType type) {
 		this.coins += amount * type.getDivider() / 100;
-		calculate();
+		this.calculate();
 	}
 
 	public void remove(int amount, MoneyType type) {
 		this.coins -= amount * type.getDivider() / 100;
-		calculate();
+		this.calculate();
 	}
 
 	private void calculate() {

@@ -30,6 +30,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import io.noks.kitpvp.Main;
+import io.noks.kitpvp.database.DBUtils;
 import io.noks.kitpvp.enums.AbilitiesEnum;
 import io.noks.kitpvp.inventories.CreateInventory;
 import io.noks.kitpvp.managers.PlayerManager;
@@ -53,7 +54,6 @@ public class PlayerListener implements Listener {
 	public void onJoin(PlayerJoinEvent event) {
 		event.setJoinMessage(null);
 		final Player player = event.getPlayer();
-		final PlayerManager pm = new PlayerManager(player.getUniqueId());
 		player.getInventory().clear();
 		player.getInventory().setArmorContents(null);
 		player.setHealth(20.0D);
@@ -65,8 +65,7 @@ public class PlayerListener implements Listener {
 		player.setAllowFlight(false);
 		player.setFlying(false);
 		player.sendMessage(Messages.WELCOME_MESSAGE);
-		pm.giveMainItem();
-		//DBUtils.getInstance().loadPlayer(PlayerManager.get(player.getUniqueId()));
+		DBUtils.getInstance().loadPlayer(player.getUniqueId());
 	}
 
 	@EventHandler
@@ -85,7 +84,9 @@ public class PlayerListener implements Listener {
 			Bukkit.broadcastMessage("(WANTED) " + player.getName() + " killed himself!");
 			this.wantedPlayer = null;
 		}
-		//DBUtils.getInstance().savePlayer(pm);
+		if (DBUtils.getInstance().isConnected()) {
+			DBUtils.getInstance().savePlayer(pm);
+		}
 		pm.remove();
 	}
 

@@ -38,6 +38,19 @@ public class PlayerManager {
 		this.economy = new Economy();
 		players.putIfAbsent(playerUUID, this);
 	}
+	
+	public PlayerManager(UUID playerUUID, Stats stats, Settings settings, Economy economy) {
+		this.playerUUID = playerUUID;
+		this.player = Bukkit.getPlayer(this.playerUUID);
+		this.ability = new Ability();
+		this.useSponsor = false;
+		this.useRecraft = false;
+		this.allowBuild = false;
+		this.stats = stats;
+		this.settings = settings;
+		this.economy = economy;
+		players.putIfAbsent(playerUUID, this);
+	}
 
 	public static PlayerManager get(UUID playerUUID) {
 		if (players.containsKey(playerUUID)) {
