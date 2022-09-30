@@ -24,9 +24,11 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerOnGroundEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import io.noks.kitpvp.Main;
@@ -312,13 +314,26 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void onDamage(EntityDamageEvent event) {
 		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
+			final Player player = (Player) event.getEntity();
 			if (!PlayerManager.get(player.getUniqueId()).getAbility().hasAbility()) {
 				event.setCancelled(true);
 				if (event.getCause() == DamageCause.VOID) {
 					player.teleport(player.getWorld().getSpawnLocation());
+					return;
+				}
+				if (event.getCause() == DamageCause.FALL && player.hasMetadata("Sponged")) {
+					event.setCancelled(true);
+					player.removeMetadata("Sponged", this.plugin);
 				}
 			}
+		}
+	}
+	
+	@EventHandler
+	public void onGround(PlayerOnGroundEvent event) {
+		final Player player = event.getPlayer();
+		if (player.hasMetadata("Sponged")) {
+			player.removeMetadata("Sponged", this.plugin);
 		}
 	}
 
@@ -366,6 +381,7 @@ public class PlayerListener implements Listener {
 			final Player player = event.getPlayer();
 			double boost = block.getRelative(BlockFace.DOWN).getType() == Material.SPONGE ? 2.5D : 2.15D;
 			player.setVelocity(new Vector(0.0D, boost, 0.0D));
+			player.setMetadata("Sponged", new FixedMetadataValue(this.plugin, Boolean.valueOf(true)));
 		}
 	}
 }
