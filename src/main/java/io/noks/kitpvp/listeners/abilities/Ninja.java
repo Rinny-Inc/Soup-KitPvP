@@ -3,6 +3,7 @@ package io.noks.kitpvp.listeners.abilities;
 import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.UUID;
+import java.util.WeakHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -18,8 +19,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
-import com.google.common.collect.Maps;
-
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.enums.AbilitiesEnum;
 import io.noks.kitpvp.managers.PlayerManager;
@@ -28,7 +27,7 @@ public class Ninja implements Listener {
 	private Main plugin;
 
 	public Ninja(Main main) {
-		this.ninja = Maps.newConcurrentMap();
+		this.ninja = new WeakHashMap<>();
 
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
@@ -38,16 +37,16 @@ public class Ninja implements Listener {
 
 	@EventHandler
 	public void onToggleSneak(PlayerToggleSneakEvent event) {
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (this.ninja.containsKey(player.getUniqueId())) {
 			if (!event.isSneaking())
 				return;
-			Player target = Bukkit.getPlayer((UUID) this.ninja.get(player.getUniqueId()));
+			final Player target = Bukkit.getPlayer((UUID) this.ninja.get(player.getUniqueId()));
 			if (target == null)
 				return;
 			if (!player.canSee(target) || !target.canSee(player))
 				return;
-			PlayerManager pm = PlayerManager.get(player.getUniqueId());
+			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 			if (pm.getAbility().hasAbility(AbilitiesEnum.NINJA)) {
 				if (pm.getAbility().hasActiveCooldown()) {
 					double cooldown = pm.getAbility().getActiveCooldown().longValue() / 1000.0D;

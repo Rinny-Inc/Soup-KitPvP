@@ -68,8 +68,7 @@ public class InventoryManager {
 
 	public Long getCooldown() {
 		if (this.cooldown.containsKey(this.biome))
-			return Long.valueOf(
-					Math.max(0L, ((Long) this.cooldown.get(this.biome)).longValue() - System.currentTimeMillis()));
+			return Long.valueOf(Math.max(0L, ((Long) this.cooldown.get(this.biome)).longValue() - System.currentTimeMillis()));
 		return Long.valueOf(0L);
 	}
 

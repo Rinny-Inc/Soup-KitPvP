@@ -15,10 +15,15 @@ public class AbilityListCommand implements CommandExecutor {
 		if (args.length > 0) {
 			return false;
 		}
-		StringJoiner ability = new StringJoiner(ChatColor.RESET + ", ");
+		final StringJoiner rarity = new StringJoiner(ChatColor.RESET + ", ");
+		for (Rarity rarities : Rarity.values()) {
+			if (rarities != Rarity.USELESS) rarity.add(rarities.getColor() + rarities.getName());
+		}
+		final StringJoiner ability = new StringJoiner(ChatColor.RESET + ", ");
 		for (AbilitiesEnum abilities : AbilitiesEnum.values()) {
 			if (abilities.getRarity() != Rarity.USELESS) ability.add(abilities.getRarity().getColor() + abilities.getName());
 		}
+		sender.sendMessage(rarity.toString());
 		sender.sendMessage("List of ability: " + ability.toString());
 		return true;
 	}

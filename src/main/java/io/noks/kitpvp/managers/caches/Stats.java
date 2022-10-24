@@ -9,6 +9,7 @@ public class Stats {
 	private int deaths;
 	private int killStreak;
 	private int bestKillStreak;
+	private int bounty;
 	private boolean paused;
 
 	public Stats() {
@@ -16,9 +17,10 @@ public class Stats {
 		this.deaths = 0;
 		this.bestKillStreak = 0;
 		this.killStreak = 0;
+		this.bounty = 0;
 		this.paused = false;
 	}
-	public Stats(int kill, int death, int bestKS) {
+	public Stats(int kill, int death, int bestKS, int bounty) {
 		this.kills = kill;
 		this.deaths = death;
 		this.bestKillStreak = bestKS;
@@ -81,12 +83,11 @@ public class Stats {
 	}
 
 	public String[] toStrings() {
-		return new String[] { ChatColor.GRAY + "Kills -> " + ChatColor.RED + this.kills,
+		return new String[] { ChatColor.GRAY + "Kills -> " + ChatColor.GREEN + this.kills,
 				ChatColor.GRAY + "Deaths -> " + ChatColor.RED + this.deaths,
-				ChatColor.GRAY + "Current KillStreak -> " + ChatColor.RED + this.killStreak,
-				ChatColor.GRAY + "Best KillStreak -> " + ChatColor.RED + this.bestKillStreak,
-				ChatColor.GRAY + "Ratio -> " + ChatColor.RED +
-
-						getRatio() };
+				ChatColor.GRAY + "Killstreak -> " + ChatColor.GOLD + this.killStreak,
+				ChatColor.GRAY + "Highest Killstreak -> " + ChatColor.GOLD + this.bestKillStreak,
+				ChatColor.GRAY + "KD -> " + ChatColor.GOLD + getRatio(),
+				ChatColor.GRAY + "Bounty -> " + ChatColor.RED + this.bounty};
 	}
 }

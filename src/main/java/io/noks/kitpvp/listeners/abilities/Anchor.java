@@ -20,6 +20,8 @@ public class Anchor implements Listener {
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}
+	
+	// TODO: TRY TO USE PLAYERVELOCITYEVENT
 
 	@EventHandler
 	public void onAnchor(EntityDamageByEntityEvent e) {

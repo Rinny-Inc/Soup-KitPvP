@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import com.google.common.collect.Maps;
 
 import io.noks.kitpvp.managers.caches.Ability;
+import io.noks.kitpvp.managers.caches.CombatTag;
 import io.noks.kitpvp.managers.caches.Economy;
 import io.noks.kitpvp.managers.caches.Settings;
 import io.noks.kitpvp.managers.caches.Stats;
@@ -19,19 +20,20 @@ public class PlayerManager {
 	private Player player;
 	private UUID playerUUID;
 	private Ability ability;
-	private boolean useSponsor;
-	private boolean useRecraft;
+	private boolean usedSponsor;
+	private boolean usedRecraft;
 	private boolean allowBuild;
 	private Stats stats;
 	private Settings settings;
 	private Economy economy;
+	private CombatTag combatTag;
 
 	public PlayerManager(UUID playerUUID) {
 		this.playerUUID = playerUUID;
 		this.player = Bukkit.getPlayer(this.playerUUID);
 		this.ability = new Ability();
-		this.useSponsor = false;
-		this.useRecraft = false;
+		this.usedSponsor = false;
+		this.usedRecraft = false;
 		this.allowBuild = false;
 		this.stats = new Stats();
 		this.settings = new Settings();
@@ -43,8 +45,8 @@ public class PlayerManager {
 		this.playerUUID = playerUUID;
 		this.player = Bukkit.getPlayer(this.playerUUID);
 		this.ability = new Ability();
-		this.useSponsor = false;
-		this.useRecraft = false;
+		this.usedSponsor = false;
+		this.usedRecraft = false;
 		this.allowBuild = false;
 		this.stats = stats;
 		this.settings = settings;
@@ -75,20 +77,20 @@ public class PlayerManager {
 		return this.ability;
 	}
 
-	public boolean hasUseSponsor() {
-		return this.useSponsor;
+	public boolean hasUsedSponsor() {
+		return this.usedSponsor;
 	}
 
-	public void setUseSponsor(boolean use) {
-		this.useSponsor = use;
+	public void setUsedSponsor(boolean use) {
+		this.usedSponsor = use;
 	}
 
-	public boolean hasUseRecraft() {
-		return this.useRecraft;
+	public boolean hasUsedRecraft() {
+		return this.usedRecraft;
 	}
 
-	public void setUseRecraft(boolean use) {
-		this.useRecraft = use;
+	public void setUsedRecraft(boolean use) {
+		this.usedRecraft = use;
 	}
 
 	public boolean isAllowBuild() {
@@ -110,12 +112,36 @@ public class PlayerManager {
 	public Economy getEconomy() {
 		return this.economy;
 	}
-
+	
+	public boolean hasCombatTag() {
+		return this.combatTag != null;
+	}
+	
+	public void updateCombatTag(CombatTag newTag) {
+		this.combatTag = newTag;
+	}
+	
+	public CombatTag getCurrentCombatTag() {
+		return this.combatTag;
+	}
+	
+	public void kill() {
+		if (this.player.getLastDamage() > 0.0D && hasCombatTag()) stats.addDeaths();
+		if (stats.getKillStreak() > stats.getBestKillStreak()) {
+			stats.updateBestKillStreak();
+		}
+		if (this.ability.hasAbility()) this.ability.remove();
+		if (hasUsedSponsor()) setUsedSponsor(false);
+		if (hasUsedRecraft()) setUsedRecraft(false);
+		if (hasCombatTag()) this.combatTag = null;
+		this.player.eject();
+	}
+	
 	public void giveMainItem() {
-		this.player.getInventory().clear();
-		this.player.getInventory().setItem(0, ItemUtils.getInstance().getAbilitiesSelector());
-		this.player.updateInventory();
-		this.player.setWalkSpeed(0.2F);
-		this.player.setMaximumNoDamageTicks(10);
+		player.getInventory().clear();
+		player.getInventory().setItem(0, ItemUtils.getInstance().getAbilitiesSelector());
+		player.updateInventory();
+		player.setWalkSpeed(0.2F);
+		player.setMaximumNoDamageTicks(10);
 	}
 }

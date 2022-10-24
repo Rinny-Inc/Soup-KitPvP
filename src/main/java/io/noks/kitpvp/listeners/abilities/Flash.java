@@ -33,11 +33,9 @@ public class Flash implements Listener {
 		if (action == Action.RIGHT_CLICK_AIR && p.getItemInHand().getType() != null
 				&& p.getItemInHand().getType() == Material.REDSTONE_TORCH_ON && ability.hasAbility(AbilitiesEnum.FLASH))
 			if (!ability.hasActiveCooldown()) {
-				Block block = p.getTargetBlock(null, 85);
+				Block block = p.getWorld().getHighestBlockAt(p.getTargetBlock(null, 85).getLocation()); // TODO
 				if (block.getType() != Material.AIR)
 					block = p.getTargetBlock(null, 45);
-				if (block.getType() != Material.AIR)
-					return;
 				ability.applyCooldown();
 				Location loc = block.getLocation();
 				p.teleport(loc);

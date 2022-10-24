@@ -15,9 +15,6 @@ public class Economy {
 		this.coins = money;
 		this.calculate();
 	}
-	public void update(int money) {
-		this.coins = money;
-	}
 
 	public int getMoney() {
 		return this.coins;

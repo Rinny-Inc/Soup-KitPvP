@@ -31,11 +31,11 @@ public class SponsorCommand implements CommandExecutor {
 			player.sendMessage(ChatColor.RED + "You can't do this command here.");
 			return false;
 		}
-		if (pm.hasUseSponsor()) {
+		if (pm.hasUsedSponsor()) {
 			player.sendMessage(ChatColor.RED + "You already do this command!");
 			return false;
 		}
-		pm.setUseSponsor(true);
+		pm.setUsedSponsor(true);
 		Location loc = player.getLocation();
 		loc.getWorld().spawnFallingBlock(loc.clone().add(0.0D, 45.0D, 0.0D), Material.CHEST, (byte) 0);
 		player.sendMessage(ChatColor.GREEN + "Your sponsor is falling down!");

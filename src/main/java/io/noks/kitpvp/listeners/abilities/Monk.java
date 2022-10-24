@@ -26,9 +26,9 @@ public class Monk implements Listener {
 
 	@EventHandler
 	public void onRightClick(PlayerInteractEntityEvent event) {
-		ItemStack item = event.getPlayer().getItemInHand();
-		Player player = event.getPlayer();
-		PlayerManager pm = PlayerManager.get(player.getUniqueId());
+		final ItemStack item = event.getPlayer().getItemInHand();
+		final Player player = event.getPlayer();
+		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 		if (pm.getAbility().hasAbility(AbilitiesEnum.MONK) && event.getRightClicked() instanceof Player
 				&& item.getType() == Material.BLAZE_ROD) {
 			if (pm.getAbility().hasActiveCooldown()) {
@@ -38,8 +38,8 @@ public class Monk implements Listener {
 				return;
 			}
 			pm.getAbility().applyCooldown();
-			Player rightClicked = (Player) event.getRightClicked();
-			PlayerInventory inv = rightClicked.getInventory();
+			final Player rightClicked = (Player) event.getRightClicked();
+			final PlayerInventory inv = rightClicked.getInventory();
 			int slot = (new Random()).nextInt(inv.getSize());
 			ItemStack replaced = inv.getItemInHand();
 			if (replaced == null)
@@ -49,6 +49,7 @@ public class Monk implements Listener {
 				replacer = new ItemStack(Material.AIR);
 			inv.setItemInHand(replacer);
 			inv.setItem(slot, replaced);
+			rightClicked.updateInventory();
 		}
 	}
 }

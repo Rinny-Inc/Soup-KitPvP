@@ -56,15 +56,16 @@ import io.noks.kitpvp.tasked.FallenGolemTask;
 import io.noks.kitpvp.tasked.FeastTask;
 
 public class Main extends JavaPlugin {
+	private DBUtils database;
+	
 	private static Main instance;
-
 	public static Main getInstance() {
 		return instance;
 	}
 
 	public void onEnable() {
 		instance = this;
-		//DBUtils.getInstance().connectDatabase();
+		this.database = new DBUtils(getConfig().getString("DATABASE.ADDRESS"), getConfig().getString("DATABASE.NAME"), getConfig().getString("DATABASE.USER"), getConfig().getString("DATABASE.PASSWORD"));
 
 		try {
 			FeastTask.getInstance().doFeast();
@@ -83,8 +84,8 @@ public class Main extends JavaPlugin {
 		}
 		PlayerManager.players.clear();
 		InventoryManager.inventories.clear();
-		if (DBUtils.getInstance().getHikari() != null) {
-			DBUtils.getInstance().getHikari().close();
+		if (this.database.getHikari() != null) {
+			this.database.getHikari().close();
 		}
 	}
 
@@ -140,5 +141,9 @@ public class Main extends JavaPlugin {
 		getCommand("build").setExecutor(new BuildCommand());
 		getCommand("boot").setExecutor(new BootCommand());
 		getCommand("balance").setExecutor(new BalanceCommand());
+	}
+	
+	public DBUtils getDataBase() {
+		return this.database;
 	}
 }

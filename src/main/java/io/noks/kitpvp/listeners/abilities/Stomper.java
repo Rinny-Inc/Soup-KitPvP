@@ -8,8 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-
-import com.google.common.collect.Lists;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.enums.AbilitiesEnum;
@@ -26,34 +25,28 @@ public class Stomper implements Listener {
 	@EventHandler
 	public void onStomper(EntityDamageEvent event) {
 		if (event.getEntity() instanceof Player) {
-			Player stomper = (Player) event.getEntity();
-			if (event.getCause() == EntityDamageEvent.DamageCause.FALL
-					&& PlayerManager.get(stomper.getUniqueId()).getAbility().hasAbility(AbilitiesEnum.STOMPER)) {
+			final Player stomper = (Player) event.getEntity();
+			if (event.getCause() == DamageCause.FALL && !stomper.hasMetadata("Sponged") && PlayerManager.get(stomper.getUniqueId()).getAbility().hasAbility(AbilitiesEnum.STOMPER)) {
 				double damage = event.getDamage();
-				List<Player> stomped = Lists.newArrayList();
-				for (Entity nearbyPlayers : stomper.getNearbyEntities(5.0D, 3.5D, 5.0D)) {
-					if (!(nearbyPlayers instanceof Player))
-						continue;
+				stomper.getWorld().playSound(stomper.getLocation(), Sound.ANVIL_LAND, 0.8F, 1.1F);
+				event.setDamage(Math.min(damage, 4.0D));
+				final List<Entity> stomped = stomper.getNearbyEntities(5.0D, 3.5D, 5.0D);
+				if (stomped.isEmpty()) {
+					return;
+				}
+				for (Entity nearbyPlayers : stomped) {
+					if (!(nearbyPlayers instanceof Player)) continue;
 					Player nearby = (Player) nearbyPlayers;
-					if (!stomper.canSee(nearby) || !nearby.canSee(stomper))
-						continue;
-					stomped.add(nearby);
+					if (!stomper.canSee(nearby) || !nearby.canSee(stomper))continue;
 					if (PlayerManager.get(nearby.getUniqueId()).getAbility().hasAbility(AbilitiesEnum.ANTISTOMPER)) {
 						stomper.damage(damage, nearby);
 						continue;
 					}
 					if (nearby.isSneaking()) {
-						nearby.damage(1.0D, stomper);
-						continue;
+						damage = 1.0D;
 					}
 					nearby.damage(damage, stomper);
 				}
-				if (stomped.isEmpty()) {
-					return;
-				}
-				stomper.getWorld().playSound(stomper.getLocation(), Sound.ANVIL_LAND, 0.8F, 1.1F);
-				event.setDamage(Math.min(damage, 4.0D));
-				stomped.clear();
 			}
 		}
 	}

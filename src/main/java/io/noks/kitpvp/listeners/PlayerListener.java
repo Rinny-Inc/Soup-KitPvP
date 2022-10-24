@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.Random;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -32,7 +31,6 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import io.noks.kitpvp.Main;
-import io.noks.kitpvp.database.DBUtils;
 import io.noks.kitpvp.enums.AbilitiesEnum;
 import io.noks.kitpvp.inventories.CreateInventory;
 import io.noks.kitpvp.managers.PlayerManager;
@@ -44,10 +42,8 @@ import io.noks.kitpvp.utils.Messages;
 
 public class PlayerListener implements Listener {
 	private Main plugin;
-	private Player wantedPlayer;
 
 	public PlayerListener(Main main) {
-		this.wantedPlayer = null;
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}
@@ -67,7 +63,7 @@ public class PlayerListener implements Listener {
 		player.setAllowFlight(false);
 		player.setFlying(false);
 		player.sendMessage(Messages.WELCOME_MESSAGE);
-		DBUtils.getInstance().loadPlayer(player.getUniqueId());
+		this.plugin.getDataBase().loadPlayer(player.getUniqueId());
 	}
 
 	@EventHandler
@@ -76,20 +72,8 @@ public class PlayerListener implements Listener {
 		final Player player = event.getPlayer();
 
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-		if (player.getLastDamage() > 0.0D)
-			pm.getStats().addDeaths();
-		if (pm.getStats().getKillStreak() > pm.getStats().getBestKillStreak()) {
-			pm.getStats().updateBestKillStreak();
-		}
-
-		if (this.wantedPlayer == player) {
-			Bukkit.broadcastMessage("(WANTED) " + player.getName() + " killed himself!");
-			this.wantedPlayer = null;
-		}
-		if (DBUtils.getInstance().isConnected()) {
-			DBUtils.getInstance().savePlayer(pm);
-		}
-		pm.remove();
+		pm.kill();
+		this.plugin.getDataBase().savePlayer(pm);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -171,51 +155,20 @@ public class PlayerListener implements Listener {
 					int moneyToAdd = ((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 2 : 1);
 					killerEconomy.add(moneyToAdd, MoneyType.BRONZE);
 
-					if (this.wantedPlayer == null && killerStats.getKillStreak() >= 8) {
-						int wantedKill = (new Random()).nextInt(30 + killerStats.getKillStreak() - 8) + 8;
-						if (killerStats.getKillStreak() == wantedKill) {
-							launchWantedEvent(killer, wantedKill);
-						}
-					}
-					if (this.wantedPlayer == killed) {
-						Bukkit.broadcastMessage("(WANTED) " + killer.getName() + " got the prime for killed the wanted player!");
-						this.wantedPlayer = null;
-					}
-
 				}
-			} else if (this.wantedPlayer == killed) {
-				Bukkit.broadcastMessage("(WANTED) " + killed.getName() + " killed himself!");
-				this.wantedPlayer = null;
 			}
 
 			if (killedAbility.get().getSpecialItem().getType() != Material.MUSHROOM_SOUP) {
 				Iterator<ItemStack> dropsIt = event.getDrops().iterator();
 				while (dropsIt.hasNext()) {
-					ItemStack loot = (ItemStack) dropsIt.next();
+					final ItemStack loot = (ItemStack) dropsIt.next();
 					if (!loot.getItemMeta().hasDisplayName())
 						continue;
 					dropsIt.remove();
 				}
 			}
-			Stats killedStats = pm.getStats();
-			if (killed.getLastDamage() > 0.0D)
-				killedStats.addDeaths();
-			if (killedStats.getKillStreak() > killedStats.getBestKillStreak()) {
-				killedStats.updateBestKillStreak();
-			}
-			killedAbility.remove();
-			if (pm.hasUseSponsor())
-				pm.setUseSponsor(false);
-			if (pm.hasUseRecraft())
-				pm.setUseRecraft(false);
-			killed.eject();
+			pm.kill();
 		}
-	}
-
-	protected void launchWantedEvent(Player wanted, int kill) {
-		this.wantedPlayer = wanted;
-		Bukkit.broadcastMessage( "(WANTED) " + wanted.getName() + " is now wanted due to murder of " + kill + " people!");
-		wanted.sendMessage("(WANTED) You are the wanted player!");
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -233,29 +186,36 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority=EventPriority.HIGH)
 	public void onPlayerInteractSoup(PlayerInteractEvent event) {
+		if (!event.hasItem()) {
+			return;
+		}
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			final Player player = event.getPlayer();
 			if (!player.isDead() && player.getItemInHand().getType() == Material.MUSHROOM_SOUP && player.getHealth() < player.getMaxHealth()) {
-				final Ability ability = PlayerManager.get(player.getUniqueId()).getAbility();
 				final double newHealth = Math.min(player.getHealth() + 7.0D, player.getMaxHealth());
 				player.setHealth(newHealth);
 				//
-				if (!ability.hasAbility(AbilitiesEnum.QUICKDROPPER)) {
+				if (!PlayerManager.get(player.getUniqueId()).getAbility().hasAbility(AbilitiesEnum.QUICKDROPPER)) {
 					player.getItemInHand().setType(Material.BOWL);
 				} else {
 					player.getItemInHand().setAmount(0);
-					player.getItemInHand().setType(null);
+					player.getItemInHand().setType(Material.AIR);
 				}
 				player.updateInventory();
 			}
 		}
 	}
 
-	@EventHandler
+	@EventHandler(priority=EventPriority.LOWEST)
 	public void onAbilitySelectorClick(PlayerInteractEvent event) {
-		Player player = event.getPlayer();
-		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && player.getItemInHand().getType() == Material.BOOK && player.getItemInHand().getItemMeta().getDisplayName().toLowerCase().equals(ChatColor.GRAY + "your abilities")) {
-			player.openInventory(CreateInventory.getInstance().loadKitsInventory(player));
+		if (!event.hasItem()) {
+			return;
+		}
+		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+			final Player player = event.getPlayer();
+			if (player.getItemInHand().getType() == Material.BOOK && player.getItemInHand().getItemMeta().getDisplayName().toLowerCase().equals(ChatColor.GRAY + "your abilities")) {
+				player.openInventory(CreateInventory.getInstance().loadKitsInventory(player));
+			}
 		}
 	}
 
@@ -290,6 +250,7 @@ public class PlayerListener implements Listener {
 	}
 
 	// TODO: remake with critical damage and enchantment
+	// TODO: FIX DOUBLE HIT????
 	@EventHandler
 	public void nerfDamage(EntityDamageByEntityEvent event) {
 		if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
@@ -315,9 +276,10 @@ public class PlayerListener implements Listener {
 	public void onDamage(EntityDamageEvent event) {
 		if (event.getEntity() instanceof Player) {
 			final Player player = (Player) event.getEntity();
-			if (!PlayerManager.get(player.getUniqueId()).getAbility().hasAbility()) {
+			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
+			if (!pm.getAbility().hasAbility()) {
 				event.setCancelled(true);
-				if (event.getCause() == DamageCause.VOID) {
+				if (event.getCause() == DamageCause.VOID && !pm.getAbility().hasAbility()) {
 					player.teleport(player.getWorld().getSpawnLocation());
 					return;
 				}
@@ -351,35 +313,45 @@ public class PlayerListener implements Listener {
 
 	@EventHandler
 	public void onUseTracker(PlayerInteractEvent event) {
-		Player player = event.getPlayer();
-
-		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && player.getItemInHand().getType() == Material.COMPASS && player.getItemInHand().getItemMeta().getDisplayName().toLowerCase().equals(ChatColor.YELLOW + "tracker")) {
-			Player nearest = null;
-			double distance = 200.0D;
-			for (Player onlineWorld : player.getWorld().getPlayers()) {
-				double calc = player.getLocation().distance(onlineWorld.getLocation());
-				if (calc > 1.0D && calc < distance) {
-					distance = calc;
-					if (onlineWorld == player || !player.canSee(onlineWorld) || !onlineWorld.canSee(player) || onlineWorld.getGameMode() != GameMode.SURVIVAL || onlineWorld.isDead())
-						continue;
-					nearest = onlineWorld;
+		if (!event.hasItem()) {
+			return;
+		}
+		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK){
+			Player player = event.getPlayer();
+	
+			if (player.getItemInHand().getType() == Material.COMPASS && player.getItemInHand().getItemMeta().getDisplayName().toLowerCase().equals(ChatColor.YELLOW + "tracker")) {
+				Player nearest = null;
+				double distance = 200.0D;
+				for (Player onlineWorld : player.getWorld().getPlayers()) {
+					double calc = player.getLocation().distance(onlineWorld.getLocation());
+					if (calc > 1.0D && calc < distance) {
+						distance = calc;
+						if (onlineWorld == player || !player.canSee(onlineWorld) || !onlineWorld.canSee(player) || onlineWorld.getGameMode() != GameMode.SURVIVAL || onlineWorld.isDead())
+							continue;
+						nearest = onlineWorld;
+					}
 				}
+				if (nearest == null) {
+					return;
+				}
+				player.setCompassTarget(nearest.getLocation());
+				player.sendMessage(ChatColor.YELLOW + "Compass pointing at " + nearest.getName() + " (" + ChatColor.GOLD + (new DecimalFormat("#.#")).format(distance) + ChatColor.YELLOW + ")");
 			}
-			if (nearest == null) {
-				return;
-			}
-			player.sendMessage(ChatColor.YELLOW + "Compass pointing at " + nearest.getName() + " (" + ChatColor.GOLD + (new DecimalFormat("#.#")).format(distance) + ChatColor.YELLOW + ")");
-			player.setCompassTarget(nearest.getLocation());
 		}
 	}
 	
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onWalkOnSponge(PlayerMoveEvent event) {
-		Block block = event.getTo().getBlock().getRelative(BlockFace.DOWN);
+		final Block block = event.getTo().getBlock().getRelative(BlockFace.DOWN);
 		
 		if (block.getType() == Material.SPONGE) {
 			final Player player = event.getPlayer();
-			double boost = block.getRelative(BlockFace.DOWN).getType() == Material.SPONGE ? 2.5D : 2.15D;
+			int sponge = 0;
+			for (int y = 20; y < 250; y++) {
+				if (block.getWorld().getBlockAt(block.getX(), y, block.getZ()).getType() == Material.SPONGE) continue;
+				sponge++;
+			}
+			final double boost = 2.15D + (0.05D * sponge);
 			player.setVelocity(new Vector(0.0D, boost, 0.0D));
 			player.setMetadata("Sponged", new FixedMetadataValue(this.plugin, Boolean.valueOf(true)));
 		}

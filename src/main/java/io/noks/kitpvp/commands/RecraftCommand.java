@@ -33,7 +33,7 @@ public class RecraftCommand implements CommandExecutor {
 			player.sendMessage(ChatColor.RED + "You can't use this command here!");
 			return false;
 		}
-		if (pm.hasUseRecraft()) {
+		if (pm.hasUsedRecraft()) {
 			player.sendMessage(ChatColor.RED + "You already used your recraft!");
 			return false;
 		}
@@ -54,7 +54,7 @@ public class RecraftCommand implements CommandExecutor {
 			player.sendMessage(ChatColor.RED + "You already have some recraft!");
 			return false;
 		}
-		pm.setUseRecraft(true);
+		pm.setUsedRecraft(true);
 		CreateInventory.getInstance().openRecraftInventory(player);
 		player.playSound(player.getLocation(), Sound.LEVEL_UP, 0.85F, 0.9F);
 		return true;

@@ -35,9 +35,7 @@ public class InventoryListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onInventoryClick(InventoryClickEvent event) {
-		if (event.getInventory().getType().equals(InventoryType.CREATIVE)
-				|| event.getInventory().getType().equals(InventoryType.CRAFTING)
-				|| event.getInventory().getType().equals(InventoryType.PLAYER)) {
+		if (event.getInventory().getType().equals(InventoryType.CREATIVE) || event.getInventory().getType().equals(InventoryType.CRAFTING) || event.getInventory().getType().equals(InventoryType.PLAYER)) {
 			Player player = (Player) event.getWhoClicked();
 			PlayerManager pm = PlayerManager.get(player.getUniqueId());
 
