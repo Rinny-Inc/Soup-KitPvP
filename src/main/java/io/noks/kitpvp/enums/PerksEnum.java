@@ -1,8 +1,35 @@
 package io.noks.kitpvp.enums;
 
 public enum PerksEnum {
-	SUCK;
+	BOUNTY_HUNTER, // TIER I
+	SORE_LOSER,
+	MARTYDOM,
+	RELINQUISH,
+	TRICKSTER,
+	REFILLER,
+	STUNT_DEVIL,
+	AQUAMAN,
+	JAMMER, // TIER II
+	REVERSE_COPYCAT,
+	STEADY_HANDS,
+	ARMORER,
+	DEATH_DO_US_PART,
+	TAUNT,
+	REVENGE,
+	INFERNO,
+	HARDLINE,
+	SKULL_COLLECTOR, // TIER III
+	INCOGNITO,
+	CONARTIST,
+	CREDITOR,
+	CANA,
+	BONUS_HEART,
+	FIRE_FIGHTER,
+	ANCHOR,
+	LIFE_SUPPORT;
 	
 	private String name;
 	private Tiers tier;
+	private int cost;
+	private String description;
 }

@@ -22,11 +22,13 @@ public class SpawnCommand implements CommandExecutor {
 		final Player player = (Player) sender;
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 		
+		final String spawnMessage = ChatColor.GREEN + "Teleporting to spawn.";
 		if (!pm.getAbility().hasAbility() && !pm.hasCombatTag()) {
-			// TODO
-			return false;
+			player.teleport(player.getWorld().getSpawnLocation());
+			player.sendMessage(spawnMessage);
+			return true;
 		}
-		// TODO
+		// TODO countdown of 5
 		return true;
 	}
 }

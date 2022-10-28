@@ -35,6 +35,7 @@ import io.noks.kitpvp.enums.AbilitiesEnum;
 import io.noks.kitpvp.inventories.CreateInventory;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Ability;
+import io.noks.kitpvp.managers.caches.CombatTag;
 import io.noks.kitpvp.managers.caches.Economy;
 import io.noks.kitpvp.managers.caches.Economy.MoneyType;
 import io.noks.kitpvp.managers.caches.Stats;
@@ -89,10 +90,10 @@ public class PlayerListener implements Listener {
 				event.getDrops().clear();
 				return;
 			}
-			if (killed.getKiller() instanceof Player) {
-				Player killer = killed.getKiller();
-				PlayerManager km = PlayerManager.get(killer.getUniqueId());
-				int[] killedStuff = { 0, 0, 0, 0 };
+			if (killed.getKiller() instanceof Player && pm.hasCombatTag()) {
+				PlayerManager km = PlayerManager.get(pm.getCurrentCombatTag().getLastAttackerUUID());
+				Player killer = km.getPlayer();
+				/*int[] killedStuff = { 0, 0, 0, 0 };
 				for (ItemStack items : killed.getInventory().getContents()) {
 					if (items != null) {
 						if (items.getType() == Material.MUSHROOM_SOUP)
@@ -120,17 +121,17 @@ public class PlayerListener implements Listener {
 				}
 				int soupDiff = Math.abs(killedStuff[0] - killerStuff[0]);
 				int recraftDiff = Math.abs((killedStuff[1] + killedStuff[2] + killedStuff[3]) / 3
-						- (killerStuff[1] + killerStuff[2] + killerStuff[3]) / 3);
+						- (killerStuff[1] + killerStuff[2] + killerStuff[3]) / 3);*/
 				String message = ChatColor.GRAY + killer.getName() + "(" + ChatColor.RED
 						+ km.getAbility().get().getName() + ChatColor.GRAY + ") killed " + killed.getName() + "("
-						+ ChatColor.RED + killedAbility.get().getName() + ChatColor.GRAY + ") " + ChatColor.BLUE
-						+ "[Soup Diff: " + soupDiff + "; Recraft Diff: " + recraftDiff + "]";
+						+ ChatColor.RED + killedAbility.get().getName() + ChatColor.GRAY + ") " /*+ ChatColor.BLUE
+						+ "[Soup Diff: " + soupDiff + "; Recraft Diff: " + recraftDiff + "]"*/;
 
 				killed.sendMessage(message);
 				if (killer != killed) {
 					killer.sendMessage(message);
 
-					int randomLoots = (new Random()).nextInt(6) + 26;
+					/*int randomLoots = (new Random()).nextInt(6) + 26;
 					int[] missing = { 64 - killerStuff[1] - randomLoots, 64 - killerStuff[2] - randomLoots,
 							64 - killerStuff[3] - randomLoots };
 					int[] total = { killerStuff[1] + randomLoots, killerStuff[2] + randomLoots,
@@ -146,7 +147,7 @@ public class PlayerListener implements Listener {
 					if (missing[2] > 0) {
 						killer.getInventory().addItem(new ItemStack[] { new ItemStack(Material.RED_MUSHROOM,
 								Math.max(0, Math.min(total[2] + missing[2], randomLoots))) });
-					}
+					}*/
 					Stats killerStats = km.getStats();
 					killerStats.addKills();
 					killerStats.addKillStreak();
@@ -154,7 +155,6 @@ public class PlayerListener implements Listener {
 					Economy killerEconomy = km.getEconomy();
 					int moneyToAdd = ((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 2 : 1);
 					killerEconomy.add(moneyToAdd, MoneyType.BRONZE);
-
 				}
 			}
 
@@ -249,6 +249,14 @@ public class PlayerListener implements Listener {
 			}*/
 	}
 
+	@EventHandler
+	public void combatTagOnHit(EntityDamageByEntityEvent event) {
+		if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
+			PlayerManager.get(event.getEntity().getUniqueId()).updateCombatTag(new CombatTag(event.getDamager().getUniqueId()));
+			PlayerManager.get(event.getDamager().getUniqueId()).updateCombatTag(new CombatTag(event.getEntity().getUniqueId()));
+		}
+	}
+	
 	// TODO: remake with critical damage and enchantment
 	// TODO: FIX DOUBLE HIT????
 	@EventHandler
