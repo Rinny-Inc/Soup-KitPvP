@@ -1,5 +1,6 @@
 package io.noks.kitpvp.listeners.abilities;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -12,15 +13,27 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import io.noks.kitpvp.Main;
-import io.noks.kitpvp.enums.AbilitiesEnum;
+import io.noks.kitpvp.abstracts.Abilities;
+import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
 
-public class Specialist implements Listener {
+public class Specialist extends Abilities implements Listener {
 	private Main plugin;
 
 	public Specialist(Main main) {
+		super("Specialist", new ItemStack(Material.ENCHANTED_BOOK), Rarity.LEGENDARY, 0L, new String[] { ChatColor.AQUA + "Enchantment table in a book" });
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
+	}
+	
+	@Override
+	public ItemStack specialItem() {
+		return this.getIcon();
+	}
+	
+	@Override
+	public String specialItemName() {
+		return "Enchantment Book";
 	}
 
 	@EventHandler
@@ -28,7 +41,7 @@ public class Specialist implements Listener {
 		Player player = event.getPlayer();
 
 		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
-				&& PlayerManager.get(player.getUniqueId()).getAbility().hasAbility(AbilitiesEnum.SPECIALIST)
+				&& PlayerManager.get(player.getUniqueId()).getAbility().hasAbility(this)
 				&& event.getItem() != null && event.getItem().getType() == Material.ENCHANTED_BOOK) {
 			event.setCancelled(true);
 			player.getPlayer().openEnchanting(player.getPlayer().getLocation(), true);
@@ -37,7 +50,7 @@ public class Specialist implements Listener {
 
 	@EventHandler
 	public void onEnchant(EnchantItemEvent event) {
-		if (PlayerManager.get(event.getEnchanter().getUniqueId()).getAbility().hasAbility(AbilitiesEnum.SPECIALIST)
+		if (PlayerManager.get(event.getEnchanter().getUniqueId()).getAbility().hasAbility(this)
 				&& event.getEnchanter().getItemInHand().getType() == Material.ENCHANTED_BOOK) {
 			event.getEnchantsToAdd().clear();
 			event.getEnchantsToAdd().put(Enchantment.DAMAGE_ALL, Integer.valueOf(
@@ -50,7 +63,7 @@ public class Specialist implements Listener {
 		if (event.getEntity().getKiller() instanceof Player) {
 			Player killer = event.getEntity().getKiller();
 
-			if (PlayerManager.get(killer.getUniqueId()).getAbility().hasAbility(AbilitiesEnum.SPECIALIST))
+			if (PlayerManager.get(killer.getUniqueId()).getAbility().hasAbility(this))
 				if (killer.getInventory().firstEmpty() == -1 && !killer.getInventory().contains(Material.EXP_BOTTLE)) {
 					killer.getWorld().dropItem(killer.getLocation(), new ItemStack(Material.EXP_BOTTLE, 1));
 				} else {

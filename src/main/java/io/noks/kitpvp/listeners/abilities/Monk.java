@@ -13,15 +13,27 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import io.noks.kitpvp.Main;
-import io.noks.kitpvp.enums.AbilitiesEnum;
+import io.noks.kitpvp.abstracts.Abilities;
+import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
 
-public class Monk implements Listener {
+public class Monk extends Abilities implements Listener {
 	private Main plugin;
 
 	public Monk(Main main) {
+		super("Monk", new ItemStack(Material.BLAZE_ROD), Rarity.UNCOMMON, 15L, new String[] { ChatColor.AQUA + "Switch your opponent sword", ChatColor.AQUA + "with another item in his", ChatColor.AQUA + "inventory" });
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
+	}
+	
+	@Override
+	public ItemStack specialItem() {
+		return this.getIcon();
+	}
+	
+	@Override
+	public String specialItemName() {
+		return "Monk Staff";
 	}
 
 	@EventHandler
@@ -29,8 +41,7 @@ public class Monk implements Listener {
 		final ItemStack item = event.getPlayer().getItemInHand();
 		final Player player = event.getPlayer();
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-		if (pm.getAbility().hasAbility(AbilitiesEnum.MONK) && event.getRightClicked() instanceof Player
-				&& item.getType() == Material.BLAZE_ROD) {
+		if (pm.getAbility().hasAbility(this) && event.getRightClicked() instanceof Player && item.getType() == Material.BLAZE_ROD) {
 			if (pm.getAbility().hasActiveCooldown()) {
 				double cooldown = pm.getAbility().getActiveCooldown().longValue() / 1000.0D;
 				player.sendMessage(ChatColor.RED + "You can use your ability in "

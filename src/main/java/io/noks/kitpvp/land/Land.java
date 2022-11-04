@@ -12,7 +12,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import io.noks.kitpvp.enums.AbilitiesEnum;
+import io.noks.kitpvp.abstracts.Abilities;
+import io.noks.kitpvp.listeners.abilities.Archer;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Settings;
 import io.noks.kitpvp.utils.ItemUtils;
@@ -41,7 +42,7 @@ public class Land {
 		this.playerManager.setAllowBuild(false);
 	}
 
-	public void giveEquipment(AbilitiesEnum ability) {
+	public void giveEquipment(Abilities ability) {
 		Player player = this.playerManager.getPlayer();
 		player.setGameMode(GameMode.SURVIVAL);
 		PlayerInventory inv = player.getInventory();
@@ -51,19 +52,19 @@ public class Land {
 		inv.setItem(13, new ItemStack(Material.RED_MUSHROOM, 32));
 		inv.setItem(15, new ItemStack(Material.BROWN_MUSHROOM, 32));
 		Settings settings = this.playerManager.getSettings();
-		inv.setItem(settings.getSlot(Settings.SlotType.SWORD), new ItemStack(ItemUtils.getInstance()
-				.getItemUnbreakable((ability == AbilitiesEnum.BOXER) ? Material.WOOD_SWORD : Material.STONE_SWORD)));
-		if (ability.getSpecialItem().getType() != Material.MUSHROOM_SOUP)
-			inv.setItem(settings.getSlot(Settings.SlotType.ITEM), ItemUtils.getInstance()
-					.getItemStack(ability.getSpecialItem(), ChatColor.RED + ability.getSpecialItemName(), null));
-		if (settings.hasCompass())
-			inv.setItem(settings.getSlot(Settings.SlotType.COMPASS), new ItemStack(
-					ItemUtils.getInstance().getItemMaterial(Material.COMPASS, ChatColor.YELLOW + "Tracker")));
+		inv.setItem(settings.getSlot(Settings.SlotType.SWORD), new ItemStack(ItemUtils.getInstance().getItemUnbreakable(ability.sword())));
+		if (ability.specialItem().getType() != Material.MUSHROOM_SOUP) {
+			inv.setItem(settings.getSlot(Settings.SlotType.ITEM), ItemUtils.getInstance().getItemStack(ability.specialItem(), ChatColor.RED + ability.specialItemName(), null));
+		}
+		if (settings.hasCompass()) {
+			inv.setItem(settings.getSlot(Settings.SlotType.COMPASS), new ItemStack(ItemUtils.getInstance().getItemMaterial(Material.COMPASS, ChatColor.YELLOW + "Tracker")));
+		}
 		while (inv.firstEmpty() != -1) {
 			inv.addItem(new ItemStack[] { new ItemStack(Material.MUSHROOM_SOUP) });
 		}
-		if (ability == AbilitiesEnum.ARCHER)
+		if (ability instanceof Archer) {
 			inv.setItem(9, new ItemStack(Material.ARROW, 18));
+		}
 		player.updateInventory();
 	}
 }

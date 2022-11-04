@@ -27,15 +27,17 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import io.noks.kitpvp.Main;
-import io.noks.kitpvp.enums.AbilitiesEnum;
+import io.noks.kitpvp.abstracts.Abilities;
+import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Ability;
 
-public class Gladiator implements Listener {
+public class Gladiator extends Abilities implements Listener {
 	private Map<UUID, Gladiators> gladiators;
 	private Location[] gladiatorZones;
 	private Main plugin;
 	public Gladiator(Main main) {
+		super("Gladiator", new ItemStack(Material.IRON_FENCE), Rarity.LEGENDARY, 20L, new String[] { ChatColor.AQUA + "Duel your opponent" });
 		this.gladiators = Maps.newHashMap();
 		final World world = Bukkit.getWorld("world");
 		this.gladiatorZones = new Location[] {
@@ -47,6 +49,16 @@ public class Gladiator implements Listener {
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}
+	
+	@Override
+	public ItemStack specialItem() {
+		return this.getIcon();
+	}
+	
+	@Override
+	public String specialItemName() {
+		return "Gladiator Fence";
+	}
 
 	@EventHandler
 	public void onGladiator(PlayerInteractEntityEvent e) {
@@ -54,19 +66,17 @@ public class Gladiator implements Listener {
 			Player p = e.getPlayer();
 			Player r = (Player) e.getRightClicked();
 			Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();
-			if (p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.IRON_FENCE
-					&& ability.hasAbility(AbilitiesEnum.GLADIATOR)) {
+			if (p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.IRON_FENCE && ability.hasAbility(this)) {
 				if (ability.hasActiveCooldown()) {
 					double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
-					p.sendMessage(ChatColor.RED + "You can use your ability in "
-							+ (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
+					p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 					return;
 				}
 				if (this.gladiators.containsKey(r.getUniqueId())) {
 					return;
 				}
 				Ability clickedAbility = PlayerManager.get(r.getUniqueId()).getAbility();
-				if (clickedAbility.hasAbility(AbilitiesEnum.ANTIGLADIATOR)) {
+				if (clickedAbility.get() instanceof AntiGladiator) {
 					ability.applyCooldown();
 					return;
 				}

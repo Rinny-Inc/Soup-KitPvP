@@ -23,20 +23,30 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.google.common.collect.Maps;
 
 import io.noks.kitpvp.Main;
-import io.noks.kitpvp.enums.AbilitiesEnum;
+import io.noks.kitpvp.abstracts.Abilities;
+import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
 
-public class Phantom implements Listener {
+public class Phantom extends Abilities implements Listener {
 	private Main plugin;
-
+	private Map<UUID, ItemStack[]> equipments;
+	
 	public Phantom(Main main) {
-		this.equipments = Maps.newHashMap();
-
+		super("Phantom", new ItemStack(Material.FEATHER), Rarity.RARE, 30L, new String[] { ChatColor.AQUA + "Fly for 5 seconds" });
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
+		this.equipments = Maps.newHashMap();
 	}
-
-	private Map<UUID, ItemStack[]> equipments;
+	
+	@Override
+	public ItemStack specialItem() {
+		return this.getIcon();
+	}
+	
+	@Override
+	public String specialItemName() {
+		return "Phantom Feather";
+	}
 
 	@EventHandler
 	public void onJellyFish(PlayerInteractEvent e) {
@@ -44,7 +54,7 @@ public class Phantom implements Listener {
 		Action action = e.getAction();
 		if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
 				&& p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.FEATHER
-				&& PlayerManager.get(p.getUniqueId()).getAbility().hasAbility(AbilitiesEnum.PHANTOM)) {
+				&& PlayerManager.get(p.getUniqueId()).getAbility().hasAbility(this)) {
 			PlayerManager pm = PlayerManager.get(p.getUniqueId());
 			if (!pm.getAbility().hasActiveCooldown()) {
 				pm.getAbility().applyCooldown();

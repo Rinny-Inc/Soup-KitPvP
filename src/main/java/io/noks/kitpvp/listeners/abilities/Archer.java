@@ -13,17 +13,32 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
 import io.noks.kitpvp.Main;
-import io.noks.kitpvp.enums.AbilitiesEnum;
+import io.noks.kitpvp.abstracts.Abilities;
+import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.utils.ItemUtils;
 
-public class Archer implements Listener {
-	private Main plugin;
+public class Archer extends Abilities implements Listener {
+	
+	@Override
+	public ItemStack specialItem() {
+		return this.getUnbreakableItemStack(Material.BOW);
+	}
+
+	@Override
+	public String specialItemName() {
+		return "Special Bow";
+	}
+
+	@Override
+	public Material sword() {
+		return null;
+	}
 
 	public Archer(Main main) {
-		this.plugin = main;
-		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
+		super("Archer", new ItemStack(Material.BOW), Rarity.COMMON, 0L, new String[] { "(Distance x 0.25) = damage" });
+		main.getServer().getPluginManager().registerEvents(this, main);
 	}
 
 	@EventHandler
@@ -32,7 +47,7 @@ public class Archer implements Listener {
 			Arrow arrow = (Arrow) event.getDamager();
 			Player shooter = (Player) arrow.getShooter();
 
-			if (PlayerManager.get(shooter.getUniqueId()).getAbility().hasAbility(AbilitiesEnum.ARCHER)) {
+			if (PlayerManager.get(shooter.getUniqueId()).getAbility().hasAbility(this)) {
 				Player hitted = (Player) event.getEntity();
 				if (hitted == shooter) return;
 				double damage = shooter.getLocation().distance(hitted.getLocation()) * 0.35D;
@@ -48,7 +63,7 @@ public class Archer implements Listener {
 			Player player = event.getEntity().getKiller();
 			Ability ability = PlayerManager.get(player.getUniqueId()).getAbility();
 
-			if (ability.hasAbility(AbilitiesEnum.ARCHER)) {
+			if (ability.hasAbility(this)) {
 				if (player.getInventory().firstEmpty() == -1 && !player.getInventory().contains(Material.ARROW)) {
 					player.getWorld().dropItem(player.getLocation(), ItemUtils.getInstance().getItemStack(new ItemStack(Material.ARROW, 2), null, null));
 				} else {

@@ -18,22 +18,23 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.inventory.ItemStack;
 
 import io.noks.kitpvp.Main;
-import io.noks.kitpvp.enums.AbilitiesEnum;
+import io.noks.kitpvp.abstracts.Abilities;
+import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
 
-public class Ninja implements Listener {
+public class Ninja extends Abilities implements Listener {
 	private Main plugin;
+	private Map<UUID, UUID> ninja;
 
 	public Ninja(Main main) {
-		this.ninja = new WeakHashMap<>();
-
+		super("Ninja", new ItemStack(Material.WOOL, 1, (short) 15), Rarity.LEGENDARY, 20L, new String[] { ChatColor.AQUA + "Teleport yourself behind your opponent" });
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
+		this.ninja = new WeakHashMap<>();
 	}
-
-	private Map<UUID, UUID> ninja;
 
 	@EventHandler
 	public void onToggleSneak(PlayerToggleSneakEvent event) {
@@ -47,11 +48,10 @@ public class Ninja implements Listener {
 			if (!player.canSee(target) || !target.canSee(player))
 				return;
 			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-			if (pm.getAbility().hasAbility(AbilitiesEnum.NINJA)) {
+			if (pm.getAbility().hasAbility(this)) {
 				if (pm.getAbility().hasActiveCooldown()) {
 					double cooldown = pm.getAbility().getActiveCooldown().longValue() / 1000.0D;
-					player.sendMessage(ChatColor.RED + "You can use your ability in "
-							+ (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
+					player.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 					return;
 				}
 				pm.getAbility().applyCooldown();
@@ -84,7 +84,7 @@ public class Ninja implements Listener {
 			Player damager = (Player) event.getDamager();
 			PlayerManager dm = PlayerManager.get(damager.getUniqueId());
 
-			if (dm.getAbility().hasAbility(AbilitiesEnum.NINJA)) {
+			if (dm.getAbility().hasAbility(this)) {
 				Player damaged = (Player) event.getEntity();
 				this.ninja.put(damager.getUniqueId(), damaged.getUniqueId());
 				this.ninja.put(damaged.getUniqueId(), damager.getUniqueId());

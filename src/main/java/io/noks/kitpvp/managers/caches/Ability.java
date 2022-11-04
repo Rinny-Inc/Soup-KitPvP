@@ -3,31 +3,31 @@ package io.noks.kitpvp.managers.caches;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import io.noks.kitpvp.enums.AbilitiesEnum;
+import io.noks.kitpvp.abstracts.Abilities;
 
 public class Ability {
-	private AbilitiesEnum ability = AbilitiesEnum.NONE;
-	private Map<AbilitiesEnum, Long> abilityCooldown = new WeakHashMap<AbilitiesEnum, Long>();
+	private Abilities ability = null;
+	private Map<Abilities, Long> abilityCooldown = new WeakHashMap<Abilities, Long>();
 	private int abilityUseTime = 0;
-	private AbilitiesEnum lastAbility = AbilitiesEnum.NONE;
+	private Abilities lastAbility = null;
 
-	public AbilitiesEnum get() {
+	public Abilities get() {
 		return this.ability;
 	}
 
-	public AbilitiesEnum getLastUsed() {
+	public Abilities getLastUsed() {
 		return this.lastAbility;
 	}
 
-	public void set(AbilitiesEnum ability) {
+	public void set(Abilities ability) {
 		this.ability = ability;
 	}
 
 	public boolean hasAbility() {
-		return (this.ability != AbilitiesEnum.NONE);
+		return (this.ability != null);
 	}
 
-	public boolean hasAbility(AbilitiesEnum ability) {
+	public boolean hasAbility(Abilities ability) {
 		return (this.ability == ability);
 	}
 
@@ -36,7 +36,7 @@ public class Ability {
 		this.abilityUseTime = 0;
 		if (this.lastAbility != this.ability)
 			this.lastAbility = this.ability;
-		this.ability = AbilitiesEnum.NONE;
+		this.ability = null;
 	}
 
 	public Long getActiveCooldown() {

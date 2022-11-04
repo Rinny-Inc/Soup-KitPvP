@@ -31,8 +31,8 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import io.noks.kitpvp.Main;
-import io.noks.kitpvp.enums.AbilitiesEnum;
 import io.noks.kitpvp.inventories.CreateInventory;
+import io.noks.kitpvp.listeners.abilities.Boxer;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.managers.caches.CombatTag;
@@ -158,7 +158,7 @@ public class PlayerListener implements Listener {
 				}
 			}
 
-			if (killedAbility.get().getSpecialItem().getType() != Material.MUSHROOM_SOUP) {
+			if (killedAbility.get().specialItem().getType() != Material.MUSHROOM_SOUP) {
 				Iterator<ItemStack> dropsIt = event.getDrops().iterator();
 				while (dropsIt.hasNext()) {
 					final ItemStack loot = (ItemStack) dropsIt.next();
@@ -192,15 +192,8 @@ public class PlayerListener implements Listener {
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			final Player player = event.getPlayer();
 			if (!player.isDead() && player.getItemInHand().getType() == Material.MUSHROOM_SOUP && player.getHealth() < player.getMaxHealth()) {
-				final double newHealth = Math.min(player.getHealth() + 7.0D, player.getMaxHealth());
-				player.setHealth(newHealth);
-				//
-				if (!PlayerManager.get(player.getUniqueId()).getAbility().hasAbility(AbilitiesEnum.QUICKDROPPER)) {
-					player.getItemInHand().setType(Material.BOWL);
-				} else {
-					player.getItemInHand().setAmount(0);
-					player.getItemInHand().setType(Material.AIR);
-				}
+				player.setHealth(Math.min(player.getHealth() + 7.0D, player.getMaxHealth()));
+				player.getItemInHand().setType(Material.BOWL);
 				player.updateInventory();
 			}
 		}
@@ -232,7 +225,7 @@ public class PlayerListener implements Listener {
 		}
 		final ItemStack dropppedItem = event.getItemDrop().getItemStack();
 		if (dropppedItem.getType() == Material.MUSHROOM_SOUP) return;
-		if (dropppedItem.getType() == pm.getAbility().get().getSpecialItem().getType()) {
+		if (dropppedItem.getType() == pm.getAbility().get().specialItem().getType()) {
 			event.setCancelled(true);
 			return;
 		}
@@ -268,7 +261,7 @@ public class PlayerListener implements Listener {
 				return;
 			}
 			double damage = event.getDamage();
-			if (handItem.getType() == Material.AIR && PlayerManager.get(damager.getUniqueId()).getAbility().hasAbility(AbilitiesEnum.BOXER))
+			if (handItem.getType() == Material.AIR && PlayerManager.get(damager.getUniqueId()).getAbility().get() instanceof Boxer)
 				damage += 2.0D;
 			if (handItem.getType() == Material.WOOD_SWORD || handItem.getType() == Material.STONE_SWORD)
 				damage -= 2.5D;

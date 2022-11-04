@@ -12,20 +12,31 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import io.noks.kitpvp.Main;
-import io.noks.kitpvp.enums.AbilitiesEnum;
+import io.noks.kitpvp.abstracts.Abilities;
+import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Ability;
 
-public class Batman implements Listener {
+public class Batman extends Abilities implements Listener {
 	private Main plugin;
 
 	public Batman(Main main) {
+		super("Batman", new ItemStack(Material.WOOD_SPADE), Rarity.RARE, 15L, new String[] { ChatColor.AQUA + "Teleport you to the hooked", ChatColor.AQUA + "player" });
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
+	}
+	
+	public ItemStack specialItem() {
+		return getUnbreakableItemStack(Material.WOOD_SPADE);
+	}
+
+	public String specialItemName() {
+		return "Batman Hook";
 	}
 
 	@EventHandler
@@ -33,7 +44,7 @@ public class Batman implements Listener {
 		Player p = e.getPlayer();
 		Action action = e.getAction();
 		Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();
-		if (action == Action.RIGHT_CLICK_AIR && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.WOOD_SPADE && ability.hasAbility(AbilitiesEnum.BATMAN)) {
+		if (action == Action.RIGHT_CLICK_AIR && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.WOOD_SPADE && ability.hasAbility(this)) {
 			if (!ability.hasActiveCooldown()) {
 				ability.applyCooldown();
 				Arrow arrow = (Arrow) p.launchProjectile(Arrow.class);

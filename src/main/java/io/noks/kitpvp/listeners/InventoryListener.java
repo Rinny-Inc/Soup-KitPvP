@@ -17,7 +17,7 @@ import org.bukkit.event.inventory.InventoryType;
 import com.google.common.collect.Lists;
 
 import io.noks.kitpvp.Main;
-import io.noks.kitpvp.enums.AbilitiesEnum;
+import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.inventories.CreateInventory;
 import io.noks.kitpvp.land.Land;
@@ -107,27 +107,27 @@ public class InventoryListener implements Listener {
 				if (itemName.toLowerCase().equals(ChatColor.YELLOW + "random abilities")) {
 					List<String> abilities = Lists.newArrayList();
 
-					for (AbilitiesEnum abilitiesEnum : AbilitiesEnum.values()) {
-						if (abilitiesEnum.getRarity() != Rarity.USELESS && (player.hasPermission("kit." + abilitiesEnum.getName().toLowerCase()) || player.hasPermission(abilitiesEnum.getRarity().getPermission()) || player.hasPermission("kit.*")))
-							abilities.add(abilitiesEnum.getName());
+					for (Abilities abilitiess : this.plugin.getAbilitiesManager().getAbilities()) {
+						if (abilitiess.getRarity() != Rarity.USELESS && (player.hasPermission("kit." + abilitiess.getName().toLowerCase()) || player.hasPermission(abilitiess.getRarity().getPermission()) || player.hasPermission("kit.*")))
+							abilities.add(abilitiess.getName());
 					}
 					if (abilities.isEmpty()) {
 						return;
 					}
 					player.closeInventory();
 					int random = (new Random()).nextInt(abilities.size());
-					pm.getAbility().set(AbilitiesEnum.getAbilityFromName((String) abilities.get(random)));
+					pm.getAbility().set(this.plugin.getAbilitiesManager().getAbilityFromName(abilities.get(random)));
 					player.sendMessage(ChatColor.GRAY + "You've chosen " + pm.getAbility().get().getRarity().getColor() + pm.getAbility().get().getName() + ChatColor.GRAY + " ability.");
 					map.giveEquipment(pm.getAbility().get());
 					map.teleportToMap();
 					abilities.clear();
 					return;
 				}
-				if (!AbilitiesEnum.contains(correctItemName)) {
+				if (!this.plugin.getAbilitiesManager().contains(correctItemName)) {
 					return;
 				}
 				player.closeInventory();
-				pm.getAbility().set(AbilitiesEnum.getAbilityFromName(correctItemName));
+				pm.getAbility().set(this.plugin.getAbilitiesManager().getAbilityFromName(correctItemName));
 				player.sendMessage(ChatColor.GRAY + "You've chosen "
 						+ pm.getAbility().get().getRarity().getColor()
 						+ pm.getAbility().get().getName() + ChatColor.GRAY + " ability.");
@@ -138,8 +138,7 @@ public class InventoryListener implements Listener {
 		}
 		if (event.getInventory().getTitle().toLowerCase().contains("settings")) {
 			event.setCancelled(true);
-			if (event.getCurrentItem() != null && event.getCurrentItem().getType() != null
-					&& event.getCurrentItem().hasItemMeta() && event.getCurrentItem().getItemMeta().hasDisplayName()) {
+			if (event.getCurrentItem() != null && event.getCurrentItem().getType() != null && event.getCurrentItem().hasItemMeta() && event.getCurrentItem().getItemMeta().hasDisplayName()) {
 				String itemName = event.getCurrentItem().getItemMeta().getDisplayName();
 				if (itemName.equals(" ") || itemName.length() < 3) {
 					return;

@@ -7,7 +7,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import io.noks.kitpvp.enums.AbilitiesEnum;
+import io.noks.kitpvp.Main;
+import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
 
 public class AbilityListCommand implements CommandExecutor {
@@ -20,7 +21,7 @@ public class AbilityListCommand implements CommandExecutor {
 			if (rarities != Rarity.USELESS) rarity.add(rarities.getColor() + rarities.getName());
 		}
 		final StringJoiner ability = new StringJoiner(ChatColor.RESET + ", ");
-		for (AbilitiesEnum abilities : AbilitiesEnum.values()) {
+		for (Abilities abilities : Main.getInstance().getAbilitiesManager().getAbilities()) {
 			if (abilities.getRarity() != Rarity.USELESS) ability.add(abilities.getRarity().getColor() + abilities.getName());
 		}
 		sender.sendMessage(rarity.toString());

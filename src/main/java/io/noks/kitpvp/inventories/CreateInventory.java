@@ -14,7 +14,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import io.noks.kitpvp.enums.AbilitiesEnum;
+import io.noks.kitpvp.Main;
+import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.InventoryManager;
 import io.noks.kitpvp.managers.PlayerManager;
@@ -82,15 +83,12 @@ public class CreateInventory {
 		}
 		inv.setItem(0, ItemUtils.getInstance().getItemMaterial(Material.ARROW, ChatColor.YELLOW + "Previous page"));
 		Settings settings = PlayerManager.get(player.getUniqueId()).getSettings();
-		inv.setItem(10, ItemUtils.getInstance().getItemMaterial(Material.COMPASS, ChatColor.GRAY + "Compass: "
-				+ (settings.hasCompass() ? (ChatColor.GREEN + "Enabled") : (ChatColor.RED + "Disabled"))));
-		inv.setItem(12, ItemUtils.getInstance().getItemMaterial(Material.STONE_SWORD, ChatColor.GRAY + "Sword Slot",
-				settings.getSlot(Settings.SlotType.SWORD) + 1));
-		inv.setItem(14, ItemUtils.getInstance().getItemMaterial(Material.POTATO_ITEM, ChatColor.GRAY + "Item Slot",
-				settings.getSlot(Settings.SlotType.ITEM) + 1));
-		if (settings.hasCompass())
-			inv.setItem(16, ItemUtils.getInstance().getItemMaterial(Material.COMPASS, ChatColor.GRAY + "Compass Slot",
-					settings.getSlot(Settings.SlotType.COMPASS) + 1));
+		inv.setItem(10, ItemUtils.getInstance().getItemMaterial(Material.COMPASS, ChatColor.GRAY + "Compass: " + (settings.hasCompass() ? (ChatColor.GREEN + "Enabled") : (ChatColor.RED + "Disabled"))));
+		inv.setItem(12, ItemUtils.getInstance().getItemMaterial(Material.STONE_SWORD, ChatColor.GRAY + "Sword Slot", settings.getSlot(Settings.SlotType.SWORD) + 1));
+		inv.setItem(14, ItemUtils.getInstance().getItemMaterial(Material.POTATO_ITEM, ChatColor.GRAY + "Item Slot", settings.getSlot(Settings.SlotType.ITEM) + 1));
+		if (settings.hasCompass()) {
+			inv.setItem(16, ItemUtils.getInstance().getItemMaterial(Material.COMPASS, ChatColor.GRAY + "Compass Slot", settings.getSlot(Settings.SlotType.COMPASS) + 1));
+		}
 		return inv;
 	}
 
@@ -147,12 +145,9 @@ public class CreateInventory {
 	}
 
 	private void sortPlayersKitsByRarity(Player player, Inventory[] inventory, @Nullable Rarity rarity) {
-		List<AbilitiesEnum> list = Lists.newArrayList();
-		for (AbilitiesEnum abilities : AbilitiesEnum.values()) {
-			list.add(abilities);
-		}
-		list.sort(Comparator.comparing(AbilitiesEnum::getRarity));
-		for (AbilitiesEnum abilities : list) {
+		List<Abilities> list = Lists.newArrayList(Main.getInstance().getAbilitiesManager().getAbilities());
+		list.sort(Comparator.comparing(Abilities::getRarity));
+		for (Abilities abilities : list) {
 			if (abilities.getRarity() == Rarity.USELESS || (!player.hasPermission("kit." + abilities.getName().toLowerCase()) && !player.hasPermission(abilities.getRarity().getPermission()) && !player.hasPermission("kit.*")) || (rarity != null && abilities.getRarity() != rarity))
 				continue;
 			if (inventory[0].firstEmpty() == -1) {
@@ -173,8 +168,8 @@ public class CreateInventory {
 		}
 		inventory.setItem(0, ItemUtils.getInstance().getItemMaterial(Material.WATCH, 0, ChatColor.YELLOW + "Random Abilities"));
 		Ability ability = PlayerManager.get(player.getUniqueId()).getAbility();
-		if (ability.getLastUsed() != AbilitiesEnum.NONE) {
-			AbilitiesEnum lastAbility = ability.getLastUsed();
+		if (ability.getLastUsed() != null) {
+			Abilities lastAbility = ability.getLastUsed();
 			inventory.setItem(1, ItemUtils.getInstance().getItemStack(lastAbility.getIcon(), ChatColor.YELLOW + "Last used ability: " + lastAbility.getRarity().getColor() + lastAbility.getName(), lastAbility.getLore()));
 		}
 		inventory.setItem(4, ItemUtils.getInstance().getItemMaterial(Material.MUSHROOM_SOUP, 0, ChatColor.DARK_GRAY + "(" + ChatColor.DARK_AQUA + "Rivu" + ChatColor.DARK_GRAY + ")"));
