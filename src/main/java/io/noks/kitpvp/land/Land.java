@@ -12,11 +12,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.listeners.abilities.Archer;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Settings;
-import io.noks.kitpvp.utils.ItemUtils;
+import io.noks.kitpvp.managers.caches.Settings.SlotType;
 
 public class Land {
 	private World world = Bukkit.getWorld("customjava8");
@@ -52,15 +53,15 @@ public class Land {
 		inv.setItem(13, new ItemStack(Material.RED_MUSHROOM, 32));
 		inv.setItem(15, new ItemStack(Material.BROWN_MUSHROOM, 32));
 		Settings settings = this.playerManager.getSettings();
-		inv.setItem(settings.getSlot(Settings.SlotType.SWORD), new ItemStack(ItemUtils.getInstance().getItemUnbreakable(ability.sword())));
+		inv.setItem(settings.getSlot(SlotType.SWORD), new ItemStack(Main.getInstance().getItemUtils().getItemUnbreakable(ability.sword())));
 		if (ability.specialItem().getType() != Material.MUSHROOM_SOUP) {
-			inv.setItem(settings.getSlot(Settings.SlotType.ITEM), ItemUtils.getInstance().getItemStack(ability.specialItem(), ChatColor.RED + ability.specialItemName(), null));
+			inv.setItem(settings.getSlot(SlotType.ITEM), Main.getInstance().getItemUtils().getItemStack(ability.specialItem(), ChatColor.RED + ability.specialItemName(), null));
 		}
 		if (settings.hasCompass()) {
-			inv.setItem(settings.getSlot(Settings.SlotType.COMPASS), new ItemStack(ItemUtils.getInstance().getItemMaterial(Material.COMPASS, ChatColor.YELLOW + "Tracker")));
+			inv.setItem(settings.getSlot(SlotType.COMPASS), new ItemStack(Main.getInstance().getItemUtils().getItemMaterial(Material.COMPASS, ChatColor.YELLOW + "Tracker")));
 		}
 		while (inv.firstEmpty() != -1) {
-			inv.addItem(new ItemStack[] { new ItemStack(Material.MUSHROOM_SOUP) });
+			inv.addItem(new ItemStack(Material.MUSHROOM_SOUP));
 		}
 		if (ability instanceof Archer) {
 			inv.setItem(9, new ItemStack(Material.ARROW, 18));

@@ -19,8 +19,8 @@ import com.google.common.collect.Lists;
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
-import io.noks.kitpvp.inventories.CreateInventory;
 import io.noks.kitpvp.land.Land;
+import io.noks.kitpvp.managers.RefillInventoryManager;
 import io.noks.kitpvp.managers.InventoryManager;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Settings;
@@ -61,7 +61,7 @@ public class InventoryListener implements Listener {
 						return;
 					}
 					event.getInventory()
-							.setContents(CreateInventory.getInstance().loadKitsInventory(player, rarity).getContents());
+							.setContents(InventoryManager.getInstance().loadKitsInventory(player, rarity).getContents());
 					return;
 				}
 				if (itemName.toLowerCase().equals(ChatColor.RED + "leave")) {
@@ -71,17 +71,17 @@ public class InventoryListener implements Listener {
 				}
 				if (itemName.toLowerCase().equals(ChatColor.DARK_AQUA + "settings")) {
 					player.closeInventory();
-					player.openInventory(CreateInventory.getInstance().loadSettingsInventory(player));
+					player.openInventory(InventoryManager.getInstance().loadSettingsInventory(player));
 					return;
 				}
 				if (itemName.toLowerCase().equals(ChatColor.YELLOW + "your whole abilities")) {
 					event.getInventory()
-							.setContents(CreateInventory.getInstance().loadKitsInventory(player).getContents());
+							.setContents(InventoryManager.getInstance().loadKitsInventory(player).getContents());
 					return;
 				}
 				if (itemName.toLowerCase().equals(ChatColor.YELLOW + "next page")) {
 					event.getInventory()
-							.setContents(CreateInventory.getInstance()
+							.setContents(InventoryManager.getInstance()
 									.loadKitsInventory(player, Rarity.getRarityByName(correctItemName),
 											event.getCurrentItem().getAmount())
 									.getContents());
@@ -89,7 +89,7 @@ public class InventoryListener implements Listener {
 				}
 				if (itemName.toLowerCase().equals(ChatColor.YELLOW + "previous page")) {
 					event.getInventory()
-							.setContents(CreateInventory.getInstance()
+							.setContents(InventoryManager.getInstance()
 									.loadKitsInventory(player, Rarity.getRarityByName(correctItemName),
 											event.getCurrentItem().getAmount())
 									.getContents());
@@ -148,18 +148,18 @@ public class InventoryListener implements Listener {
 				if (itemName.toLowerCase().contains(":")) {
 					pm.getSettings().updateCompass();
 					event.getInventory()
-							.setContents(CreateInventory.getInstance().loadSettingsInventory(player).getContents());
+							.setContents(InventoryManager.getInstance().loadSettingsInventory(player).getContents());
 					return;
 				}
 				player.closeInventory();
 				if (itemName.toLowerCase().equals(ChatColor.YELLOW + "previous page")) {
-					player.openInventory(CreateInventory.getInstance().loadKitsInventory(player));
+					player.openInventory(InventoryManager.getInstance().loadKitsInventory(player));
 					return;
 				}
 				if (itemName.toLowerCase().contains("slot")) {
 					String name = itemName.split(" ")[0];
 					name = name.substring(2, name.length());
-					player.openInventory(CreateInventory.getInstance().loadSlotsInventory(player, name));
+					player.openInventory(InventoryManager.getInstance().loadSlotsInventory(player, name));
 					return;
 				}
 			}
@@ -178,7 +178,7 @@ public class InventoryListener implements Listener {
 				}
 				settings.setSlot(Settings.SlotType.getSlotTypeFromName(titleSplitted), event.getSlot());
 				player.closeInventory();
-				player.openInventory(CreateInventory.getInstance().loadSettingsInventory(player));
+				player.openInventory(InventoryManager.getInstance().loadSettingsInventory(player));
 			}
 		}
 	}
@@ -187,7 +187,7 @@ public class InventoryListener implements Listener {
 	public void onRefillInventoryLeave(InventoryCloseEvent event) {
 		if (event.getInventory().getTitle().toLowerCase().contains("refill chest")
 				&& !event.getInventory().contains(Material.MUSHROOM_SOUP)) {
-			InventoryManager im = InventoryManager.get(event.getInventory(),
+			RefillInventoryManager im = RefillInventoryManager.get(event.getInventory(),
 					event.getPlayer().getLocation().getBlock().getBiome());
 			im.setCooldown(Long.valueOf(60L));
 			im.setFilled(false);

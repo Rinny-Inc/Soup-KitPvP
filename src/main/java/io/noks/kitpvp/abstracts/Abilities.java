@@ -1,10 +1,15 @@
 package io.noks.kitpvp.abstracts;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
+import io.noks.kitpvp.Main;
 import io.noks.kitpvp.enums.Rarity;
+import io.noks.kitpvp.listeners.abilities.Archer;
+import io.noks.kitpvp.listeners.abilities.CookieMonster;
+import io.noks.kitpvp.listeners.abilities.Switcher;
 
 public abstract class Abilities {
 	private String name;
@@ -61,11 +66,13 @@ public abstract class Abilities {
 		return this.lore;
 	}
 	
-	public ItemStack getUnbreakableItemStack(Material material) {
-		ItemStack item = new ItemStack(material);
-		ItemMeta im = item.getItemMeta();
-		im.spigot().setUnbreakable(true);
-		item.setItemMeta(im);
-		return item;
+	public void onKill(Player killer) {
+		if (this instanceof Archer || this instanceof CookieMonster || this instanceof Switcher) {
+			if (killer.getInventory().firstEmpty() == -1 && (this instanceof Archer ? !killer.getInventory().contains(Material.ARROW) : !killer.getInventory().contains(this.specialItem()))) {
+				killer.getWorld().dropItem(killer.getLocation(), Main.getInstance().getItemUtils().getItemStack(new ItemStack((this instanceof Archer ? Material.ARROW : this.specialItem().getType()), 2), (this instanceof Archer ? null : ChatColor.RED + this.specialItemName()), null));
+				return;
+			}
+			killer.getInventory().addItem(new ItemStack[] { Main.getInstance().getItemUtils().getItemStack(new ItemStack((this instanceof Archer ? Material.ARROW : this.specialItem().getType()), 2), (this instanceof Archer ? null : ChatColor.RED + this.specialItemName()), null) });
+		}
 	}
 }

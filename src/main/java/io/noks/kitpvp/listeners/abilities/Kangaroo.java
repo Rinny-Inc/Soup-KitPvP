@@ -22,7 +22,7 @@ public class Kangaroo extends Abilities implements Listener {
 	private Main plugin;
 
 	public Kangaroo(Main main) {
-		super("Kangaroo", new ItemStack(Material.FIREWORK), Rarity.UNIQUE, 0L, new String[] { ChatColor.AQUA + "Jump like a kangaroo" });
+		super("Kangaroo", new ItemStack(Material.FIREWORK), Rarity.UNIQUE, 0L /* LUNAR = 10L */, new String[] { ChatColor.AQUA + "Jump like a kangaroo" });
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}

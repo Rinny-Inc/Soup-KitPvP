@@ -1,5 +1,7 @@
 package io.noks.kitpvp.enums;
 
+import org.bukkit.inventory.ItemStack;
+
 public enum PerksEnum {
 	BOUNTY_HUNTER("Bounty Hunter", Tiers.I, 1, new String[] {""}), // TIER I
 	SORE_LOSER("Sore Loser", Tiers.I, 1, new String[] {""}),
@@ -30,12 +32,14 @@ public enum PerksEnum {
 	CONTER("Counter", Tiers.III, 1, new String[] {""});
 	
 	private String name;
+	private ItemStack icon;
 	private Tiers tier;
 	private int cost;
 	private String[] description;
 	
-	PerksEnum(String name, Tiers tier, int cost, String[] description) {
+	PerksEnum(String name, /*ItemStack icon,*/ Tiers tier, int cost, String[] description) {
 		this.name = name;
+		//this.icon = icon;
 		this.tier = tier;
 		this.cost = cost;
 		this.description = description;
@@ -43,6 +47,10 @@ public enum PerksEnum {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public ItemStack getIcon() {
+		return this.icon;
 	}
 	
 	public Tiers getTier() {

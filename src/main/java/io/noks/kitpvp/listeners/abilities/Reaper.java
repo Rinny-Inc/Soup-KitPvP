@@ -28,7 +28,7 @@ public class Reaper extends Abilities implements Listener {
 	
 	@Override
 	public ItemStack specialItem() {
-		return this.getUnbreakableItemStack(this.getIcon().getType());
+		return Main.getInstance().getItemUtils().getItemUnbreakable(this.getIcon().getType());
 	}
 	
 	@Override

@@ -1,4 +1,4 @@
-package io.noks.kitpvp.tasked;
+package io.noks.kitpvp.task.event;
 
 import java.util.Random;
 

@@ -7,14 +7,11 @@ import java.util.Random;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,7 +24,6 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -40,7 +36,6 @@ import com.google.common.collect.Maps;
 
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.managers.PlayerManager;
-import io.noks.kitpvp.utils.ItemUtils;
 import io.noks.kitpvp.utils.MathUtils;
 
 public class ServerListener implements Listener {
@@ -56,8 +51,7 @@ public class ServerListener implements Listener {
 
 	@EventHandler
 	public void onServerPing(ServerListPingEvent event) {
-		String line1 = ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "----------" + ChatColor.GRAY + ChatColor.BOLD + "( " + ChatColor.DARK_AQUA + ChatColor.BOLD + "Rivu " + ChatColor.GRAY + ChatColor.BOLD
-				+ ")" + ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "---------------\n";
+		String line1 = ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "----------" + ChatColor.GRAY + ChatColor.BOLD + "( " + ChatColor.DARK_AQUA + ChatColor.BOLD + "Rastacraft " + ChatColor.GRAY + ChatColor.BOLD + ")" + ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "---------------\n";
 		String line2 = ChatColor.GOLD.toString() + ChatColor.ITALIC + "- Home of soup pvp -";
 		event.setMotd(line1 + line2 + (Bukkit.hasWhitelist() ? (ChatColor.RED + " Whitelisted") : ""));
 	}
@@ -96,7 +90,7 @@ public class ServerListener implements Listener {
 			}
 			setBlockCooldown(location, ((new Random()).nextInt(5) + 25));
 			block.getWorld().dropItem(location,
-					ItemUtils.getInstance().getItemMaterial(
+					this.plugin.getItemUtils().getItemMaterial(
 							(block.getType() == Material.LOG) ? Material.BOWL : block.getType(),
 							(new Random()).nextInt(3) + 1));
 		}
@@ -181,8 +175,8 @@ public class ServerListener implements Listener {
 				new ItemStack(Material.BOWL, MathUtils.getRandom(3, 12)),
 				new ItemStack(Material.GOLDEN_APPLE, MathUtils.getRandom(1, 2)),
 				new ItemStack(Material.POTION, 1, (short) 16386),
-				ItemUtils.getInstance().getItemUnbreakable(Material.STONE_SWORD),
-				ItemUtils.getInstance().getItemUnbreakable(Material.IRON_SWORD), lighter,
+				this.plugin.getItemUtils().getItemUnbreakable(Material.STONE_SWORD),
+				this.plugin.getItemUtils().getItemUnbreakable(Material.IRON_SWORD), lighter,
 				new ItemStack(Material.EXP_BOTTLE, MathUtils.getRandom(1, 3))};
 
 		Random r = new Random();

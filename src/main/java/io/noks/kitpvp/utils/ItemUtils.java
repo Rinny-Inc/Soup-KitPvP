@@ -1,7 +1,6 @@
 package io.noks.kitpvp.utils;
 
 import java.util.Arrays;
-import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -11,11 +10,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class ItemUtils {
-	private static ItemUtils instance = new ItemUtils();
-	public static ItemUtils getInstance() {
-		return instance;
-	}
-
 	public ItemStack getItemStack(ItemStack item, @Nullable String name, @Nullable String[] lore) {
 		ItemStack i = item;
 		ItemMeta im = i.getItemMeta();

@@ -20,14 +20,16 @@ import io.noks.kitpvp.listeners.InventoryListener;
 import io.noks.kitpvp.listeners.PlayerListener;
 import io.noks.kitpvp.listeners.ServerListener;
 import io.noks.kitpvp.managers.AbilitiesManager;
-import io.noks.kitpvp.managers.InventoryManager;
+import io.noks.kitpvp.managers.RefillInventoryManager;
+import io.noks.kitpvp.task.event.FallenGolemTask;
+import io.noks.kitpvp.task.event.FeastTask;
 import io.noks.kitpvp.managers.PlayerManager;
-import io.noks.kitpvp.tasked.FallenGolemTask;
-import io.noks.kitpvp.tasked.FeastTask;
+import io.noks.kitpvp.utils.ItemUtils;
 
 public class Main extends JavaPlugin {
 	private DBUtils database;
 	private AbilitiesManager abilitiesManager;
+	private ItemUtils itemUtils;
 	
 	private static Main instance;
 	public static Main getInstance() {
@@ -38,6 +40,7 @@ public class Main extends JavaPlugin {
 		instance = this;
 		this.database = new DBUtils(getConfig().getString("DATABASE.ADDRESS"), getConfig().getString("DATABASE.NAME"), getConfig().getString("DATABASE.USER"), getConfig().getString("DATABASE.PASSWORD"));
 		this.abilitiesManager = new AbilitiesManager(this);
+		this.itemUtils = new ItemUtils();
 		
 		try {
 			FeastTask.getInstance().doFeast();
@@ -55,7 +58,7 @@ public class Main extends JavaPlugin {
 			}
 		}
 		PlayerManager.players.clear();
-		InventoryManager.inventories.clear();
+		RefillInventoryManager.inventories.clear();
 		if (this.database.getHikari() != null) {
 			this.database.getHikari().close();
 		}
@@ -88,5 +91,9 @@ public class Main extends JavaPlugin {
 	
 	public AbilitiesManager getAbilitiesManager() {
 		return this.abilitiesManager;
+	}
+	
+	public ItemUtils getItemUtils() {
+		return this.itemUtils;
 	}
 }

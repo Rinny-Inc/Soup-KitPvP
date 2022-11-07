@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.event.player.PlayerFishEvent.State;
 import org.bukkit.inventory.ItemStack;
 
 import io.noks.kitpvp.Main;
@@ -24,7 +25,7 @@ public class Fisherman extends Abilities implements Listener {
 	
 	@Override
 	public ItemStack specialItem() {
-		return this.getUnbreakableItemStack(this.getIcon().getType());
+		return Main.getInstance().getItemUtils().getItemUnbreakable(this.getIcon().getType());
 	}
 	
 	@Override
@@ -34,16 +35,18 @@ public class Fisherman extends Abilities implements Listener {
 
 	@EventHandler
 	public void onFish(PlayerFishEvent event) {
-		if (event.getState() == PlayerFishEvent.State.CAUGHT_FISH) {
+		if (event.getState() == State.CAUGHT_FISH) {
 			event.setCancelled(true);
 			return;
 		}
-		if (event.getCaught() instanceof Player && PlayerManager.get(event.getPlayer().getUniqueId()).getAbility().hasAbility(this)) {
-			Player target = (Player) event.getCaught();
-			Player player = event.getPlayer();
-			if (target == player) return;
-			target.teleport(player.getLocation());
-			target.setFallDistance(0.0F);
+		if (event.getCaught() instanceof Player) {
+			final Player player = event.getPlayer();
+			if (PlayerManager.get(player.getUniqueId()).getAbility().hasAbility(this)) {
+				final Player target = (Player) event.getCaught();
+				if (target == player) return;
+				target.teleport(player.getLocation()); // TODO: teleport player in front of the fisherman
+				target.setFallDistance(0.0F);
+			}
 		}
 	}
 }

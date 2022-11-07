@@ -22,7 +22,7 @@ public class Stomper extends Abilities implements Listener {
 	private Main plugin;
 
 	public Stomper(Main main) {
-		super("Stomper", new ItemStack(Material.ANVIL), Rarity.UNIQUE, 0L, new String[] { ChatColor.AQUA + "transfer fall damages to your opponents", ChatColor.AQUA + "while jumping on them" });
+		super("Stomper", new ItemStack(Material.ANVIL), Rarity.UNIQUE, 0L, new String[] { ChatColor.AQUA + "Transfer fall damages to your opponents", ChatColor.AQUA + "while jumping on them" });
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}

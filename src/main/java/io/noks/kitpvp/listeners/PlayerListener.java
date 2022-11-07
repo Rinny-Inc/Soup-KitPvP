@@ -31,8 +31,8 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import io.noks.kitpvp.Main;
-import io.noks.kitpvp.inventories.CreateInventory;
 import io.noks.kitpvp.listeners.abilities.Boxer;
+import io.noks.kitpvp.managers.InventoryManager;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.managers.caches.CombatTag;
@@ -49,7 +49,7 @@ public class PlayerListener implements Listener {
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
 		event.setJoinMessage(null);
 		final Player player = event.getPlayer();
@@ -71,7 +71,6 @@ public class PlayerListener implements Listener {
 	public void onQuit(PlayerQuitEvent event) {
 		event.setQuitMessage(null);
 		final Player player = event.getPlayer();
-
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 		pm.kill();
 		this.plugin.getDataBase().savePlayer(pm);
@@ -93,67 +92,19 @@ public class PlayerListener implements Listener {
 			if (killed.getKiller() instanceof Player && pm.hasCombatTag()) {
 				PlayerManager km = PlayerManager.get(pm.getCurrentCombatTag().getLastAttackerUUID());
 				Player killer = km.getPlayer();
-				/*int[] killedStuff = { 0, 0, 0, 0 };
-				for (ItemStack items : killed.getInventory().getContents()) {
-					if (items != null) {
-						if (items.getType() == Material.MUSHROOM_SOUP)
-							killedStuff[0]++;
-						if (items.getType() == Material.BOWL)
-							killedStuff[1] = killedStuff[1] + items.getAmount();
-						if (items.getType() == Material.BROWN_MUSHROOM)
-							killedStuff[2] = killedStuff[2] + items.getAmount();
-						if (items.getType() == Material.RED_MUSHROOM)
-							killedStuff[3] = killedStuff[3] + items.getAmount();
-					}
-				}
-				int[] killerStuff = { 0, 0, 0, 0 };
-				for (ItemStack items : killer.getInventory().getContents()) {
-					if (items != null) {
-						if (items.getType() == Material.MUSHROOM_SOUP)
-							killerStuff[0]++;
-						if (items.getType() == Material.BOWL)
-							killerStuff[1] = killerStuff[1] + items.getAmount();
-						if (items.getType() == Material.BROWN_MUSHROOM)
-							killerStuff[2] = killerStuff[2] + items.getAmount();
-						if (items.getType() == Material.RED_MUSHROOM)
-							killerStuff[3] = killerStuff[3] + items.getAmount();
-					}
-				}
-				int soupDiff = Math.abs(killedStuff[0] - killerStuff[0]);
-				int recraftDiff = Math.abs((killedStuff[1] + killedStuff[2] + killedStuff[3]) / 3
-						- (killerStuff[1] + killerStuff[2] + killerStuff[3]) / 3);*/
-				String message = ChatColor.GRAY + killer.getName() + "(" + ChatColor.RED
-						+ km.getAbility().get().getName() + ChatColor.GRAY + ") killed " + killed.getName() + "("
-						+ ChatColor.RED + killedAbility.get().getName() + ChatColor.GRAY + ") " /*+ ChatColor.BLUE
-						+ "[Soup Diff: " + soupDiff + "; Recraft Diff: " + recraftDiff + "]"*/;
+				String message = ChatColor.GRAY + killer.getName() + "(" + ChatColor.RED + km.getAbility().get().getName() + ChatColor.GRAY + ") killed " + killed.getName() + "(" + ChatColor.RED + killedAbility.get().getName() + ChatColor.GRAY + ")";
 
 				killed.sendMessage(message);
 				if (killer != killed) {
+					km.getAbility().get().onKill(killer);
 					killer.sendMessage(message);
 
-					/*int randomLoots = (new Random()).nextInt(6) + 26;
-					int[] missing = { 64 - killerStuff[1] - randomLoots, 64 - killerStuff[2] - randomLoots,
-							64 - killerStuff[3] - randomLoots };
-					int[] total = { killerStuff[1] + randomLoots, killerStuff[2] + randomLoots,
-							killerStuff[3] + randomLoots };
-					if (missing[0] > 0) {
-						killer.getInventory().addItem(new ItemStack[] { new ItemStack(Material.BOWL,
-								Math.max(0, Math.min(total[0] + missing[0], randomLoots))) });
-					}
-					if (missing[1] > 0) {
-						killer.getInventory().addItem(new ItemStack[] { new ItemStack(Material.BROWN_MUSHROOM,
-								Math.max(0, Math.min(total[1] + missing[1], randomLoots))) });
-					}
-					if (missing[2] > 0) {
-						killer.getInventory().addItem(new ItemStack[] { new ItemStack(Material.RED_MUSHROOM,
-								Math.max(0, Math.min(total[2] + missing[2], randomLoots))) });
-					}*/
 					Stats killerStats = km.getStats();
 					killerStats.addKills();
 					killerStats.addKillStreak();
 
 					Economy killerEconomy = km.getEconomy();
-					int moneyToAdd = ((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 2 : 1);
+					int moneyToAdd = ((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 20 : 10);
 					killerEconomy.add(moneyToAdd, MoneyType.BRONZE);
 				}
 			}
@@ -207,7 +158,7 @@ public class PlayerListener implements Listener {
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			final Player player = event.getPlayer();
 			if (player.getItemInHand().getType() == Material.BOOK && player.getItemInHand().getItemMeta().getDisplayName().toLowerCase().equals(ChatColor.GRAY + "your abilities")) {
-				player.openInventory(CreateInventory.getInstance().loadKitsInventory(player));
+				player.openInventory(InventoryManager.getInstance().loadKitsInventory(player));
 			}
 		}
 	}
@@ -307,7 +258,7 @@ public class PlayerListener implements Listener {
 
 			if (PlayerManager.get(player.getUniqueId()).getAbility().hasAbility()) {
 				event.setCancelled(true);
-				player.openInventory(CreateInventory.getInstance().loadRefillInventory(player));
+				player.openInventory(InventoryManager.getInstance().loadRefillInventory(player));
 			}
 		}
 	}

@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -14,7 +13,6 @@ import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
-import io.noks.kitpvp.utils.ItemUtils;
 
 public class Switcher extends Abilities implements Listener {
 	private Main plugin;
@@ -51,25 +49,6 @@ public class Switcher extends Abilities implements Listener {
 				hit.teleport(shooterLoc);
 				shooter.teleport(hitLoc);
 			}
-		}
-	}
-
-	@EventHandler
-	public void onKill(PlayerDeathEvent event) {
-		if (event.getEntity().getKiller() instanceof Player) {
-			Player player = event.getEntity().getKiller();
-			PlayerManager pm = PlayerManager.get(player.getUniqueId());
-
-			if (pm.getAbility().hasAbility(this))
-				if (player.getInventory().firstEmpty() == -1 && !player.getInventory().contains(Material.SNOW_BALL)) {
-					player.getWorld().dropItem(player.getLocation(),
-							ItemUtils.getInstance().getItemStack(new ItemStack(Material.SNOW_BALL, 2),
-									ChatColor.RED + this.specialItemName(), null));
-				} else {
-					player.getInventory().addItem(
-							new ItemStack[] { ItemUtils.getInstance().getItemStack(new ItemStack(Material.SNOW_BALL, 2),
-									ChatColor.RED + this.specialItemName(), null) });
-				}
 		}
 	}
 }

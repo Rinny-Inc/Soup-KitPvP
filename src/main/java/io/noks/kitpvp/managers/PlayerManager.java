@@ -8,12 +8,12 @@ import org.bukkit.entity.Player;
 
 import com.google.common.collect.Maps;
 
+import io.noks.kitpvp.Main;
 import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.managers.caches.CombatTag;
 import io.noks.kitpvp.managers.caches.Economy;
 import io.noks.kitpvp.managers.caches.Settings;
 import io.noks.kitpvp.managers.caches.Stats;
-import io.noks.kitpvp.utils.ItemUtils;
 
 public class PlayerManager {
 	public static final Map<UUID, PlayerManager> players = Maps.newConcurrentMap();
@@ -139,7 +139,7 @@ public class PlayerManager {
 	
 	public void giveMainItem() {
 		player.getInventory().clear();
-		player.getInventory().setItem(0, ItemUtils.getInstance().getAbilitiesSelector());
+		player.getInventory().setItem(0, Main.getInstance().getItemUtils().getAbilitiesSelector());
 		player.updateInventory();
 		player.setWalkSpeed(0.2F);
 		player.setMaximumNoDamageTicks(10);

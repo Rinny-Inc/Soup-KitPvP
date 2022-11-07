@@ -32,7 +32,7 @@ public class Batman extends Abilities implements Listener {
 	}
 	
 	public ItemStack specialItem() {
-		return getUnbreakableItemStack(Material.WOOD_SPADE);
+		return Main.getInstance().getItemUtils().getItemUnbreakable(Material.WOOD_SPADE);
 	}
 
 	public String specialItemName() {
