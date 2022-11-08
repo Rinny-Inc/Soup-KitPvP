@@ -32,7 +32,7 @@ public class Batman extends Abilities implements Listener {
 	}
 	
 	public ItemStack specialItem() {
-		return Main.getInstance().getItemUtils().getItemUnbreakable(Material.WOOD_SPADE);
+		return this.plugin.getItemUtils().getItemUnbreakable(Material.WOOD_SPADE);
 	}
 
 	public String specialItemName() {
@@ -41,6 +41,9 @@ public class Batman extends Abilities implements Listener {
 
 	@EventHandler
 	public void onBatman(PlayerInteractEvent e) {
+		if (!e.hasItem()) {
+			return;
+		}
 		Player p = e.getPlayer();
 		Action action = e.getAction();
 		Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();

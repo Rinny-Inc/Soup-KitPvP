@@ -40,6 +40,9 @@ public class CookieMonster extends Abilities implements Listener {
 
 	@EventHandler
 	public void onInteract(PlayerInteractEvent event) {
+		if (!event.hasItem()) {
+			return;
+		}
 		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && PlayerManager.get(event.getPlayer().getUniqueId()).getAbility().hasAbility(this)) {
 			Player p = event.getPlayer();
 			if (p.getItemInHand().getType() == Material.COOKIE && p.getFoodLevel() == 20 && (!p.hasPotionEffect(PotionEffectType.SPEED) || p.getHealth() * 2.0D < p.getMaxHealth())) {

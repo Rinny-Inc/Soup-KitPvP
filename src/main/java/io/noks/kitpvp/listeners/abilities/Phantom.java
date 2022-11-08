@@ -49,7 +49,10 @@ public class Phantom extends Abilities implements Listener {
 	}
 
 	@EventHandler
-	public void onJellyFish(PlayerInteractEvent e) {
+	public void onPhantom(PlayerInteractEvent e) {
+		if (!e.hasItem()) {
+			return;
+		}
 		final Player p = e.getPlayer();
 		Action action = e.getAction();
 		if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)

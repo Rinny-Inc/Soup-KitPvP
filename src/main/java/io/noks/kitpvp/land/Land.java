@@ -16,11 +16,11 @@ import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.listeners.abilities.Archer;
 import io.noks.kitpvp.managers.PlayerManager;
-import io.noks.kitpvp.managers.caches.Settings;
-import io.noks.kitpvp.managers.caches.Settings.SlotType;
+import io.noks.kitpvp.managers.caches.PlayerSettings;
+import io.noks.kitpvp.managers.caches.PlayerSettings.SlotType;
 
 public class Land {
-	private World world = Bukkit.getWorld("customjava8");
+	private World world = Bukkit.getWorld("world");
 	private Location[] locations = new Location[] { new Location(this.world, 100.0D, 134.0D, 738.0D, 42.0F, 0.0F), new Location(this.world, 82.0D, 130.0D, 932.0D, 136.0F, 0.0F), new Location(this.world, -107.0D, 130.0D, 911.0D, -130.0F, 0.0F), new Location(this.world, -78.0D, 130.0D, 741.0D, -44.0F, 0.0F), new Location(this.world, -24.0D, 130.0D, 708.0D, -10.0F, 0.0F) };;
 	private PlayerManager playerManager;
 	
@@ -52,7 +52,7 @@ public class Land {
 		inv.setItem(14, new ItemStack(Material.BOWL, 32));
 		inv.setItem(13, new ItemStack(Material.RED_MUSHROOM, 32));
 		inv.setItem(15, new ItemStack(Material.BROWN_MUSHROOM, 32));
-		Settings settings = this.playerManager.getSettings();
+		PlayerSettings settings = this.playerManager.getSettings();
 		inv.setItem(settings.getSlot(SlotType.SWORD), new ItemStack(Main.getInstance().getItemUtils().getItemUnbreakable(ability.sword())));
 		if (ability.specialItem().getType() != Material.MUSHROOM_SOUP) {
 			inv.setItem(settings.getSlot(SlotType.ITEM), Main.getInstance().getItemUtils().getItemStack(ability.specialItem(), ChatColor.RED + ability.specialItemName(), null));

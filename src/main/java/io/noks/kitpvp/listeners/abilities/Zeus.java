@@ -6,9 +6,11 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -28,7 +30,7 @@ public class Zeus extends Abilities implements Listener {
 	
 	@Override
 	public ItemStack specialItem() {
-		return Main.getInstance().getItemUtils().getItemUnbreakable(this.getIcon().getType());
+		return this.plugin.getItemUtils().getItemUnbreakable(this.getIcon().getType());
 	}
 	
 	@Override
@@ -38,6 +40,9 @@ public class Zeus extends Abilities implements Listener {
 
 	@EventHandler
 	public void onZeus(PlayerInteractEvent e) {
+		if (!e.hasItem()) {
+			return;
+		}
 		Player p = e.getPlayer();
 		Action action = e.getAction();
 		PlayerManager pm = PlayerManager.get(p.getUniqueId());
@@ -56,11 +61,11 @@ public class Zeus extends Abilities implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onZeusDamage(EntityDamageEvent e) {
 		if (e.getEntity() instanceof Player) {
 			Player p = (Player) e.getEntity();
-			if (PlayerManager.get(p.getUniqueId()).getAbility().hasAbility(this) && e.getCause() == EntityDamageEvent.DamageCause.LIGHTNING) {
+			if (PlayerManager.get(p.getUniqueId()).getAbility().hasAbility(this) && e.getCause() == DamageCause.LIGHTNING) {
 				e.setCancelled(true);
 			}
 		}

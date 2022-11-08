@@ -9,15 +9,15 @@ public class Perks {
 		this.perks = tier;
 	}
 	
-	public PerksEnum getTierI() {
+	public PerksEnum first() {
 		return this.perks[0];
 	}
 	
-	public PerksEnum getTierII() {
+	public PerksEnum second() {
 		return this.perks[1];
 	}
 	
-	public PerksEnum getTierIII() {
+	public PerksEnum third() {
 		return this.perks[2];
 	}
 }

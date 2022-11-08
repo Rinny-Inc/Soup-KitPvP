@@ -13,6 +13,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import com.google.common.collect.Lists;
 
@@ -20,10 +22,10 @@ import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.land.Land;
-import io.noks.kitpvp.managers.RefillInventoryManager;
 import io.noks.kitpvp.managers.InventoryManager;
 import io.noks.kitpvp.managers.PlayerManager;
-import io.noks.kitpvp.managers.caches.Settings;
+import io.noks.kitpvp.managers.RefillInventoryManager;
+import io.noks.kitpvp.managers.caches.PlayerSettings;
 
 public class InventoryListener implements Listener {
 	private Main plugin;
@@ -32,22 +34,41 @@ public class InventoryListener implements Listener {
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}
-
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onInventoryClick(InventoryClickEvent event) {
-		if (event.getInventory().getType().equals(InventoryType.CREATIVE) || event.getInventory().getType().equals(InventoryType.CRAFTING) || event.getInventory().getType().equals(InventoryType.PLAYER)) {
-			Player player = (Player) event.getWhoClicked();
-			PlayerManager pm = PlayerManager.get(player.getUniqueId());
+	
+	@EventHandler(priority=EventPriority.LOW)
+	public void blockSpawnMoveItem(InventoryClickEvent event) {
+		final Inventory inventory = event.getClickedInventory();
+		if (inventory == null) {
+			return;
+		}
+		if (inventory.getType().equals(InventoryType.CREATIVE) || inventory.getType().equals(InventoryType.CRAFTING) || inventory.getType().equals(InventoryType.PLAYER)) {
+			final Player player = (Player) event.getWhoClicked();
+			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 
 			if (!pm.getAbility().hasAbility() && player.getGameMode() != GameMode.CREATIVE) {
 				event.setCancelled(true);
 				player.updateInventory();
 			}
 		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onInventoryClick(InventoryClickEvent event) {
+		final Inventory inventory = event.getInventory();
+		if (inventory == null) {
+			return;
+		}
+		if (inventory.getType() != InventoryType.CHEST) {
+			return;
+		}
+		final ItemStack item = event.getCurrentItem();
+		
+		if (item == null || item.getType() == null || item.getItemMeta() == null || item.getItemMeta().getDisplayName() == null) {
+			return;
+		}
 		if (event.getInventory().getTitle().toLowerCase().contains("your abilities")) {
 			event.setCancelled(true);
-			if (event.getCurrentItem() != null && event.getCurrentItem().getType() != null
-					&& event.getCurrentItem().hasItemMeta() && event.getCurrentItem().getItemMeta().hasDisplayName()) {
+			if (event.getCurrentItem() != null && event.getCurrentItem().getType() != null && event.getCurrentItem().hasItemMeta() && event.getCurrentItem().getItemMeta().hasDisplayName()) {
 				Player player = (Player) event.getWhoClicked();
 				PlayerManager pm = PlayerManager.get(player.getUniqueId());
 				String itemName = event.getCurrentItem().getItemMeta().getDisplayName();
@@ -171,12 +192,12 @@ public class InventoryListener implements Listener {
 					&& event.getCurrentItem().hasItemMeta() && event.getCurrentItem().getItemMeta().hasDisplayName()) {
 
 				Player player = (Player) event.getWhoClicked();
-				Settings settings = PlayerManager.get(player.getUniqueId()).getSettings();
+				PlayerSettings settings = PlayerManager.get(player.getUniqueId()).getSettings();
 				String titleSplitted = event.getInventory().getTitle().split(" ")[1];
-				if (!Settings.SlotType.contains(titleSplitted)) {
+				if (!PlayerSettings.SlotType.contains(titleSplitted)) {
 					return;
 				}
-				settings.setSlot(Settings.SlotType.getSlotTypeFromName(titleSplitted), event.getSlot());
+				settings.setSlot(PlayerSettings.SlotType.getSlotTypeFromName(titleSplitted), event.getSlot());
 				player.closeInventory();
 				player.openInventory(InventoryManager.getInstance().loadSettingsInventory(player));
 			}
@@ -185,10 +206,8 @@ public class InventoryListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onRefillInventoryLeave(InventoryCloseEvent event) {
-		if (event.getInventory().getTitle().toLowerCase().contains("refill chest")
-				&& !event.getInventory().contains(Material.MUSHROOM_SOUP)) {
-			RefillInventoryManager im = RefillInventoryManager.get(event.getInventory(),
-					event.getPlayer().getLocation().getBlock().getBiome());
+		if (event.getInventory().getTitle().toLowerCase().contains("refill chest") && !event.getInventory().contains(Material.MUSHROOM_SOUP)) {
+			RefillInventoryManager im = RefillInventoryManager.get(event.getInventory(), event.getPlayer().getLocation().getBlock().getBiome());
 			im.setCooldown(Long.valueOf(60L));
 			im.setFilled(false);
 		}

@@ -25,7 +25,7 @@ public class FallenGolemTask implements Listener {
 		return instance;
 	}
 
-	private World world = Bukkit.getWorld("customjava8");
+	private World world = Bukkit.getWorld("world");
 	private int countdown = EventsType.GOLEM.getCountdown();
 	private String prefix = EventsType.GOLEM.getPrefix(ChatColor.RED);
 

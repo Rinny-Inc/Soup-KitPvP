@@ -60,6 +60,9 @@ public class Hulk extends Abilities implements Listener {
 
 	@EventHandler
 	public void onHulkThrow(PlayerInteractEvent e) {
+		if (!e.hasItem()) {
+			return;
+		}
 		Player p = e.getPlayer();
 		Action action = e.getAction();
 		if (action == Action.LEFT_CLICK_AIR && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.AIR && PlayerManager.get(p.getUniqueId()).getAbility().hasAbility(this) && p.getPassenger() != null) {

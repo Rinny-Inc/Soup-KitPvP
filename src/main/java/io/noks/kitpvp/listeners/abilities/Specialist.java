@@ -38,6 +38,9 @@ public class Specialist extends Abilities implements Listener {
 
 	@EventHandler
 	public void onInteract(PlayerInteractEvent event) {
+		if (!event.hasItem()) {
+			return;
+		}
 		Player player = event.getPlayer();
 
 		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)

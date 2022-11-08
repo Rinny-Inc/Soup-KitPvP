@@ -21,7 +21,7 @@ public class FeastTask {
 		return instance;
 	}
 
-	private World world = Bukkit.getWorld("customjava8");
+	private World world = Bukkit.getWorld("world");
 	private int countdown = (EventsType.FEAST.getCountdown() * 20) * 60;
 	private String prefix = EventsType.FEAST.getPrefix(ChatColor.GOLD);
 

@@ -22,6 +22,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerOnGroundEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -72,8 +73,30 @@ public class PlayerListener implements Listener {
 		event.setQuitMessage(null);
 		final Player player = event.getPlayer();
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
+		if (pm.hasCombatTag()) {
+			final PlayerManager km = PlayerManager.get(pm.getCurrentCombatTag().getLastAttackerUUID());
+			final Player killer = km.getPlayer();
+
+			if (killer != player) {
+				km.getAbility().get().onKill(killer);
+				killer.sendMessage(ChatColor.GRAY + killer.getName() + "(" + ChatColor.RED + km.getAbility().get().getName() + ChatColor.GRAY + ") killed " + player.getName() + "(" + ChatColor.RED + pm.getAbility().get().getName() + ChatColor.GRAY + ")");
+
+				final Stats killerStats = km.getStats();
+				killerStats.addKills();
+				killerStats.addKillStreak();
+
+				final Economy killerEconomy = km.getEconomy();
+				killerEconomy.add(((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 20 : 10), MoneyType.BRONZE);
+			}
+		}
 		pm.kill();
 		this.plugin.getDataBase().savePlayer(pm);
+	}
+	
+	@EventHandler(priority=EventPriority.HIGHEST)
+	public void onGettingKicked(PlayerKickEvent event) {
+		onQuit(new PlayerQuitEvent(event.getPlayer(), event.getLeaveMessage()));
+		event.setLeaveMessage(null);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -85,27 +108,29 @@ public class PlayerListener implements Listener {
 			final PlayerManager pm = PlayerManager.get(killed.getUniqueId());
 			final Ability killedAbility = pm.getAbility();
 
+			if (killed.getItemOnCursor() != null) {
+				killed.setItemOnCursor(null);
+			}
 			if (!killedAbility.hasAbility()) {
 				event.getDrops().clear();
 				return;
 			}
 			if (killed.getKiller() instanceof Player && pm.hasCombatTag()) {
-				PlayerManager km = PlayerManager.get(pm.getCurrentCombatTag().getLastAttackerUUID());
-				Player killer = km.getPlayer();
-				String message = ChatColor.GRAY + killer.getName() + "(" + ChatColor.RED + km.getAbility().get().getName() + ChatColor.GRAY + ") killed " + killed.getName() + "(" + ChatColor.RED + killedAbility.get().getName() + ChatColor.GRAY + ")";
+				final PlayerManager km = PlayerManager.get(pm.getCurrentCombatTag().getLastAttackerUUID());
+				final Player killer = km.getPlayer();
+				final String message = ChatColor.GRAY + killer.getName() + "(" + ChatColor.RED + km.getAbility().get().getName() + ChatColor.GRAY + ") killed " + killed.getName() + "(" + ChatColor.RED + killedAbility.get().getName() + ChatColor.GRAY + ")";
 
 				killed.sendMessage(message);
 				if (killer != killed) {
 					km.getAbility().get().onKill(killer);
 					killer.sendMessage(message);
 
-					Stats killerStats = km.getStats();
+					final Stats killerStats = km.getStats();
 					killerStats.addKills();
 					killerStats.addKillStreak();
 
-					Economy killerEconomy = km.getEconomy();
-					int moneyToAdd = ((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 20 : 10);
-					killerEconomy.add(moneyToAdd, MoneyType.BRONZE);
+					final Economy killerEconomy = km.getEconomy();
+					killerEconomy.add(((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 20 : 10), MoneyType.BRONZE);
 				}
 			}
 

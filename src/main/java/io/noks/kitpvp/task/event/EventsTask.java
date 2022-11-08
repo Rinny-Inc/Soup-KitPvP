@@ -17,8 +17,7 @@ public class EventsTask extends EventTask {
 	private EventsType type;
 
 	public void start() {
-		if (this.type.getPosition().getX() == 0.0D && this.type.getPosition().getY() == 0.0D
-				&& this.type.getPosition().getZ() == 0.0D) {
+		if (this.type.getPosition().getX() == 0.0D && this.type.getPosition().getY() == 0.0D && this.type.getPosition().getZ() == 0.0D) {
 			return;
 		}
 		if (this.spawned) {

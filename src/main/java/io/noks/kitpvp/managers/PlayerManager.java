@@ -12,20 +12,20 @@ import io.noks.kitpvp.Main;
 import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.managers.caches.CombatTag;
 import io.noks.kitpvp.managers.caches.Economy;
-import io.noks.kitpvp.managers.caches.Settings;
+import io.noks.kitpvp.managers.caches.PlayerSettings;
 import io.noks.kitpvp.managers.caches.Stats;
 
 public class PlayerManager {
 	public static final Map<UUID, PlayerManager> players = Maps.newConcurrentMap();
-	private Player player;
-	private UUID playerUUID;
+	private final Player player;
+	private final UUID playerUUID;
 	private Ability ability;
 	private boolean usedSponsor;
 	private boolean usedRecraft;
 	private boolean allowBuild;
-	private Stats stats;
-	private Settings settings;
-	private Economy economy;
+	private final Stats stats;
+	private final PlayerSettings settings;
+	private final Economy economy;
 	private CombatTag combatTag;
 
 	public PlayerManager(UUID playerUUID) {
@@ -36,12 +36,12 @@ public class PlayerManager {
 		this.usedRecraft = false;
 		this.allowBuild = false;
 		this.stats = new Stats();
-		this.settings = new Settings();
+		this.settings = new PlayerSettings();
 		this.economy = new Economy();
 		players.putIfAbsent(playerUUID, this);
 	}
 	
-	public PlayerManager(UUID playerUUID, Stats stats, Settings settings, Economy economy) {
+	public PlayerManager(UUID playerUUID, Stats stats, PlayerSettings settings, Economy economy) {
 		this.playerUUID = playerUUID;
 		this.player = Bukkit.getPlayer(this.playerUUID);
 		this.ability = new Ability();
@@ -105,7 +105,7 @@ public class PlayerManager {
 		return this.stats;
 	}
 
-	public Settings getSettings() {
+	public PlayerSettings getSettings() {
 		return this.settings;
 	}
 

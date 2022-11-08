@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -28,14 +29,13 @@ public class Turtle extends Abilities implements Listener {
 		if (event.getDamager() instanceof Player) {
 			Player damager = (Player) event.getDamager();
 
-			if (PlayerManager.get(damager.getUniqueId()).getAbility().hasAbility(this)
-					&& damager.getPlayer().isSneaking()) {
+			if (PlayerManager.get(damager.getUniqueId()).getAbility().hasAbility(this) && damager.getPlayer().isSneaking()) {
 				event.setCancelled(true);
 			}
 		}
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onDamage(EntityDamageEvent event) {
 		if (event.getEntity() instanceof Player) {
 			Player player = (Player) event.getEntity();

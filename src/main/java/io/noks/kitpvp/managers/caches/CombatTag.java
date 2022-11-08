@@ -18,4 +18,9 @@ public class CombatTag {
 	public Long getTime() {
 		return this.time;
 	}
+	
+	public Long getRemainingTime() {
+		final Long current = System.currentTimeMillis();
+		return (current > this.time ? 0L : this.time - current);
+	}
 }

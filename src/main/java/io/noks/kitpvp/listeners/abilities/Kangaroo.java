@@ -39,6 +39,9 @@ public class Kangaroo extends Abilities implements Listener {
 
 	@EventHandler
 	public void onKangarooInteract(PlayerInteractEvent event) {
+		if (!event.hasItem()) {
+			return;
+		}
 		final Player player = event.getPlayer();
 		if (player.getItemInHand().getType() != null && player.getItemInHand().getType() == Material.FIREWORK && PlayerManager.get(player.getUniqueId()).getAbility().hasAbility(this)) {
 			event.setCancelled(true);

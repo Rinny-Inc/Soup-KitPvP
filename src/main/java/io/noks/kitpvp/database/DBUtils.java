@@ -8,10 +8,10 @@ import java.util.UUID;
 
 import com.zaxxer.hikari.HikariDataSource;
 
-import io.noks.kitpvp.Main;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Economy;
-import io.noks.kitpvp.managers.caches.Settings;
+import io.noks.kitpvp.managers.caches.PlayerSettings;
+import io.noks.kitpvp.managers.caches.PlayerSettings.SlotType;
 import io.noks.kitpvp.managers.caches.Stats;
 
 public class DBUtils {
@@ -111,7 +111,7 @@ public class DBUtils {
 			if (result.next()) {
 				new PlayerManager(uuid, 
 						new Stats(result.getInt("kills"), result.getInt("death"), result.getInt("bestks"), result.getInt("bounty")), 
-						new Settings(result.getBoolean("hascompass"), result.getInt("swordslot"), result.getInt("itemslot"), result.getInt("compassslot")), 
+						new PlayerSettings(result.getBoolean("hascompass"), result.getInt("swordslot"), result.getInt("itemslot"), result.getInt("compassslot")), 
 						new Economy(result.getInt("money"))).giveMainItem();
 			}
 			statement.close();
@@ -131,6 +131,7 @@ public class DBUtils {
 
 	public void savePlayer(PlayerManager pm) {
 		if (!isConnected()) {
+			pm.remove();
 			return;
 		}
 		Connection connection = null;
@@ -143,9 +144,9 @@ public class DBUtils {
 			statement.setInt(3, pm.getStats().getBestKillStreak());
 			statement.setInt(4, pm.getStats().getBestKillStreak());
 			statement.setBoolean(5, pm.getSettings().hasCompass());
-			statement.setInt(6, pm.getSettings().getSlot(Settings.SlotType.SWORD));
-			statement.setInt(7, pm.getSettings().getSlot(Settings.SlotType.ITEM));
-			statement.setInt(8, pm.getSettings().getSlot(Settings.SlotType.COMPASS));
+			statement.setInt(6, pm.getSettings().getSlot(SlotType.SWORD));
+			statement.setInt(7, pm.getSettings().getSlot(SlotType.ITEM));
+			statement.setInt(8, pm.getSettings().getSlot(SlotType.COMPASS));
 			statement.setInt(9, pm.getEconomy().getMoney());
 			statement.setString(10, pm.getPlayerUUID().toString());
 			statement.execute();

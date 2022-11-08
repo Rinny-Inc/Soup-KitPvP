@@ -44,6 +44,9 @@ public class Blink extends Abilities implements Listener {
 
 	@EventHandler
 	public void onBlink(PlayerInteractEvent e) {
+		if (!e.hasItem()) {
+			return;
+		}
 		Player p = e.getPlayer();
 		Action action = e.getAction();
 		Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();

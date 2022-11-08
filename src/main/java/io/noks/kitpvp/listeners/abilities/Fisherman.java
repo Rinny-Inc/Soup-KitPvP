@@ -25,7 +25,7 @@ public class Fisherman extends Abilities implements Listener {
 	
 	@Override
 	public ItemStack specialItem() {
-		return Main.getInstance().getItemUtils().getItemUnbreakable(this.getIcon().getType());
+		return this.plugin.getItemUtils().getItemUnbreakable(this.getIcon().getType());
 	}
 	
 	@Override

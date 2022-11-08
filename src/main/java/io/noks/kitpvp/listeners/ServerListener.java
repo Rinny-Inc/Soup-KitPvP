@@ -200,7 +200,7 @@ public class ServerListener implements Listener {
 					public void run() {
 						sponsor.getBlock().setType(Material.AIR);
 					}
-				}).runTaskLater(Main.getInstance(), 200L);
+				}).runTaskLater(this.plugin, 200L);
 			}
 		}
 	}

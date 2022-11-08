@@ -64,4 +64,13 @@ public enum PerksEnum {
 	public String[] getDescription() {
 		return description;
 	}
+	
+	public static PerksEnum getPerksFromName(String name) {
+		for (PerksEnum perk : values()) {
+			if (perk.getName().toLowerCase().equals(name.toLowerCase())) {
+				return perk;
+			}
+		}
+		return null;
+	}
 }

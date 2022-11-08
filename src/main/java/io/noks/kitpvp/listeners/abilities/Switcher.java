@@ -1,7 +1,6 @@
 package io.noks.kitpvp.listeners.abilities;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,19 +34,15 @@ public class Switcher extends Abilities implements Listener {
 
 	@EventHandler
 	public void onSwitcherSwitch(ProjectileHitEvent event) {
-		if (event.getEntity() instanceof org.bukkit.entity.Snowball && event.getEntity().getShooter() instanceof Player
-				&& event.getHitEntity() instanceof Player) {
+		if (event.getEntity() instanceof org.bukkit.entity.Snowball && event.getEntity().getShooter() instanceof Player && event.getHitEntity() instanceof Player) {
 			Player shooter = (Player) event.getEntity().getShooter();
 
 			if (PlayerManager.get(shooter.getUniqueId()).getAbility().hasAbility(this)) {
-				Player hit = (Player) event.getHitEntity();
+				final Player hit = (Player) event.getHitEntity();
 
-				if (hit == shooter)
-					return;
-				Location shooterLoc = shooter.getLocation();
-				Location hitLoc = hit.getLocation();
-				hit.teleport(shooterLoc);
-				shooter.teleport(hitLoc);
+				if (hit == shooter)return;
+				hit.teleport(shooter.getLocation());
+				shooter.teleport(hit.getLocation());
 			}
 		}
 	}
