@@ -23,10 +23,6 @@ import net.minecraft.util.com.google.common.collect.Lists;
 import net.minecraft.util.org.apache.commons.lang3.text.WordUtils;
 
 public class InventoryManager {
-	public static InventoryManager instance = new InventoryManager();
-	public static InventoryManager getInstance() {
-		return instance;
-	}
 
 	public Inventory loadKitsInventory(Player player) {
 		return loadKitsInventory(player, null, 1);
@@ -57,8 +53,7 @@ public class InventoryManager {
 				player.getLocation().getBlock().getBiome());
 		if (im.hasCooldown()) {
 			double cooldown = im.getCooldown().longValue() / 1000.0D;
-			player.sendMessage(
-					ChatColor.RED + "Refill ends in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
+			player.sendMessage(ChatColor.RED + "Refill ends in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 			return null;
 		}
 		if (!im.isFilled()) {

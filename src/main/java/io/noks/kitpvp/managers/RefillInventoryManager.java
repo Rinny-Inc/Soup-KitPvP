@@ -1,19 +1,19 @@
 package io.noks.kitpvp.managers;
 
-import java.util.List;
 import java.util.Map;
 
 import org.bukkit.block.Biome;
 import org.bukkit.inventory.Inventory;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import io.noks.kitpvp.utils.LightList;
+
 public class RefillInventoryManager {
+	public static final LightList<RefillInventoryManager> inventories = new LightList<RefillInventoryManager>();
 	private Inventory inventory;
 	private boolean filled;
 	private Biome biome;
-	public static final List<RefillInventoryManager> inventories = Lists.newArrayList();
 	private Map<Biome, Long> cooldown;
 
 	public RefillInventoryManager(Inventory inv) {

@@ -25,10 +25,11 @@ public class Stats {
 		this.deaths = death;
 		this.bestKillStreak = bestKS;
 		this.killStreak = 0;
+		this.bounty = bounty;
 		this.paused = false;
 	}
 
-	public Double getRatio() {
+	private Double getRatio() {
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(3);
 		df.setDecimalSeparatorAlwaysShown(true);
@@ -87,7 +88,7 @@ public class Stats {
 				ChatColor.GRAY + "Deaths -> " + ChatColor.RED + this.deaths,
 				ChatColor.GRAY + "Killstreak -> " + ChatColor.GOLD + this.killStreak,
 				ChatColor.GRAY + "Highest Killstreak -> " + ChatColor.GOLD + this.bestKillStreak,
-				ChatColor.GRAY + "KD -> " + ChatColor.GOLD + getRatio(),
+				ChatColor.GRAY + "K/D Ratio -> " + ChatColor.GOLD + getRatio(),
 				ChatColor.GRAY + "Bounty -> " + ChatColor.RED + this.bounty};
 	}
 }

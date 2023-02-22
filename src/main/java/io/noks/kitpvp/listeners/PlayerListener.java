@@ -33,7 +33,6 @@ import org.bukkit.util.Vector;
 
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.listeners.abilities.Boxer;
-import io.noks.kitpvp.managers.InventoryManager;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.managers.caches.CombatTag;
@@ -95,7 +94,7 @@ public class PlayerListener implements Listener {
 	
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onGettingKicked(PlayerKickEvent event) {
-		onQuit(new PlayerQuitEvent(event.getPlayer(), event.getLeaveMessage()));
+		this.onQuit(new PlayerQuitEvent(event.getPlayer(), event.getLeaveMessage()));
 		event.setLeaveMessage(null);
 	}
 
@@ -183,7 +182,7 @@ public class PlayerListener implements Listener {
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			final Player player = event.getPlayer();
 			if (player.getItemInHand().getType() == Material.BOOK && player.getItemInHand().getItemMeta().getDisplayName().toLowerCase().equals(ChatColor.GRAY + "your abilities")) {
-				player.openInventory(InventoryManager.getInstance().loadKitsInventory(player));
+				player.openInventory(this.plugin.getInventoryManager().loadKitsInventory(player));
 			}
 		}
 	}
@@ -283,7 +282,7 @@ public class PlayerListener implements Listener {
 
 			if (PlayerManager.get(player.getUniqueId()).getAbility().hasAbility()) {
 				event.setCancelled(true);
-				player.openInventory(InventoryManager.getInstance().loadRefillInventory(player));
+				player.openInventory(this.plugin.getInventoryManager().loadRefillInventory(player));
 			}
 		}
 	}

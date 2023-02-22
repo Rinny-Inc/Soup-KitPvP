@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import io.noks.kitpvp.managers.InventoryManager;
+import io.noks.kitpvp.Main;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.utils.Messages;
 
@@ -55,7 +55,7 @@ public class RecraftCommand implements CommandExecutor {
 			return false;
 		}
 		pm.setUsedRecraft(true);
-		InventoryManager.getInstance().openRecraftInventory(player);
+		Main.getInstance().getInventoryManager().openRecraftInventory(player);
 		player.playSound(player.getLocation(), Sound.LEVEL_UP, 0.85F, 0.9F);
 		return true;
 	}

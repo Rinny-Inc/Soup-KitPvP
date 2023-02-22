@@ -142,6 +142,6 @@ public class PlayerManager {
 		player.getInventory().setItem(0, Main.getInstance().getItemUtils().getAbilitiesSelector());
 		player.updateInventory();
 		player.setWalkSpeed(0.2F);
-		player.setMaximumNoDamageTicks(10);
+		player.setMaximumNoDamageTicks(20);
 	}
 }

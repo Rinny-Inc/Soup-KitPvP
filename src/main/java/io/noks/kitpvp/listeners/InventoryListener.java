@@ -22,7 +22,6 @@ import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.land.Land;
-import io.noks.kitpvp.managers.InventoryManager;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.RefillInventoryManager;
 import io.noks.kitpvp.managers.caches.PlayerSettings;
@@ -82,7 +81,7 @@ public class InventoryListener implements Listener {
 						return;
 					}
 					event.getInventory()
-							.setContents(InventoryManager.getInstance().loadKitsInventory(player, rarity).getContents());
+							.setContents(this.plugin.getInventoryManager().loadKitsInventory(player, rarity).getContents());
 					return;
 				}
 				if (itemName.toLowerCase().equals(ChatColor.RED + "leave")) {
@@ -92,17 +91,17 @@ public class InventoryListener implements Listener {
 				}
 				if (itemName.toLowerCase().equals(ChatColor.DARK_AQUA + "settings")) {
 					player.closeInventory();
-					player.openInventory(InventoryManager.getInstance().loadSettingsInventory(player));
+					player.openInventory(this.plugin.getInventoryManager().loadSettingsInventory(player));
 					return;
 				}
 				if (itemName.toLowerCase().equals(ChatColor.YELLOW + "your whole abilities")) {
 					event.getInventory()
-							.setContents(InventoryManager.getInstance().loadKitsInventory(player).getContents());
+							.setContents(this.plugin.getInventoryManager().loadKitsInventory(player).getContents());
 					return;
 				}
 				if (itemName.toLowerCase().equals(ChatColor.YELLOW + "next page")) {
 					event.getInventory()
-							.setContents(InventoryManager.getInstance()
+							.setContents(this.plugin.getInventoryManager()
 									.loadKitsInventory(player, Rarity.getRarityByName(correctItemName),
 											event.getCurrentItem().getAmount())
 									.getContents());
@@ -110,7 +109,7 @@ public class InventoryListener implements Listener {
 				}
 				if (itemName.toLowerCase().equals(ChatColor.YELLOW + "previous page")) {
 					event.getInventory()
-							.setContents(InventoryManager.getInstance()
+							.setContents(this.plugin.getInventoryManager()
 									.loadKitsInventory(player, Rarity.getRarityByName(correctItemName),
 											event.getCurrentItem().getAmount())
 									.getContents());
@@ -169,18 +168,18 @@ public class InventoryListener implements Listener {
 				if (itemName.toLowerCase().contains(":")) {
 					pm.getSettings().updateCompass();
 					event.getInventory()
-							.setContents(InventoryManager.getInstance().loadSettingsInventory(player).getContents());
+							.setContents(this.plugin.getInventoryManager().loadSettingsInventory(player).getContents());
 					return;
 				}
 				player.closeInventory();
 				if (itemName.toLowerCase().equals(ChatColor.YELLOW + "previous page")) {
-					player.openInventory(InventoryManager.getInstance().loadKitsInventory(player));
+					player.openInventory(this.plugin.getInventoryManager().loadKitsInventory(player));
 					return;
 				}
 				if (itemName.toLowerCase().contains("slot")) {
 					String name = itemName.split(" ")[0];
 					name = name.substring(2, name.length());
-					player.openInventory(InventoryManager.getInstance().loadSlotsInventory(player, name));
+					player.openInventory(this.plugin.getInventoryManager().loadSlotsInventory(player, name));
 					return;
 				}
 			}
@@ -199,7 +198,7 @@ public class InventoryListener implements Listener {
 				}
 				settings.setSlot(PlayerSettings.SlotType.getSlotTypeFromName(titleSplitted), event.getSlot());
 				player.closeInventory();
-				player.openInventory(InventoryManager.getInstance().loadSettingsInventory(player));
+				player.openInventory(this.plugin.getInventoryManager().loadSettingsInventory(player));
 			}
 		}
 	}
