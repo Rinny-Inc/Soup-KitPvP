@@ -7,9 +7,15 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import io.noks.kitpvp.utils.Messages;
+import io.noks.kitpvp.Main;
 
 public class BootCommand implements CommandExecutor {
+	private Main main;
+	public BootCommand(Main main) {
+		this.main = main;
+		main.getCommand("boot").setExecutor(this);
+	}
+	
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (!(sender instanceof Player)) {
 			return false;
@@ -21,7 +27,7 @@ public class BootCommand implements CommandExecutor {
 		Player target = Bukkit.getPlayer(args[0]);
 
 		if (target == null) {
-			sender.sendMessage(Messages.PLAYER_NOT_ONLINE);
+			sender.sendMessage(this.main.getMessages().PLAYER_NOT_ONLINE);
 			return false;
 		}
 		Player player = (Player) sender;

@@ -13,6 +13,7 @@ public class Clan {
 	private String name;
 	private UUID leaderUUID, coLeaderUUID;
 	private LightList<UUID> membersUUIDList;
+	private String tag;
 	private boolean open;
 	
 	public Clan(UUID leaderUUID, String name) {
@@ -22,11 +23,12 @@ public class Clan {
 		this.open = false;
 		teamList.putIfAbsent(leaderUUID, this);
 	}
-	public Clan(UUID leaderUUID, @Nullable UUID coLeaderUUID, String name, LightList<UUID> membersList, boolean open) {
+	public Clan(UUID leaderUUID, @Nullable UUID coLeaderUUID, String name, String tag, LightList<UUID> membersList, boolean open) {
 		this.name = name;
 		this.leaderUUID = leaderUUID;
 		this.coLeaderUUID = coLeaderUUID;
 		this.membersUUIDList = membersList;
+		this.tag = tag;
 		this.open = open;
 		teamList.putIfAbsent(leaderUUID, this);
 	}

@@ -7,11 +7,17 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import io.noks.kitpvp.Main;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Stats;
-import io.noks.kitpvp.utils.Messages;
 
 public class StatisticCommand implements CommandExecutor {
+	private Main main;
+	public StatisticCommand(Main main) {
+		this.main = main;
+		main.getCommand("stats").setExecutor(this);
+	}
+	
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (!(sender instanceof Player)) {
 			return false;
@@ -24,7 +30,7 @@ public class StatisticCommand implements CommandExecutor {
 		if (args.length == 1) {
 			Player target = Bukkit.getPlayer(args[0]);
 			if (target == null) {
-				sender.sendMessage(Messages.PLAYER_NOT_ONLINE);
+				sender.sendMessage(this.main.getMessages().PLAYER_NOT_ONLINE);
 				return false;
 			}
 			Stats stats = PlayerManager.get(target.getUniqueId()).getStats();

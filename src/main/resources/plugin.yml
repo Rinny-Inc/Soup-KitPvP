@@ -12,7 +12,6 @@ commands:
   skull:
   sponsor:
   stats:
-  recraft:
   build:
   boot:
     aliases: [ddos]

@@ -39,11 +39,9 @@ import io.noks.kitpvp.managers.caches.CombatTag;
 import io.noks.kitpvp.managers.caches.Economy;
 import io.noks.kitpvp.managers.caches.Economy.MoneyType;
 import io.noks.kitpvp.managers.caches.Stats;
-import io.noks.kitpvp.utils.Messages;
 
 public class PlayerListener implements Listener {
 	private Main plugin;
-
 	public PlayerListener(Main main) {
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
@@ -63,7 +61,7 @@ public class PlayerListener implements Listener {
 		player.teleport(player.getWorld().getSpawnLocation());
 		player.setAllowFlight(false);
 		player.setFlying(false);
-		player.sendMessage(Messages.WELCOME_MESSAGE);
+		player.sendMessage(this.plugin.getMessages().WELCOME_MESSAGE);
 		this.plugin.getDataBase().loadPlayer(player.getUniqueId());
 	}
 

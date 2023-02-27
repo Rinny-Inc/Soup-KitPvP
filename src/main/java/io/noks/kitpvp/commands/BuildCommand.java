@@ -7,16 +7,22 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import io.noks.kitpvp.Main;
 import io.noks.kitpvp.managers.PlayerManager;
-import io.noks.kitpvp.utils.Messages;
 
 public class BuildCommand implements CommandExecutor {
+	private Main main;
+	public BuildCommand(Main main) {
+		this.main = main;
+		main.getCommand("build").setExecutor(this);
+	}
+	
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (!(sender instanceof Player)) {
 			return false;
 		}
 		if (!sender.hasPermission("command.build")) {
-			sender.sendMessage(Messages.NO_PERMISSION);
+			sender.sendMessage(this.main.getMessages().NO_PERMISSION);
 			return false;
 		}
 		if (args.length > 1) {
@@ -29,7 +35,7 @@ public class BuildCommand implements CommandExecutor {
 			Player target = Bukkit.getPlayer(args[0]);
 
 			if (target == null) {
-				player.sendMessage(Messages.PLAYER_NOT_ONLINE);
+				player.sendMessage(this.main.getMessages().PLAYER_NOT_ONLINE);
 				return false;
 			}
 			PlayerManager tm = PlayerManager.get(target.getUniqueId());

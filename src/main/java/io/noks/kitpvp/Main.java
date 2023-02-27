@@ -13,7 +13,6 @@ import io.noks.kitpvp.commands.BalanceCommand;
 import io.noks.kitpvp.commands.BootCommand;
 import io.noks.kitpvp.commands.BuildCommand;
 import io.noks.kitpvp.commands.PingCommand;
-import io.noks.kitpvp.commands.RecraftCommand;
 import io.noks.kitpvp.commands.ReportCommand;
 import io.noks.kitpvp.commands.ShoutCommand;
 import io.noks.kitpvp.commands.SkullCommand;
@@ -31,6 +30,7 @@ import io.noks.kitpvp.managers.caches.Tournament;
 import io.noks.kitpvp.task.event.FallenGolemTask;
 import io.noks.kitpvp.task.event.FeastTask;
 import io.noks.kitpvp.utils.ItemUtils;
+import io.noks.kitpvp.utils.Messages;
 
 public class Main extends JavaPlugin {
 	private DBUtils database;
@@ -38,6 +38,7 @@ public class Main extends JavaPlugin {
 	private ItemUtils itemUtils;
 	private InventoryManager inventoryManager;
 	private Tournament tournament;
+	private Messages messages;
 	
 	private static Main instance;
 	public static Main getInstance() {
@@ -47,10 +48,10 @@ public class Main extends JavaPlugin {
 	public void onEnable() {
 		instance = this;
 		this.database = new DBUtils(getConfig().getString("DATABASE.ADDRESS"), getConfig().getString("DATABASE.NAME"), getConfig().getString("DATABASE.USER"), getConfig().getString("DATABASE.PASSWORD"));
-		this.abilitiesManager = new AbilitiesManager(this);
+		this.messages = new Messages();
 		this.itemUtils = new ItemUtils();
 		this.inventoryManager = new InventoryManager();
-		
+		this.abilitiesManager = new AbilitiesManager(this);
 		try {
 			FeastTask.getInstance().doFeast();
 		} catch (Exception exception) {
@@ -94,11 +95,10 @@ public class Main extends JavaPlugin {
 		getCommand("report").setExecutor(new ReportCommand());
 		getCommand("skull").setExecutor(new SkullCommand());
 		getCommand("sponsor").setExecutor(new SponsorCommand());
-		getCommand("stats").setExecutor(new StatisticCommand());
-		getCommand("recraft").setExecutor(new RecraftCommand());
-		getCommand("build").setExecutor(new BuildCommand());
-		getCommand("boot").setExecutor(new BootCommand());
+		new StatisticCommand(this);
+		new BuildCommand(this);
 		getCommand("balance").setExecutor(new BalanceCommand());
+		new BootCommand(this);
 	}
 	
 	public DBUtils getDataBase() {
@@ -127,5 +127,9 @@ public class Main extends JavaPlugin {
 	
 	public void setActiveTournament(Tournament tournament) {
 		this.tournament = tournament;
+	}
+	
+	public Messages getMessages() {
+		return this.messages;
 	}
 }
