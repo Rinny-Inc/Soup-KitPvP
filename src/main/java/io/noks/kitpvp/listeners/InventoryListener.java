@@ -65,7 +65,7 @@ public class InventoryListener implements Listener {
 		if (item == null || item.getType() == null || item.getItemMeta() == null || item.getItemMeta().getDisplayName() == null) {
 			return;
 		}
-		if (event.getInventory().getTitle().toLowerCase().contains("your abilities")) {
+		if (inventory.getTitle().toLowerCase().contains("your abilities")) {
 			event.setCancelled(true);
 			if (event.getCurrentItem() != null && event.getCurrentItem().getType() != null && event.getCurrentItem().hasItemMeta() && event.getCurrentItem().getItemMeta().hasDisplayName()) {
 				Player player = (Player) event.getWhoClicked();
@@ -156,7 +156,7 @@ public class InventoryListener implements Listener {
 			}
 			return;
 		}
-		if (event.getInventory().getTitle().toLowerCase().contains("settings")) {
+		if (inventory.getTitle().toLowerCase().contains("settings")) {
 			event.setCancelled(true);
 			if (event.getCurrentItem() != null && event.getCurrentItem().getType() != null && event.getCurrentItem().hasItemMeta() && event.getCurrentItem().getItemMeta().hasDisplayName()) {
 				String itemName = event.getCurrentItem().getItemMeta().getDisplayName();
@@ -185,7 +185,7 @@ public class InventoryListener implements Listener {
 			}
 			return;
 		}
-		if (event.getInventory().getTitle().toLowerCase().contains("slot")) {
+		if (inventory.getTitle().toLowerCase().contains("slot")) {
 			event.setCancelled(true);
 			if (event.getCurrentItem() != null && event.getCurrentItem().getType() != null
 					&& event.getCurrentItem().hasItemMeta() && event.getCurrentItem().getItemMeta().hasDisplayName()) {
@@ -205,8 +205,9 @@ public class InventoryListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onRefillInventoryLeave(InventoryCloseEvent event) {
-		if (event.getInventory().getTitle().toLowerCase().contains("refill chest") && !event.getInventory().contains(Material.MUSHROOM_SOUP)) {
-			RefillInventoryManager im = RefillInventoryManager.get(event.getInventory(), event.getPlayer().getLocation().getBlock().getBiome());
+		final Inventory inventory = event.getInventory();
+		if (inventory.getTitle().toLowerCase().contains("refill chest") && !inventory.contains(Material.MUSHROOM_SOUP)) {
+			final RefillInventoryManager im = RefillInventoryManager.get(inventory, event.getPlayer().getLocation().getBlock().getBiome());
 			im.setCooldown(Long.valueOf(60L));
 			im.setFilled(false);
 		}
