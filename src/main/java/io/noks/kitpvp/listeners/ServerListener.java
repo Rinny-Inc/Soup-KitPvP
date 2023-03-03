@@ -23,7 +23,9 @@ import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -203,6 +205,14 @@ public class ServerListener implements Listener {
 				}).runTaskLater(this.plugin, 200L);
 			}
 		}
+	}
+	
+	@EventHandler
+	public void onMobSpawn(CreatureSpawnEvent event) {
+		if (event.getSpawnReason() == SpawnReason.CUSTOM) {
+			return;
+		}
+		event.setCancelled(true);
 	}
 
 	private Long getBlockCooldown(Location location) {
