@@ -11,7 +11,7 @@ import io.noks.kitpvp.Main;
 import io.noks.kitpvp.managers.PlayerManager;
 
 public class BuildCommand implements CommandExecutor {
-	private Main main;
+	private final Main main;
 	public BuildCommand(Main main) {
 		this.main = main;
 		main.getCommand("build").setExecutor(this);
@@ -30,27 +30,27 @@ public class BuildCommand implements CommandExecutor {
 			return false;
 		}
 
-		Player player = (Player) sender;
+		final Player player = (Player) sender;
 		if (args.length == 1) {
-			Player target = Bukkit.getPlayer(args[0]);
+			final Player target = Bukkit.getPlayer(args[0]);
 
 			if (target == null) {
 				player.sendMessage(this.main.getMessages().PLAYER_NOT_ONLINE);
 				return false;
 			}
-			PlayerManager tm = PlayerManager.get(target.getUniqueId());
+			final PlayerManager tm = PlayerManager.get(target.getUniqueId());
 			if (tm.getAbility().hasAbility()) {
 				player.sendMessage(ChatColor.RED + "This player is in the map!");
 				return false;
 			}
 			tm.setAllowBuild(!tm.isAllowBuild());
-			if (target != player)
-				player.sendMessage(ChatColor.GRAY + "Build state updated for " + target.getName() + ": "
-						+ ChatColor.YELLOW + tm.isAllowBuild());
+			if (target != player) {
+				player.sendMessage(ChatColor.GRAY + "Build state updated for " + target.getName() + ": " + ChatColor.YELLOW + tm.isAllowBuild());
+			}
 			target.sendMessage(ChatColor.GRAY + "Build state updated: " + ChatColor.YELLOW + tm.isAllowBuild());
 			return true;
 		}
-		PlayerManager pm = PlayerManager.get(player.getUniqueId());
+		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 		if (pm.getAbility().hasAbility()) {
 			player.sendMessage(ChatColor.RED + "You are in the map!");
 			return false;

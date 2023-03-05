@@ -21,11 +21,10 @@ import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -38,7 +37,6 @@ import com.google.common.collect.Maps;
 
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.managers.PlayerManager;
-import io.noks.kitpvp.utils.MathUtils;
 
 public class ServerListener implements Listener {
 	private Main plugin;
@@ -164,25 +162,23 @@ public class ServerListener implements Listener {
 	}
 
 	private void fillSponsor(Chest chest) {
-		Random random = new Random();
-		
 		ItemStack lighter = new ItemStack(Material.FLINT_AND_STEEL, 1);
-		lighter.setDurability((short) MathUtils.getRandom(59, 63));
-		ItemStack[] items = { new ItemStack(Material.MUSHROOM_SOUP, MathUtils.getRandom(3, 6)),
+		lighter.setDurability((short) this.plugin.getMathUtils().getRandom(59, 63));
+		ItemStack[] items = { new ItemStack(Material.MUSHROOM_SOUP, this.plugin.getMathUtils().getRandom(3, 6)),
 				new ItemStack(Material.LEATHER_BOOTS),
-				new ItemStack(Material.BROWN_MUSHROOM, MathUtils.getRandom(2, 9)),
+				new ItemStack(Material.BROWN_MUSHROOM, this.plugin.getMathUtils().getRandom(2, 9)),
 				new ItemStack(Material.LEATHER_LEGGINGS), new ItemStack(Material.LEATHER_CHESTPLATE),
-				new ItemStack(Material.RED_MUSHROOM, MathUtils.getRandom(2, 9)),
+				new ItemStack(Material.RED_MUSHROOM, this.plugin.getMathUtils().getRandom(2, 9)),
 				new ItemStack(Material.LEATHER_HELMET),
-				new ItemStack(Material.BOWL, MathUtils.getRandom(3, 12)),
-				new ItemStack(Material.GOLDEN_APPLE, MathUtils.getRandom(1, 2)),
+				new ItemStack(Material.BOWL, this.plugin.getMathUtils().getRandom(3, 12)),
+				new ItemStack(Material.GOLDEN_APPLE, this.plugin.getMathUtils().getRandom(1, 2)),
 				new ItemStack(Material.POTION, 1, (short) 16386),
 				this.plugin.getItemUtils().getItemUnbreakable(Material.STONE_SWORD),
 				this.plugin.getItemUtils().getItemUnbreakable(Material.IRON_SWORD), lighter,
-				new ItemStack(Material.EXP_BOTTLE, MathUtils.getRandom(1, 3))};
+				new ItemStack(Material.EXP_BOTTLE, this.plugin.getMathUtils().getRandom(1, 3))};
 
-		Random r = new Random();
-		int rand = r.nextInt(4);
+		Random random = new Random();
+		int rand = random.nextInt(4);
 		for (int i = 0; i < 4 + rand; i++) {
 			chest.getInventory().setItem((new Random()).nextInt(chest.getInventory().getSize()), new ItemStack(items[random.nextInt(items.length)]));
 		}

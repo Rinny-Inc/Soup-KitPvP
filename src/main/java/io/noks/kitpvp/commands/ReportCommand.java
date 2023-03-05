@@ -29,20 +29,19 @@ public class ReportCommand implements CommandExecutor {
 			sender.sendMessage(ChatColor.RED + "Usage: /report <player> <reason>");
 			return false;
 		}
-		Player target = Bukkit.getPlayer(args[0]);
+		final Player target = Bukkit.getPlayer(args[0]);
 
 		if (target == null) {
 			sender.sendMessage(ChatColor.RED + "This player is not online.");
 			return false;
 		}
-		Player p = (Player) sender;
+		final Player p = (Player) sender;
 		if (target == p) {
 			p.sendMessage(ChatColor.RED + "You can't report yourself!");
 			return false;
 		}
 		if (this.cooldowns.containsKey(p.getUniqueId())) {
-			long secondsLeft = ((Long) this.cooldowns.get(p.getUniqueId())).longValue() / 1000L + this.cooldownTime
-					- System.currentTimeMillis() / 1000L;
+			long secondsLeft = ((Long) this.cooldowns.get(p.getUniqueId())).longValue() / 1000L + this.cooldownTime - System.currentTimeMillis() / 1000L;
 			if (secondsLeft > 0L) {
 				p.sendMessage(ChatColor.RED + "You cant report for another " + secondsLeft + " seconds!");
 				return false;
@@ -90,8 +89,7 @@ public class ReportCommand implements CommandExecutor {
 		l1h.setText("[Teleport]");
 		l1h.setColor(ChatColor.BLUE);
 		l1h.setBold(Boolean.valueOf(true));
-		l1h.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-				(new ComponentBuilder(ChatColor.GREEN + "Click to teleport you to " + target.getName())).create()));
+		l1h.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, (new ComponentBuilder(ChatColor.GREEN + "Click to teleport you to " + target.getName())).create()));
 		l1h.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + target.getName()));
 
 		l1.addExtra(l1a);

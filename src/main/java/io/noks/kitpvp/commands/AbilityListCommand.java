@@ -21,13 +21,19 @@ public class AbilityListCommand implements CommandExecutor {
 		}
 		final StringJoiner rarity = new StringJoiner(ChatColor.RESET + ", ");
 		for (Rarity rarities : Rarity.values()) {
-			if (rarities != Rarity.USELESS) rarity.add(rarities.getColor() + rarities.getName());
+			if (rarities == Rarity.USELESS) {
+				continue;
+			}
+			rarity.add(rarities.getColor() + rarities.getName());
 		}
 		List<Abilities> list = Lists.newArrayList(Main.getInstance().getAbilitiesManager().getAbilities());
 		list.sort(Comparator.comparing(Abilities::getRarity));
 		final StringJoiner ability = new StringJoiner(ChatColor.RESET + ", ");
 		for (Abilities abilities : list) {
-			if (abilities.getRarity() != Rarity.USELESS) ability.add(abilities.getRarity().getColor() + abilities.getName());
+			if (abilities.getRarity() == Rarity.USELESS) {
+				continue;
+			}
+			ability.add(abilities.getRarity().getColor() + abilities.getName());
 		}
 		sender.sendMessage(rarity.toString());
 		sender.sendMessage("List of ability: " + ability.toString());

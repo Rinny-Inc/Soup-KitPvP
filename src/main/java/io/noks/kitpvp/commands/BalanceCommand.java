@@ -18,8 +18,8 @@ public class BalanceCommand implements CommandExecutor {
 			sender.sendMessage(ChatColor.RED + "Usage: /balance");
 			return false;
 		}
-		Player player = (Player) sender;
-		Economy economy = PlayerManager.get(player.getUniqueId()).getEconomy();
+		final Player player = (Player) sender;
+		final Economy economy = PlayerManager.get(player.getUniqueId()).getEconomy();
 		player.sendMessage(economy.toStrings());
 		return true;
 	}

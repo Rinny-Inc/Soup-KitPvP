@@ -25,15 +25,15 @@ public class SkullCommand implements CommandExecutor {
 			sender.sendMessage(ChatColor.RED + "Usage: /skull <player>");
 			return false;
 		}
-		Player p = (Player) sender;
-		OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
-		ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
-		SkullMeta sitem = (SkullMeta) item.getItemMeta();
+		final Player player = (Player) sender;
+		final OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
+		final ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
+		final SkullMeta sitem = (SkullMeta) item.getItemMeta();
 		sitem.setDisplayName(ChatColor.YELLOW + "Head of " + target.getName());
 		sitem.setOwner(target.getName());
 		item.setItemMeta(sitem);
-		p.getInventory().addItem(new ItemStack[] { item });
-		p.updateInventory();
+		player.getInventory().addItem(item);
+		player.updateInventory();
 		return true;
 	}
 }

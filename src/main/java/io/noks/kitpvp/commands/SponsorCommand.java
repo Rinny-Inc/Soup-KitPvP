@@ -24,8 +24,8 @@ public class SponsorCommand implements CommandExecutor {
 			sender.sendMessage(ChatColor.RED + "Usage: /sponsor");
 			return false;
 		}
-		Player player = (Player) sender;
-		PlayerManager pm = PlayerManager.get(player.getUniqueId());
+		final Player player = (Player) sender;
+		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 
 		if (!pm.getAbility().hasAbility()) {
 			player.sendMessage(ChatColor.RED + "You can't do this command here.");
@@ -36,7 +36,7 @@ public class SponsorCommand implements CommandExecutor {
 			return false;
 		}
 		pm.setUsedSponsor(true);
-		Location loc = player.getLocation();
+		final Location loc = player.getLocation();
 		loc.getWorld().spawnFallingBlock(loc.clone().add(0.0D, 45.0D, 0.0D), Material.CHEST, (byte) 0);
 		player.sendMessage(ChatColor.GREEN + "Your sponsor is falling down!");
 		return true;

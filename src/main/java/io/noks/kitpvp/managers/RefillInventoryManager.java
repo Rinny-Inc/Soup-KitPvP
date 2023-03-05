@@ -37,7 +37,7 @@ public class RefillInventoryManager {
 				return im;
 			}
 		}
-		RefillInventoryManager im = new RefillInventoryManager(inv, biome);
+		final RefillInventoryManager im = new RefillInventoryManager(inv, biome);
 		inventories.add(im);
 		return im;
 	}

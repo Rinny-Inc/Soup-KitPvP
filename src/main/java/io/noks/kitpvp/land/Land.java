@@ -20,8 +20,8 @@ import io.noks.kitpvp.managers.caches.PlayerSettings;
 import io.noks.kitpvp.managers.caches.PlayerSettings.SlotType;
 
 public class Land {
-	private World world = Bukkit.getWorld("world");
-	private Location[] locations = new Location[] { new Location(this.world, 100.0D, 134.0D, 738.0D, 42.0F, 0.0F), new Location(this.world, 82.0D, 130.0D, 932.0D, 136.0F, 0.0F), new Location(this.world, -107.0D, 130.0D, 911.0D, -130.0F, 0.0F), new Location(this.world, -78.0D, 130.0D, 741.0D, -44.0F, 0.0F), new Location(this.world, -24.0D, 130.0D, 708.0D, -10.0F, 0.0F) };;
+	private static World world = Bukkit.getWorld("world");
+	private static Location[] locations = new Location[] { new Location(world, 100.0D, 134.0D, 738.0D, 42.0F, 0.0F), new Location(world, 82.0D, 130.0D, 932.0D, 136.0F, 0.0F), new Location(world, -107.0D, 130.0D, 911.0D, -130.0F, 0.0F), new Location(world, -78.0D, 130.0D, 741.0D, -44.0F, 0.0F), new Location(world, -24.0D, 130.0D, 708.0D, -10.0F, 0.0F) };
 	private PlayerManager playerManager;
 	
 	public Land(PlayerManager pm) {
@@ -29,7 +29,7 @@ public class Land {
 	}
 	
 	public boolean hasValidLocation() {
-		return (this.locations.length > 0);
+		return (locations.length > 0);
 	}
 
 	public void teleportToMap() {
@@ -38,7 +38,7 @@ public class Land {
 		player.setHealth(20.0D);
 		player.setFoodLevel(20);
 		player.setSaturation(10000.0F);
-		player.teleport(this.locations[(new Random()).nextInt(this.locations.length)]);
+		player.teleport(locations[(new Random()).nextInt(locations.length)]);
 		player.setItemOnCursor(null);
 		this.playerManager.setAllowBuild(false);
 	}

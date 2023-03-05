@@ -82,6 +82,10 @@ public class Stats {
 	public void addKillStreak() {
 		this.killStreak++;
 	}
+	
+	public int getBounty() {
+		return this.bounty;
+	}
 
 	public String[] toStrings() {
 		return new String[] { ChatColor.GRAY + "Kills -> " + ChatColor.GREEN + this.kills,

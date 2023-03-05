@@ -13,7 +13,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.enums.EventsType;
-import io.noks.kitpvp.utils.MathUtils;
 
 public class FeastTask {
 	private static FeastTask instance = new FeastTask();
@@ -66,22 +65,21 @@ public class FeastTask {
 		Random random = new Random();
 
 		ItemStack lighter = new ItemStack(Material.FLINT_AND_STEEL, 1);
-		lighter.setDurability((short) MathUtils.getRandom(59, 63));
-		ItemStack[] items = { new ItemStack(Material.MUSHROOM_SOUP, MathUtils.getRandom(1, 6)),
+		lighter.setDurability((short) Main.getInstance().getMathUtils().getRandom(59, 63));
+		ItemStack[] items = { new ItemStack(Material.MUSHROOM_SOUP, Main.getInstance().getMathUtils().getRandom(1, 6)),
 				new ItemStack(Material.LEATHER_BOOTS), new ItemStack(Material.BOW),
-				new ItemStack(Material.ARROW, MathUtils.getRandom(2, 6)),
-				new ItemStack(Material.BROWN_MUSHROOM, MathUtils.getRandom(2, 9)),
+				new ItemStack(Material.ARROW, Main.getInstance().getMathUtils().getRandom(2, 6)),
+				new ItemStack(Material.BROWN_MUSHROOM, Main.getInstance().getMathUtils().getRandom(2, 9)),
 				new ItemStack(Material.LEATHER_LEGGINGS), new ItemStack(Material.LEATHER_CHESTPLATE),
-				new ItemStack(Material.RED_MUSHROOM, MathUtils.getRandom(2, 9)),
+				new ItemStack(Material.RED_MUSHROOM, Main.getInstance().getMathUtils().getRandom(2, 9)),
 				new ItemStack(Material.LEATHER_HELMET),
-				new ItemStack(Material.BOWL, MathUtils.getRandom(3, 9)),
-				new ItemStack(Material.GOLDEN_APPLE, MathUtils.getRandom(1, 2)),
+				new ItemStack(Material.BOWL, Main.getInstance().getMathUtils().getRandom(3, 9)),
+				new ItemStack(Material.GOLDEN_APPLE, Main.getInstance().getMathUtils().getRandom(1, 2)),
 				new ItemStack(Material.POTION, 1, (short) 16386), new ItemStack(Material.GOLD_HELMET),
-				lighter, new ItemStack(Material.EXP_BOTTLE, MathUtils.getRandom(1, 3)) };
+				lighter, new ItemStack(Material.EXP_BOTTLE, Main.getInstance().getMathUtils().getRandom(1, 3)) };
 
 		for (int i = 0; i < (new Random()).nextInt(5) + 1 + 3; i++) {
-			chest.getInventory().setItem((new Random()).nextInt(chest.getInventory().getSize()),
-					new ItemStack(items[random.nextInt(items.length)]));
+			chest.getInventory().setItem((new Random()).nextInt(chest.getInventory().getSize()), new ItemStack(items[random.nextInt(items.length)]));
 		}
 	}
 

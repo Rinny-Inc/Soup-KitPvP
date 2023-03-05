@@ -3,6 +3,7 @@ package io.noks.kitpvp;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -30,10 +31,12 @@ import io.noks.kitpvp.managers.caches.Tournament;
 import io.noks.kitpvp.task.event.FallenGolemTask;
 import io.noks.kitpvp.task.event.FeastTask;
 import io.noks.kitpvp.utils.ItemUtils;
+import io.noks.kitpvp.utils.MathUtils;
 import io.noks.kitpvp.utils.Messages;
 
 public class Main extends JavaPlugin {
 	private DBUtils database;
+	private MathUtils mathUtils;
 	private AbilitiesManager abilitiesManager;
 	private ItemUtils itemUtils;
 	private InventoryManager inventoryManager;
@@ -47,6 +50,7 @@ public class Main extends JavaPlugin {
 
 	public void onEnable() {
 		instance = this;
+		this.mathUtils = new MathUtils();
 		this.database = new DBUtils(getConfig().getString("DATABASE.ADDRESS"), getConfig().getString("DATABASE.NAME"), getConfig().getString("DATABASE.USER"), getConfig().getString("DATABASE.PASSWORD"));
 		this.messages = new Messages();
 		this.itemUtils = new ItemUtils();
@@ -56,14 +60,14 @@ public class Main extends JavaPlugin {
 			FeastTask.getInstance().doFeast();
 		} catch (Exception exception) {
 		}
+		this.registerScoreboard();
 		this.registerListeners();
 		this.registerCommands();
-		this.registerScoreboard();
 	}
 
 	public void onDisable() {
 		for (Entity entity : Bukkit.getWorld("world").getEntities()) {
-			if (entity instanceof org.bukkit.entity.IronGolem) {
+			if (entity instanceof org.bukkit.entity.IronGolem || entity instanceof Item) {
 				entity.remove();
 			}
 		}
@@ -76,9 +80,11 @@ public class Main extends JavaPlugin {
 	
 	private void registerScoreboard() {
 		final Scoreboard board = this.getServer().getScoreboardManager().getMainScoreboard();
-		final Objective life = board.registerNewObjective("life", "health");
-		life.setDisplaySlot(DisplaySlot.BELOW_NAME);
-		life.setDisplayName(ChatColor.DARK_RED + "❤");
+		if (board.getObjective("life") == null) {
+			final Objective life = board.registerNewObjective("life", "health");
+			life.setDisplaySlot(DisplaySlot.BELOW_NAME);
+			life.setDisplayName(ChatColor.DARK_RED + "❤");
+		}
 	}
 
 	private void registerListeners() {
@@ -99,6 +105,10 @@ public class Main extends JavaPlugin {
 		new BuildCommand(this);
 		getCommand("balance").setExecutor(new BalanceCommand());
 		new BootCommand(this);
+	}
+	
+	public MathUtils getMathUtils() {
+		return this.mathUtils;
 	}
 	
 	public DBUtils getDataBase() {

@@ -28,18 +28,18 @@ public class StatisticCommand implements CommandExecutor {
 		}
 
 		if (args.length == 1) {
-			Player target = Bukkit.getPlayer(args[0]);
+			final Player target = Bukkit.getPlayer(args[0]);
 			if (target == null) {
 				sender.sendMessage(this.main.getMessages().PLAYER_NOT_ONLINE);
 				return false;
 			}
-			Stats stats = PlayerManager.get(target.getUniqueId()).getStats();
+			final Stats stats = PlayerManager.get(target.getUniqueId()).getStats();
 			sender.sendMessage(ChatColor.GOLD + target.getName() + ChatColor.GRAY + "'s Statistics:");
 			sender.sendMessage(stats.toStrings());
 			return true;
 		}
-		Player player = (Player) sender;
-		Stats stats = PlayerManager.get(player.getUniqueId()).getStats();
+		final Player player = (Player) sender;
+		final Stats stats = PlayerManager.get(player.getUniqueId()).getStats();
 		sender.sendMessage(ChatColor.GOLD + player.getName() + ChatColor.GRAY + "'s Statistics:");
 		sender.sendMessage(stats.toStrings());
 		return true;

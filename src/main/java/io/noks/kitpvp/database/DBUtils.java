@@ -143,12 +143,13 @@ public class DBUtils {
 			statement.setInt(2, pm.getStats().getDeaths());
 			statement.setInt(3, pm.getStats().getBestKillStreak());
 			statement.setInt(4, pm.getStats().getBestKillStreak());
-			statement.setBoolean(5, pm.getSettings().hasCompass());
-			statement.setInt(6, pm.getSettings().getSlot(SlotType.SWORD));
-			statement.setInt(7, pm.getSettings().getSlot(SlotType.ITEM));
-			statement.setInt(8, pm.getSettings().getSlot(SlotType.COMPASS));
-			statement.setInt(9, pm.getEconomy().getMoney());
-			statement.setString(10, pm.getPlayerUUID().toString());
+			statement.setInt(5, pm.getStats().getBounty());
+			statement.setBoolean(6, pm.getSettings().hasCompass());
+			statement.setInt(7, pm.getSettings().getSlot(SlotType.SWORD));
+			statement.setInt(8, pm.getSettings().getSlot(SlotType.ITEM));
+			statement.setInt(9, pm.getSettings().getSlot(SlotType.COMPASS));
+			statement.setInt(10, pm.getEconomy().getMoney());
+			statement.setString(11, pm.getPlayerUUID().toString());
 			statement.execute();
 			statement.close();
 		} catch (SQLException e) {

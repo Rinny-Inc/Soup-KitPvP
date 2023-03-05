@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import io.noks.kitpvp.Main;
 
 public class BootCommand implements CommandExecutor {
-	private Main main;
+	private final Main main;
 	public BootCommand(Main main) {
 		this.main = main;
 		main.getCommand("boot").setExecutor(this);
@@ -24,13 +24,13 @@ public class BootCommand implements CommandExecutor {
 			sender.sendMessage(ChatColor.RED + "Usage: /boot <player>");
 			return false;
 		}
-		Player target = Bukkit.getPlayer(args[0]);
+		final Player target = Bukkit.getPlayer(args[0]);
 
 		if (target == null) {
 			sender.sendMessage(this.main.getMessages().PLAYER_NOT_ONLINE);
 			return false;
 		}
-		Player player = (Player) sender;
+		final Player player = (Player) sender;
 		if (target == player) {
 			player.sendMessage(ChatColor.RED + "You can't use this command on yourself!");
 			return false;

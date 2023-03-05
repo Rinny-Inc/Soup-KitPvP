@@ -16,13 +16,13 @@ public class PingCommand implements CommandExecutor {
 			sender.sendMessage(ChatColor.RED + "Usage: /ping <player>");
 			return false;
 		}
-		Player player = (Player) sender;
+		final Player player = (Player) sender;
 		if (args.length == 0) {
 			player.sendMessage(ChatColor.GRAY + "Your ping: " + ChatColor.RED + player.getPing() + "ms");
 			return true;
 		}
 		if (args.length == 1) {
-			Player target = Bukkit.getPlayer(args[0]);
+			final Player target = Bukkit.getPlayer(args[0]);
 
 			if (target == null) {
 				player.sendMessage(ChatColor.RED + "This player is not online.");
