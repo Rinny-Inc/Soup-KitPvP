@@ -83,8 +83,13 @@ public class Main extends JavaPlugin {
 		if (board.getObjective("life") == null) {
 			final Objective life = board.registerNewObjective("life", "health");
 			life.setDisplaySlot(DisplaySlot.BELOW_NAME);
-			life.setDisplayName(ChatColor.DARK_RED + "❤");
+			life.setDisplayName(ChatColor.RED + "❤");
 		}
+		/*if (board.getObjective("bounty") == null) {
+			final Objective life = board.registerNewObjective("bounty", "health");
+			life.setDisplaySlot(DisplaySlot.BELOW_NAME);
+			life.setDisplayName(ChatColor.YELLOW + "Bounty:");
+		}*/
 	}
 
 	private void registerListeners() {
