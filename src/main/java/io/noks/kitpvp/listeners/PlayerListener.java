@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -21,6 +22,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -51,6 +53,7 @@ public class PlayerListener implements Listener {
 	public void onJoin(PlayerJoinEvent event) {
 		event.setJoinMessage(null);
 		final Player player = event.getPlayer();
+		player.setScoreboard(this.plugin.getServer().getScoreboardManager().getMainScoreboard());
 		player.getInventory().clear();
 		player.getInventory().setArmorContents(null);
 		player.setHealth(20.0D);
@@ -157,7 +160,7 @@ public class PlayerListener implements Listener {
 		PlayerManager.get(player.getUniqueId()).giveMainItem();
 	}
 
-	@EventHandler(priority=EventPriority.HIGH)
+	@EventHandler
 	public void onPlayerInteractSoup(PlayerInteractEvent event) {
 		if (!event.hasItem()) {
 			return;
@@ -165,10 +168,19 @@ public class PlayerListener implements Listener {
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			final Player player = event.getPlayer();
 			if (!player.isDead() && player.getItemInHand().getType() == Material.MUSHROOM_SOUP && player.getHealth() < player.getMaxHealth()) {
-				player.setHealth(Math.min(player.getHealth() + 7.0D, player.getMaxHealth()));
+				event.setUseItemInHand(Result.DENY);
+				final double newHealth = Math.min(player.getHealth() + 7.0D, player.getMaxHealth());
+				player.setHealth(newHealth);
 				player.getItemInHand().setType(Material.BOWL);
 				player.updateInventory();
-			}
+			} 
+		} 
+	}
+	
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onConsumeSoup(PlayerItemConsumeEvent event) {
+		if (event.getItem().getType() == Material.MUSHROOM_SOUP) {
+			event.setCancelled(true);
 		}
 	}
 
