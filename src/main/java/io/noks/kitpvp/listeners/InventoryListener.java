@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
-import io.noks.kitpvp.land.Land;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.RefillInventoryManager;
 import io.noks.kitpvp.managers.caches.PlayerSettings;
@@ -68,9 +67,9 @@ public class InventoryListener implements Listener {
 			return;
 		}
 		if (inventory.getTitle().toLowerCase().contains("your abilities")) {
-			Player player = (Player) event.getWhoClicked();
-			PlayerManager pm = PlayerManager.get(player.getUniqueId());
-			String itemName = item.getItemMeta().getDisplayName();
+			final Player player = (Player) event.getWhoClicked();
+			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
+			final String itemName = item.getItemMeta().getDisplayName();
 			if (itemName.equals(" ") || itemName.length() < 3) {
 				return;
 			}
@@ -106,13 +105,8 @@ public class InventoryListener implements Listener {
 				return;
 			}
 			if (itemName.toLowerCase().contains("last used ability:")) {
-				String split = itemName.split(": ")[1];
+				final String split = itemName.split(": ")[1];
 				correctItemName = split.substring(2, split.length());
-			}
-			final Land map = new Land(pm);
-			if (!map.hasValidLocation()) {
-				player.sendMessage(ChatColor.RED + "Failed to teleport! (Invalid map locations)");
-				return;
 			}
 			if (itemName.toLowerCase().equals(ChatColor.YELLOW + "random abilities")) {
 				List<String> abilities = Lists.newArrayList();
@@ -121,27 +115,23 @@ public class InventoryListener implements Listener {
 					if (abilitiess.getRarity() != Rarity.USELESS && (player.hasPermission("kit." + abilitiess.getName().toLowerCase()) || player.hasPermission(abilitiess.getRarity().getPermission()) || player.hasPermission("kit.*"))) {
 						abilities.add(abilitiess.getName());
 					}
-					if (abilities.isEmpty()) {
-						return;
-					}
-					player.closeInventory();
-					int random = (new Random()).nextInt(abilities.size());
-					pm.getAbility().set(this.plugin.getAbilitiesManager().getAbilityFromName(abilities.get(random)));
-					player.sendMessage(ChatColor.GRAY + "You've chosen " + pm.getAbility().get().getRarity().getColor() + pm.getAbility().get().getName() + ChatColor.GRAY + " ability.");
-					map.giveEquipment(pm.getAbility().get());
-					map.teleportToMap();
-					abilities.clear();
-					return;
 				}
-				if (!this.plugin.getAbilitiesManager().contains(correctItemName)) {
+				if (abilities.isEmpty()) {
 					return;
 				}
 				player.closeInventory();
-				pm.getAbility().set(this.plugin.getAbilitiesManager().getAbilityFromName(correctItemName));
+				int random = (new Random()).nextInt(abilities.size());
+				pm.getAbility().setSelected(this.plugin.getAbilitiesManager().getAbilityFromName(abilities.get(random)));
 				player.sendMessage(ChatColor.GRAY + "You've chosen " + pm.getAbility().get().getRarity().getColor() + pm.getAbility().get().getName() + ChatColor.GRAY + " ability.");
-				map.giveEquipment(pm.getAbility().get());
-				map.teleportToMap();
+				abilities.clear();
+				return;
 			}
+			if (!this.plugin.getAbilitiesManager().contains(correctItemName)) {
+				return;
+			}
+			player.closeInventory();
+			pm.getAbility().setSelected(this.plugin.getAbilitiesManager().getAbilityFromName(correctItemName));
+			player.sendMessage(ChatColor.GRAY + "You've chosen " + pm.getAbility().get().getRarity().getColor() + pm.getAbility().get().getName() + ChatColor.GRAY + " ability.");
 			return;
 		}
 		if (inventory.getTitle().toLowerCase().contains("settings")) {

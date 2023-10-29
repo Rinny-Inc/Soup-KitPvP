@@ -6,15 +6,17 @@ import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -41,12 +43,17 @@ import io.noks.kitpvp.managers.caches.CombatTag;
 import io.noks.kitpvp.managers.caches.Economy;
 import io.noks.kitpvp.managers.caches.Economy.MoneyType;
 import io.noks.kitpvp.managers.caches.Stats;
+import io.noks.kitpvp.utils.Cuboid;
 
 public class PlayerListener implements Listener {
-	private Main plugin;
+	private final Main plugin;
+	private final Cuboid spawnCuboid;
+	
 	public PlayerListener(Main main) {
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
+		final World world = main.getServer().getWorld("world");
+		this.spawnCuboid = new Cuboid(new Location(world, 0, 0, 0), new Location(world, 0, 0, 0));
 	}
 
 	@EventHandler
@@ -149,7 +156,7 @@ public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onRespawn(PlayerRespawnEvent event) {
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		event.setRespawnLocation(player.getWorld().getSpawnLocation());
 		player.getInventory().clear();
 		player.getInventory().setArmorContents(null);
@@ -288,7 +295,7 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void onWantRefill(PlayerInteractEvent event) {
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENDER_CHEST && event.getClickedBlock().getRelative(BlockFace.DOWN).getType() == Material.GLOWSTONE) {
-			Player player = event.getPlayer();
+			final Player player = event.getPlayer();
 
 			if (PlayerManager.get(player.getUniqueId()).getAbility().hasAbility()) {
 				event.setCancelled(true);
@@ -303,18 +310,19 @@ public class PlayerListener implements Listener {
 			return;
 		}
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK){
-			Player player = event.getPlayer();
+			final Player player = event.getPlayer();
 	
 			if (player.getItemInHand().getType() == Material.COMPASS && player.getItemInHand().getItemMeta().getDisplayName().toLowerCase().equals(ChatColor.YELLOW + "tracker")) {
 				Player nearest = null;
 				double distance = 200.0D;
 				for (Player onlineWorld : player.getWorld().getPlayers()) {
-					double calc = player.getLocation().distance(onlineWorld.getLocation());
+					final double calc = player.getLocation().distance(onlineWorld.getLocation());
 					if (calc > 1.0D && calc < distance) {
 						distance = calc;
 						if (onlineWorld == player || !player.canSee(onlineWorld) || !onlineWorld.canSee(player) || onlineWorld.getGameMode() != GameMode.SURVIVAL || onlineWorld.isDead())
 							continue;
 						nearest = onlineWorld;
+						break;
 					}
 				}
 				if (nearest == null) {
@@ -327,13 +335,17 @@ public class PlayerListener implements Listener {
 	}
 	
 	@EventHandler(priority=EventPriority.LOWEST)
-	public void onWalkOnSponge(PlayerMoveEvent event) {
+	public void onMove(PlayerMoveEvent event) {
+		final Player player = event.getPlayer();
+		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
+		if (pm.isInSpawn() && !this.spawnCuboid.isIn(player)) {
+			// TODO
+			return;
+		}
 		final Block block = event.getTo().getBlock().getRelative(BlockFace.DOWN);
-		
 		if (block.getType() == Material.SPONGE) {
-			final Player player = event.getPlayer();
 			int sponge = 0;
-			for (int y = 20; y < 250; y++) {
+			for (int y = block.getLocation().getBlockY(); y < 250; y++) {
 				if (block.getWorld().getBlockAt(block.getX(), y, block.getZ()).getType() == Material.SPONGE) continue;
 				sponge++;
 			}

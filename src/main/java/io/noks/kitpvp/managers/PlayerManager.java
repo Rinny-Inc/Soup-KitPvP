@@ -3,6 +3,8 @@ package io.noks.kitpvp.managers;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -26,7 +28,7 @@ public class PlayerManager {
 	private final Stats stats;
 	private final PlayerSettings settings;
 	private final Economy economy;
-	private CombatTag combatTag;
+	private @Nullable CombatTag combatTag;
 
 	public PlayerManager(UUID playerUUID) {
 		this.playerUUID = playerUUID;
@@ -71,6 +73,10 @@ public class PlayerManager {
 
 	public UUID getPlayerUUID() {
 		return this.playerUUID;
+	}
+	
+	public boolean isInSpawn() {
+		return this.ability == null;
 	}
 
 	public Ability getAbility() {

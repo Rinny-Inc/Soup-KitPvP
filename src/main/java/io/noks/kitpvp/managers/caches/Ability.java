@@ -1,23 +1,35 @@
 package io.noks.kitpvp.managers.caches;
 
+import javax.annotation.Nullable;
+
 import io.noks.kitpvp.abstracts.Abilities;
 
 public class Ability {
-	private Abilities ability = null;
-	private Long abilityCooldown = 0L;
-	private int abilityUseTime = 0;
-	private Abilities lastAbility = null;
+	private @Nullable Abilities ability, selectedAbility;
+	private Long abilityCooldown;
+	private int abilityUseTime;
+	
+	public Ability() {
+		this.ability = null;
+		this.selectedAbility = null;
+		this.abilityCooldown = 0L;
+		this.abilityUseTime = 0;
+	}
 
 	public Abilities get() {
 		return this.ability;
 	}
 
-	public Abilities getLastUsed() {
-		return this.lastAbility;
+	public Abilities getSelected() {
+		return this.selectedAbility;
 	}
 
 	public void set(Abilities ability) {
 		this.ability = ability;
+	}
+	
+	public void setSelected(Abilities ability) {
+		this.selectedAbility = ability;
 	}
 
 	public boolean hasAbility() {
@@ -31,8 +43,8 @@ public class Ability {
 	public void remove() {
 		removeCooldown();
 		this.abilityUseTime = 0;
-		if (this.lastAbility != this.ability) {
-			this.lastAbility = this.ability;
+		if (this.selectedAbility != this.ability) {
+			this.selectedAbility = this.ability;
 		}
 		this.ability = null;
 	}

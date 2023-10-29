@@ -157,8 +157,8 @@ public class InventoryManager {
 		}
 		inventory.setItem(0, Main.getInstance().getItemUtils().getItemMaterial(Material.WATCH, 0, ChatColor.YELLOW + "Random Abilities"));
 		final Ability ability = PlayerManager.get(player.getUniqueId()).getAbility();
-		if (ability.getLastUsed() != null) {
-			Abilities lastAbility = ability.getLastUsed();
+		if (ability.getSelected() != null) {
+			final Abilities lastAbility = ability.getSelected();
 			inventory.setItem(1, Main.getInstance().getItemUtils().getItemStack(lastAbility.getIcon(), ChatColor.YELLOW + "Last used ability: " + lastAbility.getRarity().getColor() + lastAbility.getName(), lastAbility.getLore()));
 		}
 		inventory.setItem(4, Main.getInstance().getItemUtils().getItemMaterial(Material.BEACON, 0, ChatColor.DARK_GRAY + "(" + ChatColor.DARK_AQUA + "Rastacraft" + ChatColor.DARK_GRAY + ")"));
