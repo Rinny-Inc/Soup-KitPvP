@@ -27,9 +27,9 @@ import io.noks.kitpvp.managers.AbilitiesManager;
 import io.noks.kitpvp.managers.InventoryManager;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.RefillInventoryManager;
-import io.noks.kitpvp.managers.caches.Tournament;
+import io.noks.kitpvp.managers.TournamentManager;
+import io.noks.kitpvp.task.event.EventsTask;
 import io.noks.kitpvp.task.event.FallenGolemTask;
-import io.noks.kitpvp.task.event.FeastTask;
 import io.noks.kitpvp.utils.ItemUtils;
 import io.noks.kitpvp.utils.MathUtils;
 import io.noks.kitpvp.utils.Messages;
@@ -40,8 +40,9 @@ public class Main extends JavaPlugin {
 	private AbilitiesManager abilitiesManager;
 	private ItemUtils itemUtils;
 	private InventoryManager inventoryManager;
-	private Tournament tournament;
+	private TournamentManager tournamentManager;
 	private Messages messages;
+	private EventsTask eventsTask;
 	
 	private static Main instance;
 	public static Main getInstance() {
@@ -56,13 +57,10 @@ public class Main extends JavaPlugin {
 		this.itemUtils = new ItemUtils();
 		this.inventoryManager = new InventoryManager();
 		this.abilitiesManager = new AbilitiesManager(this);
-		try {
-			FeastTask.getInstance().doFeast();
-		} catch (Exception exception) {
-		}
 		this.registerScoreboard();
 		this.registerListeners();
 		this.registerCommands();
+		this.eventsTask = new EventsTask(this); // TODO: need to execute it (see in class)
 	}
 
 	public void onDisable() {
@@ -83,7 +81,8 @@ public class Main extends JavaPlugin {
 		if (board.getObjective("life") == null) {
 			final Objective life = board.registerNewObjective("life", "health");
 			life.setDisplaySlot(DisplaySlot.BELOW_NAME);
-			life.setDisplayName(ChatColor.RED + "❤");
+			final char heart = '\u2764';
+			life.setDisplayName(ChatColor.RED.toString() + heart);
 		}
 		/*if (board.getObjective("bounty") == null) {
 			final Objective life = board.registerNewObjective("bounty", "health");
@@ -132,19 +131,15 @@ public class Main extends JavaPlugin {
 		return this.inventoryManager;
 	}
 	
-	public boolean isTournamentActive() {
-		return this.tournament != null;
-	}
-	
-	public Tournament getActiveTournament() {
-		return this.tournament;
-	}
-	
-	public void setActiveTournament(Tournament tournament) {
-		this.tournament = tournament;
+	public TournamentManager getTournamentManager() {
+		return this.tournamentManager;
 	}
 	
 	public Messages getMessages() {
 		return this.messages;
+	}
+	
+	public EventsTask getEventsTask() {
+		return this.eventsTask;
 	}
 }

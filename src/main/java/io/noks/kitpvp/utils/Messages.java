@@ -3,10 +3,10 @@ package io.noks.kitpvp.utils;
 import org.bukkit.ChatColor;
 
 public class Messages {
-	public String[] WELCOME_MESSAGE;
-	public String NO_PERMISSION;
-	public String PLAYER_NOT_ONLINE;
-	public String YOU_ARENT_IN_THE_SPAWN;
+	public final String[] WELCOME_MESSAGE;
+	public final String NO_PERMISSION;
+	public final String PLAYER_NOT_ONLINE;
+	public final String YOU_ARENT_IN_THE_SPAWN;
 	
 	public Messages() {
 		WELCOME_MESSAGE = new String[]{ChatColor.DARK_GRAY.toString() + ChatColor.STRIKETHROUGH + "----------------------------------------------------",

@@ -1,23 +1,22 @@
 package io.noks.kitpvp.managers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.block.Biome;
 import org.bukkit.inventory.Inventory;
 
-import com.google.common.collect.Maps;
-
-import io.noks.kitpvp.utils.LightList;
-
 public class RefillInventoryManager {
-	public static final LightList<RefillInventoryManager> inventories = new LightList<RefillInventoryManager>();
+	public static final List<RefillInventoryManager> inventories = new ArrayList<RefillInventoryManager>();
 	private Inventory inventory;
 	private boolean filled;
 	private Biome biome;
 	private Map<Biome, Long> cooldown;
 
 	public RefillInventoryManager(Inventory inv) {
-		this.cooldown = Maps.newConcurrentMap();
+		this.cooldown = new HashMap<Biome, Long>();
 
 		this.inventory = inv;
 		this.filled = false;
@@ -25,7 +24,7 @@ public class RefillInventoryManager {
 	}
 
 	public RefillInventoryManager(Inventory inv, Biome biome) {
-		this.cooldown = Maps.newConcurrentMap();
+		this.cooldown = new HashMap<Biome, Long>();
 		this.inventory = inv;
 		this.filled = false;
 		this.biome = biome;

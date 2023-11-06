@@ -6,6 +6,8 @@ public class CooldownBarTask extends BukkitRunnable {
 
 	@Override
 	public void run() {
-		// TODO: XP BAR COOLDOWN
+		// TODO: for the map players
+		// TODO: check if they're on cooldown
+		// TODO: execute cooldown bar
 	}
 }

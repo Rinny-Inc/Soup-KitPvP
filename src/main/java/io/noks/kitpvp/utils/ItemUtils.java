@@ -21,8 +21,8 @@ import io.noks.kitpvp.managers.caches.PlayerSettings.SlotType;
 
 public class ItemUtils {
 	public ItemStack getItemStack(ItemStack item, @Nullable String name, @Nullable String[] lore) {
-		ItemStack i = item;
-		ItemMeta im = i.getItemMeta();
+		final ItemStack i = item;
+		final ItemMeta im = i.getItemMeta();
 		im.setDisplayName(name);
 		if (lore != null) im.setLore(Arrays.asList(lore));
 		i.setItemMeta(im);
@@ -30,8 +30,8 @@ public class ItemUtils {
 	}
 
 	public ItemStack getItemMaterial(Material m, int data, String name) {
-		ItemStack i = new ItemStack(m, 1, (short) data);
-		ItemMeta im = i.getItemMeta();
+		final ItemStack i = new ItemStack(m, 1, (short) data);
+		final ItemMeta im = i.getItemMeta();
 		im.setDisplayName(name);
 		i.setItemMeta(im);
 		return i;
@@ -42,8 +42,8 @@ public class ItemUtils {
 	}
 
 	public ItemStack getItemMaterial(Material m, String name, int amount) {
-		ItemStack i = new ItemStack(m, amount);
-		ItemMeta im = i.getItemMeta();
+		final ItemStack i = new ItemStack(m, amount);
+		final ItemMeta im = i.getItemMeta();
 		im.setDisplayName(name);
 		i.setItemMeta(im);
 		return i;
@@ -58,8 +58,8 @@ public class ItemUtils {
 	}
 
 	public ItemStack getItemUnbreakable(Material material, @Nullable String name) {
-		ItemStack i = new ItemStack(material);
-		ItemMeta im = i.getItemMeta();
+		final ItemStack i = new ItemStack(material);
+		final ItemMeta im = i.getItemMeta();
 		im.setDisplayName(name);
 		im.spigot().setUnbreakable(true);
 		i.setItemMeta(im);

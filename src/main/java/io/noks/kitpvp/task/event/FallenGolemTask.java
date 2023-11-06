@@ -33,10 +33,8 @@ public class FallenGolemTask implements Listener {
 	private Location[] possibleLocations = { new Location(this.world, -274.0D, 86.0D, 600.0D) };
 
 	private void setupFallenGolem() {
-		Bukkit.broadcastMessage(
-				this.prefix + ChatColor.GREEN.toString() + ChatColor.BOLD + "The Fallen Golem just appear!");
-		IronGolem golem = (IronGolem) this.world
-				.spawn(this.possibleLocations[(new Random()).nextInt(this.possibleLocations.length)], IronGolem.class);
+		Bukkit.broadcastMessage(this.prefix + ChatColor.GREEN.toString() + ChatColor.BOLD + "The Fallen Golem just appear!");
+		IronGolem golem = (IronGolem) this.world.spawn(this.possibleLocations[(new Random()).nextInt(this.possibleLocations.length)], IronGolem.class);
 		golem.setCustomName(ChatColor.RED + EventsType.GOLEM.getName());
 		golem.setCustomNameVisible(true);
 		golem.setMaxHealth(350.0D);
@@ -104,9 +102,9 @@ public class FallenGolemTask implements Listener {
 
 	@EventHandler
 	public void onPlayerAttackGolem(EntityDamageByEntityEvent event) {
-		if (event.getDamager() instanceof Player && event.getEntity() instanceof IronGolem) {
-			Player player = (Player) event.getDamager();
-			IronGolem golem = (IronGolem) event.getEntity();
+		if (event.getEntity() instanceof IronGolem && event.getDamager() instanceof Player) {
+			final Player player = (Player) event.getDamager();
+			final IronGolem golem = (IronGolem) event.getEntity();
 
 			if (golem.getCustomName().toLowerCase().contains("fallen")) {
 				if (!PlayerManager.get(player.getUniqueId()).getAbility().hasAbility()) {

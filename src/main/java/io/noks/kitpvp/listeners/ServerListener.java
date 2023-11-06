@@ -40,7 +40,7 @@ import io.noks.kitpvp.managers.PlayerManager;
 
 public class ServerListener implements Listener {
 	private Main plugin;
-	private Map<Location, Long> blockCooldown;
+	private final Map<Location, Long> blockCooldown;
 
 	public ServerListener(Main main) {
 		this.blockCooldown = Maps.newConcurrentMap();
@@ -51,8 +51,8 @@ public class ServerListener implements Listener {
 
 	@EventHandler
 	public void onServerPing(ServerListPingEvent event) {
-		String line1 = ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "----------" + ChatColor.GRAY + ChatColor.BOLD + "( " + ChatColor.DARK_AQUA + ChatColor.BOLD + "Rastacraft " + ChatColor.GRAY + ChatColor.BOLD + ")" + ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "---------------\n";
-		String line2 = ChatColor.GOLD.toString() + ChatColor.ITALIC + "- Home of soup pvp -";
+		final String line1 = ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "----------" + ChatColor.GRAY + ChatColor.BOLD + "( " + ChatColor.DARK_AQUA + ChatColor.BOLD + "Rastacraft " + ChatColor.GRAY + ChatColor.BOLD + ")" + ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "---------------\n";
+		final String line2 = ChatColor.GOLD.toString() + ChatColor.ITALIC + "- Home of soup pvp -";
 		event.setMotd(line1 + line2 + (Bukkit.hasWhitelist() ? (ChatColor.RED + " Whitelisted") : ""));
 	}
 
@@ -64,13 +64,13 @@ public class ServerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockBreak(BlockBreakEvent event) {
-		Player player = event.getPlayer();
-		PlayerManager pm = PlayerManager.get(player.getUniqueId());
+		final Player player = event.getPlayer();
+		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 
 		if (pm.isAllowBuild()) {
 			return;
 		}
-		Block block = event.getBlock();
+		final Block block = event.getBlock();
 		if (block.getType() == Material.FIRE) {
 			return;
 		}
@@ -78,33 +78,27 @@ public class ServerListener implements Listener {
 		if (!pm.getAbility().hasAbility()) {
 			return;
 		}
-		if (block.getType() == Material.BROWN_MUSHROOM || block.getType() == Material.RED_MUSHROOM
-				|| block.getType() == Material.LOG) {
-			Location location = event.getBlock().getLocation();
+		if (block.getType() == Material.BROWN_MUSHROOM || block.getType() == Material.RED_MUSHROOM || block.getType() == Material.LOG) {
+			final Location location = event.getBlock().getLocation();
 			if (isBlockCooldownActive(location)) {
 				double time = getBlockCooldown(location).longValue() / 1000.0D;
-				player.sendMessage(ChatColor.RED + "This "
-						+ WordUtils.capitalizeFully(block.getType().toString().replaceAll("_", " ")) + " respawn in "
-						+ (new DecimalFormat("#.#")).format(time) + " seconds.");
+				player.sendMessage(ChatColor.RED + "This " + WordUtils.capitalizeFully(block.getType().toString().replaceAll("_", " ")) + " respawn in " + (new DecimalFormat("#.#")).format(time) + " seconds.");
 				return;
 			}
 			setBlockCooldown(location, ((new Random()).nextInt(5) + 25));
-			block.getWorld().dropItem(location,
-					this.plugin.getItemUtils().getItemMaterial(
-							(block.getType() == Material.LOG) ? Material.BOWL : block.getType(),
-							(new Random()).nextInt(3) + 1));
+			block.getWorld().dropItem(location, this.plugin.getItemUtils().getItemMaterial((block.getType() == Material.LOG) ? Material.BOWL : block.getType(), (new Random()).nextInt(3) + 1));
 		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockPlace(BlockPlaceEvent event) {
-		Player player = event.getPlayer();
-		PlayerManager pm = PlayerManager.get(player.getUniqueId());
+		final Player player = event.getPlayer();
+		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 
 		if (pm.isAllowBuild()) {
 			return;
 		}
-		Block block = event.getBlock();
+		final Block block = event.getBlock();
 		if (block.getType() == Material.FIRE) {
 			return;
 		}
@@ -149,7 +143,7 @@ public class ServerListener implements Listener {
 	public void onFoodChange(FoodLevelChangeEvent event) {
 		if (event.getEntity() instanceof Player) {
 			event.setCancelled(true);
-			Player player = (Player) event.getEntity();
+			final Player player = (Player) event.getEntity();
 			player.setSaturation(10000.0F);
 		}
 	}
@@ -162,9 +156,9 @@ public class ServerListener implements Listener {
 	}
 
 	private void fillSponsor(Chest chest) {
-		ItemStack lighter = new ItemStack(Material.FLINT_AND_STEEL, 1);
+		final ItemStack lighter = new ItemStack(Material.FLINT_AND_STEEL, 1);
 		lighter.setDurability((short) this.plugin.getMathUtils().getRandom(59, 63));
-		ItemStack[] items = { new ItemStack(Material.MUSHROOM_SOUP, this.plugin.getMathUtils().getRandom(3, 6)),
+		final ItemStack[] items = { new ItemStack(Material.MUSHROOM_SOUP, this.plugin.getMathUtils().getRandom(3, 6)),
 				new ItemStack(Material.LEATHER_BOOTS),
 				new ItemStack(Material.BROWN_MUSHROOM, this.plugin.getMathUtils().getRandom(2, 9)),
 				new ItemStack(Material.LEATHER_LEGGINGS), new ItemStack(Material.LEATHER_CHESTPLATE),
@@ -177,8 +171,8 @@ public class ServerListener implements Listener {
 				this.plugin.getItemUtils().getItemUnbreakable(Material.IRON_SWORD), lighter,
 				new ItemStack(Material.EXP_BOTTLE, this.plugin.getMathUtils().getRandom(1, 3))};
 
-		Random random = new Random();
-		int rand = random.nextInt(4);
+		final Random random = new Random();
+		final int rand = random.nextInt(4);
 		for (int i = 0; i < 4 + rand; i++) {
 			chest.getInventory().setItem((new Random()).nextInt(chest.getInventory().getSize()), new ItemStack(items[random.nextInt(items.length)]));
 		}
@@ -213,8 +207,7 @@ public class ServerListener implements Listener {
 
 	private Long getBlockCooldown(Location location) {
 		if (this.blockCooldown.containsKey(location))
-			return Long.valueOf(
-					Math.max(0L, ((Long) this.blockCooldown.get(location)).longValue() - System.currentTimeMillis()));
+			return Long.valueOf(Math.max(0L, ((Long) this.blockCooldown.get(location)).longValue() - System.currentTimeMillis()));
 		return Long.valueOf(0L);
 	}
 

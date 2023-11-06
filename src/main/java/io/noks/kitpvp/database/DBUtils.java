@@ -65,7 +65,7 @@ public class DBUtils {
 		Connection connection = null;
 		try {
 			connection = this.hikari.getConnection();
-			PreparedStatement statement = (PreparedStatement) connection.createStatement();
+			final PreparedStatement statement = (PreparedStatement) connection.createStatement();
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS players(uuid varchar(36), kills int(11), death int(11), bestks int(11), bounty int(11), hascompass boolean, swordslot int(11), itemslot int(11), compassslot int(11), money int(11), PRIMARY KEY(`uuid`), UNIQUE(`uuid`));");
 			statement.close();
 		} catch (SQLException e) {
@@ -107,7 +107,7 @@ public class DBUtils {
 
 			statement = connection.prepareStatement(SELECT);
 			statement.setString(1, uuid.toString());
-			ResultSet result = statement.executeQuery();
+			final ResultSet result = statement.executeQuery();
 			if (result.next()) {
 				new PlayerManager(uuid, 
 						new Stats(result.getInt("kills"), result.getInt("death"), result.getInt("bestks"), result.getInt("bounty")), 
@@ -137,7 +137,7 @@ public class DBUtils {
 		Connection connection = null;
 		try {
 			connection = this.hikari.getConnection();
-			PreparedStatement statement = connection.prepareStatement(SAVE);
+			final PreparedStatement statement = connection.prepareStatement(SAVE);
 
 			statement.setInt(1, pm.getStats().getKills());
 			statement.setInt(2, pm.getStats().getDeaths());
