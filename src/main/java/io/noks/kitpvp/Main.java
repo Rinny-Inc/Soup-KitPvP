@@ -24,6 +24,7 @@ import io.noks.kitpvp.listeners.InventoryListener;
 import io.noks.kitpvp.listeners.PlayerListener;
 import io.noks.kitpvp.listeners.ServerListener;
 import io.noks.kitpvp.managers.AbilitiesManager;
+import io.noks.kitpvp.managers.ConfigManager;
 import io.noks.kitpvp.managers.InventoryManager;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.RefillInventoryManager;
@@ -35,6 +36,7 @@ import io.noks.kitpvp.utils.MathUtils;
 import io.noks.kitpvp.utils.Messages;
 
 public class Main extends JavaPlugin {
+	private ConfigManager configManager;
 	private DBUtils database;
 	private MathUtils mathUtils;
 	private AbilitiesManager abilitiesManager;
@@ -52,8 +54,9 @@ public class Main extends JavaPlugin {
 	public void onEnable() {
 		instance = this;
 		this.mathUtils = new MathUtils();
+		this.configManager = new ConfigManager(this);
 		this.database = new DBUtils(getConfig().getString("DATABASE.ADDRESS"), getConfig().getString("DATABASE.NAME"), getConfig().getString("DATABASE.USER"), getConfig().getString("DATABASE.PASSWORD"));
-		this.messages = new Messages();
+		this.messages = new Messages(this.configManager.domainName);
 		this.itemUtils = new ItemUtils();
 		this.inventoryManager = new InventoryManager();
 		this.abilitiesManager = new AbilitiesManager(this);
@@ -102,7 +105,7 @@ public class Main extends JavaPlugin {
 		getCommand("abilitylist").setExecutor(new AbilityListCommand());
 		getCommand("ping").setExecutor(new PingCommand());
 		getCommand("shout").setExecutor(new ShoutCommand());
-		getCommand("report").setExecutor(new ReportCommand());
+		new ReportCommand(this);
 		getCommand("skull").setExecutor(new SkullCommand());
 		getCommand("sponsor").setExecutor(new SponsorCommand());
 		new StatisticCommand(this);
@@ -141,5 +144,9 @@ public class Main extends JavaPlugin {
 	
 	public EventsTask getEventsTask() {
 		return this.eventsTask;
+	}
+	
+	public ConfigManager getConfigManager() {
+		return this.configManager;
 	}
 }

@@ -25,9 +25,9 @@ public class Camel extends Abilities implements Listener {
 	}
 
 	@EventHandler
-	public void onCamelMove(PlayerMoveEvent event) {
-		Player player = event.getPlayer();
-		Ability ability = PlayerManager.get(player.getUniqueId()).getAbility();
+	public void onMove(PlayerMoveEvent event) {
+		final Player player = event.getPlayer();
+		final Ability ability = PlayerManager.get(player.getUniqueId()).getAbility();
 		if (ability.hasAbility(this)) {
 			if (player.getLocation().getBlock().getBiome() == Biome.DESERT) {
 				if (player.getWalkSpeed() != 0.275F) player.setWalkSpeed(0.275F);

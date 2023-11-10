@@ -54,11 +54,9 @@ public class Phantom extends Abilities implements Listener {
 			return;
 		}
 		final Player p = e.getPlayer();
-		Action action = e.getAction();
-		if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
-				&& p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.FEATHER
-				&& PlayerManager.get(p.getUniqueId()).getAbility().hasAbility(this)) {
-			PlayerManager pm = PlayerManager.get(p.getUniqueId());
+		final Action action = e.getAction();
+		if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.FEATHER && PlayerManager.get(p.getUniqueId()).getAbility().hasAbility(this)) {
+			final PlayerManager pm = PlayerManager.get(p.getUniqueId());
 			if (!pm.getAbility().hasActiveCooldown()) {
 				pm.getAbility().applyCooldown();
 				for (Entity n : p.getNearbyEntities(20.0D, 20.0D, 20.0D)) {
@@ -72,25 +70,23 @@ public class Phantom extends Abilities implements Listener {
 				p.sendMessage(ChatColor.BLUE + "You can now flying for 5 seconds");
 				p.playSound(p.getLocation(), Sound.WITHER_DEATH, 1.0F, 1.0F);
 				givePhantomEquipment(p);
-				(new BukkitRunnable() {
+				new BukkitRunnable() {
 					public void run() {
 						if (Phantom.this.equipments.containsKey(p.getUniqueId())) {
 							p.playSound(p.getLocation(), Sound.WITHER_SPAWN, 1.0F, 1.0F);
 							p.sendMessage(ChatColor.RED + "Fly unabled!");
 							p.setFlying(false);
 							p.setAllowFlight(false);
-							p.getInventory()
-									.setArmorContents((ItemStack[]) Phantom.this.equipments.get(p.getUniqueId()));
+							p.getInventory().setArmorContents((ItemStack[]) Phantom.this.equipments.get(p.getUniqueId()));
 							p.updateInventory();
 							Phantom.this.equipments.remove(p.getUniqueId());
 						}
 					}
-				}).runTaskLater(this.plugin, 120L);
-			} else {
-				double cooldown = pm.getAbility().getActiveCooldown().longValue() / 1000.0D;
-				p.sendMessage(ChatColor.RED + "You can use your ability in "
-						+ (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
+				}.runTaskLater(this.plugin, 120L);
+				return;
 			}
+			final double cooldown = pm.getAbility().getActiveCooldown().longValue() / 1000.0D;
+			p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 		}
 	}
 
@@ -110,23 +106,23 @@ public class Phantom extends Abilities implements Listener {
 	private void givePhantomEquipment(Player player) {
 		this.equipments.put(player.getUniqueId(), player.getInventory().getArmorContents());
 
-		ItemStack h = new ItemStack(Material.LEATHER_HELMET);
-		LeatherArmorMeta hm = (LeatherArmorMeta) h.getItemMeta();
+		final ItemStack h = new ItemStack(Material.LEATHER_HELMET);
+		final LeatherArmorMeta hm = (LeatherArmorMeta) h.getItemMeta();
 		hm.setColor(Color.fromRGB(255, 255, 255));
 		h.setItemMeta(hm);
 
-		ItemStack c = new ItemStack(Material.LEATHER_CHESTPLATE);
-		LeatherArmorMeta cm = (LeatherArmorMeta) c.getItemMeta();
+		final ItemStack c = new ItemStack(Material.LEATHER_CHESTPLATE);
+		final LeatherArmorMeta cm = (LeatherArmorMeta) c.getItemMeta();
 		cm.setColor(Color.fromRGB(255, 255, 255));
 		c.setItemMeta(cm);
 
-		ItemStack l = new ItemStack(Material.LEATHER_LEGGINGS);
-		LeatherArmorMeta lm = (LeatherArmorMeta) l.getItemMeta();
+		final ItemStack l = new ItemStack(Material.LEATHER_LEGGINGS);
+		final LeatherArmorMeta lm = (LeatherArmorMeta) l.getItemMeta();
 		lm.setColor(Color.fromRGB(255, 255, 255));
 		l.setItemMeta(lm);
 
-		ItemStack b = new ItemStack(Material.LEATHER_BOOTS);
-		LeatherArmorMeta bm = (LeatherArmorMeta) b.getItemMeta();
+		final ItemStack b = new ItemStack(Material.LEATHER_BOOTS);
+		final LeatherArmorMeta bm = (LeatherArmorMeta) b.getItemMeta();
 		bm.setColor(Color.fromRGB(255, 255, 255));
 		b.setItemMeta(bm);
 

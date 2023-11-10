@@ -33,7 +33,7 @@ public class Viper extends Abilities implements Listener {
 			if (rand > 20) {
 				return;
 			}
-			LivingEntity living = (LivingEntity) event.getEntity();
+			final LivingEntity living = (LivingEntity) event.getEntity();
 			living.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, (new Random()).nextInt(1)));
 		}
 	}

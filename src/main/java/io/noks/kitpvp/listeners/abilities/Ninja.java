@@ -58,8 +58,8 @@ public class Ninja extends Abilities implements Listener {
 				float nang = target.getLocation().getYaw() + 90.0F;
 				if (nang < 0.0F)
 					nang += 360.0F;
-				double nX = Math.cos(Math.toRadians(nang));
-				double nZ = Math.sin(Math.toRadians(nang));
+				final double nX = Math.cos(Math.toRadians(nang));
+				final double nZ = Math.sin(Math.toRadians(nang));
 				Location behindTargetLocation = new Location(player.getWorld(), target.getLocation().getX() - nX,
 						target.getLocation().getY(), target.getLocation().getZ() - nZ, target.getLocation().getYaw(),
 						target.getLocation().getPitch());
@@ -81,8 +81,8 @@ public class Ninja extends Abilities implements Listener {
 	@EventHandler
 	public void onPlayerAttack(EntityDamageByEntityEvent event) {
 		if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
-			Player damager = (Player) event.getDamager();
-			PlayerManager dm = PlayerManager.get(damager.getUniqueId());
+			final Player damager = (Player) event.getDamager();
+			final PlayerManager dm = PlayerManager.get(damager.getUniqueId());
 
 			if (dm.getAbility().hasAbility(this)) {
 				Player damaged = (Player) event.getEntity();
@@ -94,7 +94,7 @@ public class Ninja extends Abilities implements Listener {
 
 	@EventHandler
 	public void onQuit(PlayerQuitEvent event) {
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (this.ninja.containsKey(player.getUniqueId())) {
 			this.ninja.remove(this.ninja.get(player.getUniqueId()));
 			this.ninja.remove(player.getUniqueId());
@@ -104,7 +104,7 @@ public class Ninja extends Abilities implements Listener {
 	@EventHandler
 	public void onDeath(PlayerDeathEvent event) {
 		if (event.getEntity() instanceof Player) {
-			Player player = event.getEntity();
+			final Player player = event.getEntity();
 			if (this.ninja.containsKey(player.getUniqueId())) {
 				this.ninja.remove(this.ninja.get(player.getUniqueId()));
 				this.ninja.remove(player.getUniqueId());

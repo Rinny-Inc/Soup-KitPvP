@@ -25,7 +25,7 @@ public class Fireman extends Abilities implements Listener {
 	@EventHandler
 	public void onFireman(EntityDamageEvent event) {
 		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
+			final Player player = (Player) event.getEntity();
 			if (PlayerManager.get(player.getUniqueId()).getAbility().hasAbility(this)) {
 				switch (event.getCause()) {
 				case FIRE:

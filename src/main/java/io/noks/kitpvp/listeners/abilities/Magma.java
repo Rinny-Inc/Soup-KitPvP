@@ -16,12 +16,10 @@ import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
 
 public class Magma extends Abilities implements Listener {
-	private Main plugin;
 
 	public Magma(Main main) {
 		super("Magma", new ItemStack(Material.FIRE), Rarity.COMMON, 0L, new String[] { ChatColor.AQUA + "10% chance to put in fire", ChatColor.AQUA + "your opponent." });
-		this.plugin = main;
-		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
+		main.getServer().getPluginManager().registerEvents(this, main);
 	}
 
 	@EventHandler
@@ -31,7 +29,7 @@ public class Magma extends Abilities implements Listener {
 			if (rand > 10) {
 				return;
 			}
-			Biome biome = event.getDamager().getLocation().getBlock().getBiome();
+			final Biome biome = event.getDamager().getLocation().getBlock().getBiome();
 			event.getEntity().setFireTicks(((biome == Biome.HELL) ? 20 : 10) * 4);
 		}
 	}

@@ -41,7 +41,7 @@ public class Stomper extends Abilities implements Listener {
 				}
 				for (Entity nearbyPlayers : stomped) {
 					if (!(nearbyPlayers instanceof Player)) continue;
-					Player nearby = (Player) nearbyPlayers;
+					final Player nearby = (Player) nearbyPlayers;
 					if (!stomper.canSee(nearby) || !nearby.canSee(stomper))continue;
 					if (PlayerManager.get(nearby.getUniqueId()).getAbility().get() instanceof AntiStomper) {
 						stomper.damage(damage, nearby);

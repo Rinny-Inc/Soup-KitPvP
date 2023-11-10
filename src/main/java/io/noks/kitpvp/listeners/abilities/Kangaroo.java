@@ -46,10 +46,10 @@ public class Kangaroo extends Abilities implements Listener {
 		if (player.getItemInHand().getType() != null && player.getItemInHand().getType() == Material.FIREWORK && PlayerManager.get(player.getUniqueId()).getAbility().hasAbility(this)) {
 			event.setCancelled(true);
 			if (!player.hasMetadata("kangaroo")) {
-				boolean sneak = player.isSneaking();
-				float multiplier = !sneak ? 0.6F : 1.5F;
-				float vertical = !sneak ? 0.8F : 0.5F;
-				Vector kangaVel = player.getEyeLocation().getDirection();
+				final boolean sneak = player.isSneaking();
+				final float multiplier = !sneak ? 0.6F : 1.5F;
+				final float vertical = !sneak ? 0.8F : 0.5F;
+				final Vector kangaVel = player.getEyeLocation().getDirection();
 				player.setVelocity(kangaVel.multiply(multiplier).setY(vertical));
 				player.setFallDistance(0.0F);
 				player.setMetadata("kangaroo", new FixedMetadataValue(this.plugin, Boolean.valueOf(true)));
@@ -62,7 +62,7 @@ public class Kangaroo extends Abilities implements Listener {
 		if (!event.getOnGround()) {
 			return;
 		}
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (player.hasMetadata("kangaroo")) {
 			player.removeMetadata("kangaroo", this.plugin);
 		}
@@ -79,7 +79,7 @@ public class Kangaroo extends Abilities implements Listener {
 	@EventHandler
 	public void onDeath(PlayerDeathEvent event) {
 		if (event.getEntity() instanceof Player) {
-			Player player = event.getEntity();
+			final Player player = event.getEntity();
 
 			if (player.hasMetadata("kangaroo")) {
 				player.removeMetadata("kangaroo", this.plugin);

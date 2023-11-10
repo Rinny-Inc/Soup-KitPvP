@@ -28,11 +28,9 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerOnGroundEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import io.noks.kitpvp.Main;
@@ -78,7 +76,16 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void onQuit(PlayerQuitEvent event) {
 		event.setQuitMessage(null);
-		final Player player = event.getPlayer();
+		this.leaveAction(event.getPlayer());
+	}
+	
+	@EventHandler(priority=EventPriority.HIGHEST)
+	public void onGettingKicked(PlayerKickEvent event) {
+		event.setLeaveMessage(null);
+		this.leaveAction(event.getPlayer());
+	}
+	
+	private void leaveAction(Player player) {
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 		if (pm.hasCombatTag()) {
 			final PlayerManager km = PlayerManager.get(pm.getCurrentCombatTag().getLastAttackerUUID());
@@ -98,12 +105,6 @@ public class PlayerListener implements Listener {
 		}
 		pm.kill();
 		this.plugin.getDataBase().savePlayer(pm);
-	}
-	
-	@EventHandler(priority=EventPriority.HIGHEST)
-	public void onGettingKicked(PlayerKickEvent event) {
-		this.onQuit(new PlayerQuitEvent(event.getPlayer(), event.getLeaveMessage()));
-		event.setLeaveMessage(null);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -274,21 +275,8 @@ public class PlayerListener implements Listener {
 				event.setCancelled(true);
 				if (event.getCause() == DamageCause.VOID && !pm.getAbility().hasAbility()) {
 					player.teleport(player.getWorld().getSpawnLocation());
-					return;
-				}
-				if (event.getCause() == DamageCause.FALL && player.hasMetadata("Sponged")) {
-					event.setCancelled(true);
-					player.removeMetadata("Sponged", this.plugin);
 				}
 			}
-		}
-	}
-	
-	@EventHandler
-	public void onGround(PlayerOnGroundEvent event) {
-		final Player player = event.getPlayer();
-		if (player.hasMetadata("Sponged")) {
-			player.removeMetadata("Sponged", this.plugin);
 		}
 	}
 
@@ -339,19 +327,23 @@ public class PlayerListener implements Listener {
 		final Player player = event.getPlayer();
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 		if (pm.isInSpawn() && !this.spawnCuboid.isIn(player)) {
-			// TODO
+			final Ability ability = pm.getAbility();
+			ability.set(ability.getSelected());
+			this.plugin.getItemUtils().giveEquipment(player, ability.get());
 			return;
 		}
-		final Block block = event.getTo().getBlock().getRelative(BlockFace.DOWN);
-		if (block.getType() == Material.SPONGE) {
-			int sponge = 0;
-			for (int y = block.getLocation().getBlockY(); y < 250; y++) {
-				if (block.getWorld().getBlockAt(block.getX(), y, block.getZ()).getType() == Material.SPONGE) continue;
-				sponge++;
+		if (!pm.isInSpawn()) {
+			// TODO: SPAWN LOCKING
+			final Block block = event.getTo().getBlock().getRelative(BlockFace.DOWN);
+			if (block.getType() == Material.SPONGE) {
+				int sponge = 0;
+				for (int y = block.getLocation().getBlockY(); y < 250; y++) {
+					if (block.getWorld().getBlockAt(block.getX(), y, block.getZ()).getType() == Material.SPONGE) continue;
+					sponge++;
+				}
+				final double boost = 2.15D + (0.05D * sponge);
+				player.setVelocity(new Vector(0.0D, boost, 0.0D));
 			}
-			final double boost = 2.15D + (0.05D * sponge);
-			player.setVelocity(new Vector(0.0D, boost, 0.0D));
-			player.setMetadata("Sponged", new FixedMetadataValue(this.plugin, Boolean.valueOf(true)));
 		}
 	}
 }

@@ -44,34 +44,34 @@ public class Batman extends Abilities implements Listener {
 		if (!e.hasItem()) {
 			return;
 		}
-		Player p = e.getPlayer();
-		Action action = e.getAction();
-		Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();
+		final Player p = e.getPlayer();
+		final Action action = e.getAction();
+		final Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();
 		if (action == Action.RIGHT_CLICK_AIR && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.WOOD_SPADE && ability.hasAbility(this)) {
 			if (!ability.hasActiveCooldown()) {
 				ability.applyCooldown();
-				Arrow arrow = (Arrow) p.launchProjectile(Arrow.class);
+				final Arrow arrow = (Arrow) p.launchProjectile(Arrow.class);
 				arrow.setMetadata("batHook", new FixedMetadataValue(this.plugin, Boolean.valueOf(true)));
 				arrow.spigot().setDamage(0.0D);
-				Vector handle = p.getEyeLocation().getDirection().multiply(3.0D);
+				final Vector handle = p.getEyeLocation().getDirection().multiply(3.0D);
 				arrow.setVelocity(handle);
 				return;
 			}
-			double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
+			final double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
 			p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 		}
 	}
 
 	@EventHandler
-	public void onBatmanHit(ProjectileHitEvent event) {
+	public void onHit(ProjectileHitEvent event) {
 		if (event.getEntity() instanceof Arrow && event.getEntity().getShooter() instanceof Player && event.getHitEntity() instanceof Player) {
-			Player shooter = (Player) event.getEntity().getShooter();
+			final Player shooter = (Player) event.getEntity().getShooter();
 
 			if (event.getEntity().hasMetadata("batHook")) {
-				Player hit = (Player) event.getHitEntity();
+				final Player hit = (Player) event.getHitEntity();
 
 				if (hit == shooter) return;
-				Location hitLoc = hit.getLocation();
+				final Location hitLoc = hit.getLocation();
 				shooter.teleport(hitLoc);
 				shooter.setFallDistance(0.0F);
 			}

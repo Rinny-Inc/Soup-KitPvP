@@ -47,12 +47,12 @@ public class Blink extends Abilities implements Listener {
 		if (!e.hasItem()) {
 			return;
 		}
-		Player p = e.getPlayer();
-		Action action = e.getAction();
-		Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();
+		final Player p = e.getPlayer();
+		final Action action = e.getAction();
+		final Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();
 		if (action == Action.RIGHT_CLICK_AIR && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.NETHER_STAR && ability.hasAbility(this)) {
 			if (ability.hasActiveCooldown()) {
-				double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
+				final double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
 				p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 				return;
 			}

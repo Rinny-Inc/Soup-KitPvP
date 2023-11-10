@@ -27,7 +27,7 @@ public class Turtle extends Abilities implements Listener {
 	@EventHandler
 	public void onEntityDamagedByPlayer(EntityDamageByEntityEvent event) {
 		if (event.getDamager() instanceof Player) {
-			Player damager = (Player) event.getDamager();
+			final Player damager = (Player) event.getDamager();
 
 			if (PlayerManager.get(damager.getUniqueId()).getAbility().hasAbility(this) && damager.getPlayer().isSneaking()) {
 				event.setCancelled(true);
@@ -38,7 +38,7 @@ public class Turtle extends Abilities implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onDamage(EntityDamageEvent event) {
 		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
+			final Player player = (Player) event.getEntity();
 
 			if (PlayerManager.get(player.getUniqueId()).getAbility().hasAbility(this)) {
 				if (player.getPlayer().isSneaking() && !player.getPlayer().isBlocking()) {

@@ -30,20 +30,20 @@ public class Hulk extends Abilities implements Listener {
 	}
 
 	@EventHandler
-	public void onHulkCarry(PlayerInteractEntityEvent e) {
-		Player p = e.getPlayer();
+	public void onCarry(PlayerInteractEntityEvent e) {
+		final Player p = e.getPlayer();
 		if (e.getRightClicked() instanceof Player) {
-			Player r = (Player) e.getRightClicked();
-			Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();
+			final Player r = (Player) e.getRightClicked();
+			final Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();
 			if (p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.AIR && ability.hasAbility(this) && !p.isInsideVehicle() && p.getPassenger() == null && r.getPassenger() == null) {
 				if (!ability.hasActiveCooldown()) {
 					p.setPassenger(r);
 					r.sendMessage(ChatColor.GREEN + p.getName() + " just picked you up! Press SHIFT to dismount!");
 					ability.applyCooldown();
-				} else {
-					double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
-					p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
+					return;
 				}
+				final double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
+				p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 			}
 		}
 	}
@@ -51,42 +51,42 @@ public class Hulk extends Abilities implements Listener {
 	@EventHandler
 	public void onPlayerAttack(EntityDamageByEntityEvent e) {
 		if (e.getEntity() instanceof Player && e.getDamager() instanceof Player) {
-			Player damager = (Player) e.getDamager();
-			if (PlayerManager.get(damager.getUniqueId()).getAbility().hasAbility(this) && damager.getPassenger() != null)
+			final Player damager = (Player) e.getDamager();
+			if (PlayerManager.get(damager.getUniqueId()).getAbility().hasAbility(this) && damager.getPassenger() != null) {
 				e.setCancelled(true);
-
+			}
 		}
 	}
 
 	@EventHandler
-	public void onHulkThrow(PlayerInteractEvent e) {
+	public void onThrow(PlayerInteractEvent e) {
 		if (!e.hasItem()) {
 			return;
 		}
-		Player p = e.getPlayer();
-		Action action = e.getAction();
+		final Player p = e.getPlayer();
+		final Action action = e.getAction();
 		if (action == Action.LEFT_CLICK_AIR && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.AIR && PlayerManager.get(p.getUniqueId()).getAbility().hasAbility(this) && p.getPassenger() != null) {
-			Player passenger = (Player) p.getPassenger();
+			final Player passenger = (Player) p.getPassenger();
 			passenger.leaveVehicle();
 			passenger.setVelocity(p.getEyeLocation().getDirection().multiply(1.2D).setY(0.7D));
 		}
 	}
 
 	@EventHandler
-	public void onHulkDeath(PlayerDeathEvent e) {
-		Player p = e.getEntity();
+	public void onDeath(PlayerDeathEvent e) {
+		final Player p = e.getEntity();
 		if (e.getEntity() instanceof Player && p.getPassenger() != null && p.getPassenger() instanceof Player) {
-			Player passenger = (Player) p.getPassenger();
+			final Player passenger = (Player) p.getPassenger();
 			p.eject();
 			passenger.leaveVehicle();
 		}
 	}
 
 	@EventHandler
-	public void onHulkDamage(EntityDamageByEntityEvent e) {
+	public void onDamage(EntityDamageByEntityEvent e) {
 		if (e.getEntity() instanceof Player && e.getDamager() instanceof Player && PlayerManager.get(e.getEntity().getUniqueId()).getAbility().hasAbility(this)) {
-			Player p = (Player) e.getDamager();
-			Player v = (Player) e.getEntity();
+			final Player p = (Player) e.getDamager();
+			final Player v = (Player) e.getEntity();
 			if (p.getPassenger() == v) {
 				p.eject();
 				v.leaveVehicle();

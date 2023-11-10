@@ -51,8 +51,8 @@ public class ServerListener implements Listener {
 
 	@EventHandler
 	public void onServerPing(ServerListPingEvent event) {
-		final String line1 = ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "----------" + ChatColor.GRAY + ChatColor.BOLD + "( " + ChatColor.DARK_AQUA + ChatColor.BOLD + "Rastacraft " + ChatColor.GRAY + ChatColor.BOLD + ")" + ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "---------------\n";
-		final String line2 = ChatColor.GOLD.toString() + ChatColor.ITALIC + "- Home of soup pvp -";
+		final String line1 = ChatColor.translateAlternateColorCodes('&', this.plugin.getConfigManager().motdFirstLine) + "\n";
+		final String line2 = ChatColor.translateAlternateColorCodes('&', this.plugin.getConfigManager().motdSecondLine);
 		event.setMotd(line1 + line2 + (Bukkit.hasWhitelist() ? (ChatColor.RED + " Whitelisted") : ""));
 	}
 

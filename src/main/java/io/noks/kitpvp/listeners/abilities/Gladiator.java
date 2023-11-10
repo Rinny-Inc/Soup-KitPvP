@@ -39,7 +39,7 @@ public class Gladiator extends Abilities implements Listener {
 	public Gladiator(Main main) {
 		super("Gladiator", new ItemStack(Material.IRON_FENCE), Rarity.LEGENDARY, 20L, new String[] { ChatColor.AQUA + "Duel your opponent" });
 		this.gladiators = Maps.newHashMap();
-		final World world = Bukkit.getWorld("world");
+		final World world = main.getServer().getWorld("world");
 		this.gladiatorZones = new Location[] {
 				new Location(world, -50.5D, 170.5D, 775.5D, 135.0F, 0.0F),
 				new Location(world, -68.5D, 170.5D, 756.5D, -45.0F, 0.0F),
@@ -63,19 +63,19 @@ public class Gladiator extends Abilities implements Listener {
 	@EventHandler
 	public void onGladiator(PlayerInteractEntityEvent e) {
 		if (e.getRightClicked() instanceof Player) {
-			Player p = e.getPlayer();
-			Player r = (Player) e.getRightClicked();
-			Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();
+			final Player p = e.getPlayer();
+			final Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();
 			if (p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.IRON_FENCE && ability.hasAbility(this)) {
 				if (ability.hasActiveCooldown()) {
-					double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
+					final double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
 					p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 					return;
 				}
+				final Player r = (Player) e.getRightClicked();
 				if (this.gladiators.containsKey(r.getUniqueId())) {
 					return;
 				}
-				Ability clickedAbility = PlayerManager.get(r.getUniqueId()).getAbility();
+				final Ability clickedAbility = PlayerManager.get(r.getUniqueId()).getAbility();
 				if (clickedAbility.get() instanceof AntiGladiator) {
 					ability.applyCooldown();
 					return;
@@ -88,19 +88,19 @@ public class Gladiator extends Abilities implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onGladiatorsDeath(PlayerDeathEvent e) {
 		if (e.getEntity() instanceof Player) {
-			Player p = e.getEntity();
+			final Player p = e.getEntity();
 			if (this.gladiators.containsKey(p.getUniqueId())) {
-				List<ItemStack> loot = Lists.newArrayList(e.getDrops());
+				final List<ItemStack> loot = Lists.newArrayList(e.getDrops());
 				e.getDrops().clear();
-				Player enemy = ((Gladiators) this.gladiators.get(p.getUniqueId())).getOpponentPlayer();
-				for (Player allPlayers : Bukkit.getOnlinePlayers()) {
+				final Player enemy = ((Gladiators) this.gladiators.get(p.getUniqueId())).getOpponentPlayer();
+				for (Player allPlayers : this.plugin.getServer().getOnlinePlayers()) {
 					p.showPlayer(allPlayers);
 					enemy.showPlayer(allPlayers);
 				}
 				enemy.sendMessage(ChatColor.GREEN + "You have beated " + p.getName());
 				enemy.setNoDamageTicks(50);
 				p.sendMessage(ChatColor.RED + "You lost in face of " + enemy.getName());
-				Location loc = ((Gladiators) this.gladiators.get(enemy.getUniqueId())).getLastLocation();
+				final Location loc = ((Gladiators) this.gladiators.get(enemy.getUniqueId())).getLastLocation();
 				enemy.teleport(loc);
 				for (ItemStack loots : loot) {
 					if (loots.getItemMeta().hasDisplayName())
@@ -123,18 +123,17 @@ public class Gladiator extends Abilities implements Listener {
 
 	@EventHandler
 	public void onGladiatorsQuit(PlayerQuitEvent e) {
-		Player p = e.getPlayer();
+		final Player p = e.getPlayer();
 		if (this.gladiators.containsKey(p.getUniqueId())) {
-
-			Player enemy = ((Gladiators) this.gladiators.get(p.getUniqueId())).getOpponentPlayer();
-			for (Player allPlayers : Bukkit.getOnlinePlayers()) {
+			final Player enemy = ((Gladiators) this.gladiators.get(p.getUniqueId())).getOpponentPlayer();
+			for (Player allPlayers : this.plugin.getServer().getOnlinePlayers()) {
 				p.showPlayer(allPlayers);
 				enemy.showPlayer(allPlayers);
 			}
 			enemy.sendMessage(ChatColor.GREEN + "You have beated " + p.getName());
 			enemy.setNoDamageTicks(50);
 			p.sendMessage(ChatColor.RED + "You lost in face of " + enemy.getName());
-			Location loc = ((Gladiators) this.gladiators.get(enemy.getUniqueId())).getLastLocation();
+			final Location loc = ((Gladiators) this.gladiators.get(enemy.getUniqueId())).getLastLocation();
 			enemy.teleport(loc);
 			this.gladiators.remove(p.getUniqueId());
 			this.gladiators.remove(enemy.getUniqueId());
@@ -151,9 +150,9 @@ public class Gladiator extends Abilities implements Listener {
 
 	@EventHandler
 	public void onJoinForGladiators(PlayerJoinEvent event) {
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 
-		for (Player fightings : Bukkit.getOnlinePlayers()) {
+		for (Player fightings : this.plugin.getServer().getOnlinePlayers()) {
 			if (fightings == null || !this.gladiators.containsKey(fightings.getUniqueId()))
 				continue;
 			fightings.hidePlayer(player);
@@ -162,12 +161,12 @@ public class Gladiator extends Abilities implements Listener {
 
 	@EventHandler
 	public void onDropReceive(PlayerPickupItemEvent event) {
-		Player receiver = event.getPlayer();
+		final Player receiver = event.getPlayer();
 		if (!this.gladiators.containsKey(receiver.getUniqueId())) {
 			return;
 		}
 		if (event.getItem().getOwner() instanceof Player) {
-			Player dropper = (Player) event.getItem().getOwner();
+			final Player dropper = (Player) event.getItem().getOwner();
 			if (!receiver.canSee(dropper))
 				event.setCancelled(true);
 		}
@@ -181,11 +180,11 @@ public class Gladiator extends Abilities implements Listener {
 		target.sendMessage(ChatColor.GREEN + "You have been gladiator by " + gladiator.getName());
 		this.gladiators.put(gladiator.getUniqueId(), new Gladiators(target.getUniqueId(), gladiator.getLocation()));
 		this.gladiators.put(target.getUniqueId(), new Gladiators(gladiator.getUniqueId(), target.getLocation()));
-		for (Player allPlayers : Bukkit.getOnlinePlayers()) {
+		for (Player allPlayers : this.plugin.getServer().getOnlinePlayers()) {
 			gladiator.hidePlayer(allPlayers);
 			target.hidePlayer(allPlayers);
 		}
-		int random = new Random().nextInt(1);
+		final int random = new Random().nextInt(1);
 		gladiator.teleport(this.gladiatorZones[(random == 0 ? 0 : 2)]);
 		target.teleport(this.gladiatorZones[(random == 0 ? 1 : 3)]);
 		gladiator.showPlayer(target);

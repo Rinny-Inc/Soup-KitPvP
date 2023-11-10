@@ -1,6 +1,14 @@
+# For secret informations :) #
 DATABASE:
   ADDRESS:
   NAME:
   USER:
   PASSWORD:
-  
+domain-name: noks.io
+# \n for newLine
+tab:
+  header: "Noks.io"
+  footer: "github.com/iamnoksio/KitPvPSoup"
+motd:
+  first-line: "noks.io"
+  second-line: "soup server"
