@@ -2,16 +2,20 @@ package io.noks.kitpvp.managers.caches;
 
 import javax.annotation.Nullable;
 
+import com.avaje.ebean.validation.NotNull;
+
 import io.noks.kitpvp.abstracts.Abilities;
+import io.noks.kitpvp.listeners.abilities.PvP;
 
 public class Ability {
-	private @Nullable Abilities ability, selectedAbility;
+	private @Nullable Abilities ability;
+	private @NotNull Abilities selectedAbility;
 	private Long abilityCooldown;
 	private int abilityUseTime;
 	
 	public Ability() {
 		this.ability = null;
-		this.selectedAbility = null;
+		this.selectedAbility = new PvP();
 		this.abilityCooldown = 0L;
 		this.abilityUseTime = 0;
 	}

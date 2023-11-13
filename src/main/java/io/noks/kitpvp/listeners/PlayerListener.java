@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
@@ -51,7 +52,7 @@ public class PlayerListener implements Listener {
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 		final World world = main.getServer().getWorld("world");
-		this.spawnCuboid = new Cuboid(new Location(world, 0, 0, 0), new Location(world, 0, 0, 0));
+		this.spawnCuboid = new Cuboid(new Location(world, -34, 96, 31), new Location(world, 23, 105, -15));
 	}
 
 	@EventHandler
@@ -234,20 +235,14 @@ public class PlayerListener implements Listener {
 				}
 			}*/
 	}
-
-	@EventHandler
-	public void combatTagOnHit(EntityDamageByEntityEvent event) {
-		if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
-			PlayerManager.get(event.getEntity().getUniqueId()).updateCombatTag(new CombatTag(event.getDamager().getUniqueId()));
-			PlayerManager.get(event.getDamager().getUniqueId()).updateCombatTag(new CombatTag(event.getEntity().getUniqueId()));
-		}
-	}
 	
 	// TODO: remake with critical damage and enchantment
 	// TODO: FIX DOUBLE HIT????
 	@EventHandler
-	public void nerfDamage(EntityDamageByEntityEvent event) {
+	public void onEntityDamageEntity(EntityDamageByEntityEvent event) {
 		if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
+			PlayerManager.get(event.getEntity().getUniqueId()).updateCombatTag(new CombatTag(event.getDamager().getUniqueId()));
+			PlayerManager.get(event.getDamager().getUniqueId()).updateCombatTag(new CombatTag(event.getEntity().getUniqueId()));
 			final Player damager = (Player) event.getDamager();
 			final ItemStack handItem = damager.getItemInHand();
 			if (handItem.getType() == Material.MUSHROOM_SOUP) {
@@ -310,7 +305,6 @@ public class PlayerListener implements Listener {
 						if (onlineWorld == player || !player.canSee(onlineWorld) || !onlineWorld.canSee(player) || onlineWorld.getGameMode() != GameMode.SURVIVAL || onlineWorld.isDead())
 							continue;
 						nearest = onlineWorld;
-						break;
 					}
 				}
 				if (nearest == null) {
@@ -325,24 +319,37 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onMove(PlayerMoveEvent event) {
 		final Player player = event.getPlayer();
+		if (player.getGameMode() == GameMode.CREATIVE || player.isDead()) {
+			return;
+		}
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-		if (pm.isInSpawn() && !this.spawnCuboid.isIn(player)) {
-			final Ability ability = pm.getAbility();
-			ability.set(ability.getSelected());
-			this.plugin.getItemUtils().giveEquipment(player, ability.get());
+		if (pm.isInSpawn()) {
+			if (!this.spawnCuboid.isIn(player)) {
+				final Ability ability = pm.getAbility();
+				ability.set(ability.getSelected());
+				this.plugin.getItemUtils().giveEquipment(player, ability.get());
+				return;
+			}
+			event.setCancelled(true);
 			return;
 		}
 		if (!pm.isInSpawn()) {
-			// TODO: SPAWN LOCKING
-			final Block block = event.getTo().getBlock().getRelative(BlockFace.DOWN);
-			if (block.getType() == Material.SPONGE) {
-				int sponge = 0;
-				for (int y = block.getLocation().getBlockY(); y < 250; y++) {
-					if (block.getWorld().getBlockAt(block.getX(), y, block.getZ()).getType() == Material.SPONGE) continue;
-					sponge++;
+			// TODO: SPAWN LOCKING BY CLIENT SIDE BLOCKS
+			final Block sponge = event.getTo().getBlock().getRelative(BlockFace.DOWN);
+			if (sponge.getType() == Material.SPONGE) {
+				final Block signBlock = sponge.getLocation().getBlock().getRelative(BlockFace.DOWN);
+				
+				if (!(signBlock.getState() instanceof Sign)) {
+					return;
 				}
-				final double boost = 2.15D + (0.05D * sponge);
-				player.setVelocity(new Vector(0.0D, boost, 0.0D));
+				final Sign sign = (Sign) signBlock.getState();
+				final String firstLine = sign.getLine(0);
+				try {
+					final double multiplier = Double.parseDouble(firstLine);
+					player.setVelocity(new Vector(0, multiplier, 0));
+				} catch (NumberFormatException e) {
+					player.sendMessage("The first line is not a valid double.");
+				}
 			}
 		}
 	}

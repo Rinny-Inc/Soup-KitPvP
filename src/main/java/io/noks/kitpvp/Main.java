@@ -9,6 +9,8 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
+import com.avaje.ebean.validation.NotNull;
+
 import io.noks.kitpvp.commands.AbilityListCommand;
 import io.noks.kitpvp.commands.BalanceCommand;
 import io.noks.kitpvp.commands.BootCommand;
@@ -36,15 +38,15 @@ import io.noks.kitpvp.utils.MathUtils;
 import io.noks.kitpvp.utils.Messages;
 
 public class Main extends JavaPlugin {
-	private ConfigManager configManager;
-	private DBUtils database;
-	private MathUtils mathUtils;
-	private AbilitiesManager abilitiesManager;
-	private ItemUtils itemUtils;
-	private InventoryManager inventoryManager;
-	private TournamentManager tournamentManager;
-	private Messages messages;
-	private EventsTask eventsTask;
+	private @NotNull ConfigManager configManager;
+	private @NotNull DBUtils database;
+	private @NotNull MathUtils mathUtils;
+	private @NotNull AbilitiesManager abilitiesManager;
+	private @NotNull ItemUtils itemUtils;
+	private @NotNull InventoryManager inventoryManager;
+	private @NotNull TournamentManager tournamentManager;
+	private @NotNull Messages messages;
+	private @NotNull EventsTask eventsTask;
 	
 	private static Main instance;
 	public static Main getInstance() {

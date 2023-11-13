@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import com.avaje.ebean.validation.NotNull;
 import com.google.common.collect.Maps;
 
 import io.noks.kitpvp.Main;
@@ -19,15 +20,15 @@ import io.noks.kitpvp.managers.caches.Stats;
 
 public class PlayerManager {
 	public static final Map<UUID, PlayerManager> players = Maps.newConcurrentMap();
-	private final Player player;
-	private final UUID playerUUID;
-	private Ability ability;
+	private final @NotNull Player player;
+	private final @NotNull UUID playerUUID;
+	private final @NotNull Ability ability;
 	private boolean usedSponsor;
 	private boolean usedRecraft;
 	private boolean allowBuild;
-	private final Stats stats;
-	private final PlayerSettings settings;
-	private final Economy economy;
+	private final @NotNull Stats stats;
+	private final @NotNull PlayerSettings settings;
+	private final @NotNull Economy economy;
 	private @Nullable CombatTag combatTag;
 
 	public PlayerManager(UUID playerUUID) {
@@ -76,7 +77,7 @@ public class PlayerManager {
 	}
 	
 	public boolean isInSpawn() {
-		return this.ability == null;
+		return !this.ability.hasAbility();
 	}
 
 	public Ability getAbility() {

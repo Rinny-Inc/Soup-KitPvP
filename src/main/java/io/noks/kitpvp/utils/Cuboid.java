@@ -1,14 +1,16 @@
 package io.noks.kitpvp.utils;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import com.avaje.ebean.validation.NotNull;
 
 public class Cuboid {
     private final int xMin, xMax;
@@ -17,7 +19,8 @@ public class Cuboid {
     private final double xMinCentered, xMaxCentered;
     private final double yMinCentered, yMaxCentered;
     private final double zMinCentered, zMaxCentered;
-    private final World world;
+    private @NotNull final World world;
+    private @NotNull final List<Location> cachedEdgeLocations;
 
     public Cuboid(final Location point1, final Location point2) {
         this.xMin = Math.min(point1.getBlockX(), point2.getBlockX());
@@ -33,6 +36,19 @@ public class Cuboid {
         this.yMaxCentered = this.yMax + 0.5;
         this.zMinCentered = this.zMin + 0.5;
         this.zMaxCentered = this.zMax + 0.5;
+        
+        final List<Location> edgeLocations = new ArrayList<>();
+        for (int x = this.xMin; x <= this.xMax; x++) {
+            for (int y = this.yMin; y <= this.yMax; y++) {
+                for (int z = this.zMin; z <= this.zMax; z++) {
+                    if (x == this.xMin || x == this.xMax || y == this.yMin || y == this.yMax || z == this.zMin || z == this.zMax) {
+                        Location edgeLocation = new Location(this.world, x + 0.5, y + 0.5, z + 0.5);
+                        edgeLocations.add(edgeLocation);
+                    }
+                }
+            }
+        }
+        cachedEdgeLocations = edgeLocations;
     }
 
     public Iterator<Block> blockList() {
@@ -102,5 +118,9 @@ public class Cuboid {
 
     public boolean isInWithMarge(final Location loc, final double marge) {
         return loc.getWorld() == this.world && loc.getX() >= this.xMinCentered - marge && loc.getX() <= this.xMaxCentered + marge && loc.getY() >= this.yMinCentered - marge && loc.getY() <= this.yMaxCentered + marge && loc.getZ() >= this.zMinCentered - marge && loc.getZ() <= this.zMaxCentered + marge;
+    }
+    
+    public List<Location> getEdgeLocations() {
+    	return cachedEdgeLocations;
     }
 }

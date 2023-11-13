@@ -44,7 +44,7 @@ public class InventoryListener implements Listener {
 			final Player player = (Player) event.getWhoClicked();
 			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 
-			if (!pm.getAbility().hasAbility() && player.getGameMode() != GameMode.CREATIVE) {
+			if (pm.isInSpawn() && player.getGameMode() != GameMode.CREATIVE) {
 				event.setCancelled(true);
 				player.updateInventory();
 			}
@@ -131,7 +131,7 @@ public class InventoryListener implements Listener {
 			}
 			player.closeInventory();
 			pm.getAbility().setSelected(this.plugin.getAbilitiesManager().getAbilityFromName(correctItemName));
-			player.sendMessage(ChatColor.GRAY + "You've chosen " + pm.getAbility().get().getRarity().getColor() + pm.getAbility().get().getName() + ChatColor.GRAY + " ability.");
+			player.sendMessage(ChatColor.GRAY + "You've chosen " + pm.getAbility().getSelected().getRarity().getColor() + pm.getAbility().getSelected().getName() + ChatColor.GRAY + " ability.");
 			return;
 		}
 		if (inventory.getTitle().toLowerCase().contains("settings")) {
