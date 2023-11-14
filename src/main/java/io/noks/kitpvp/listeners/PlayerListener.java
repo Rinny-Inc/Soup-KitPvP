@@ -89,19 +89,21 @@ public class PlayerListener implements Listener {
 	private void leaveAction(Player player) {
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 		if (pm.hasCombatTag()) {
-			final PlayerManager km = PlayerManager.get(pm.getCurrentCombatTag().getLastAttackerUUID());
-			final Player killer = km.getPlayer();
+			final PlayerManager km = PlayerManager.get(pm.getCurrentCombatTag().getLastAttackerUUID()); 
+			if (km != null) {
+				final Player killer = km.getPlayer();
 
-			if (killer != player) {
-				km.getAbility().get().onKill(killer);
-				killer.sendMessage(ChatColor.GRAY + killer.getName() + "(" + ChatColor.RED + km.getAbility().get().getName() + ChatColor.GRAY + ") killed " + player.getName() + "(" + ChatColor.RED + pm.getAbility().get().getName() + ChatColor.GRAY + ")");
+				if (killer != player) {
+					km.getAbility().get().onKill(killer);
+					killer.sendMessage(ChatColor.GRAY + killer.getName() + "(" + ChatColor.RED + km.getAbility().get().getName() + ChatColor.GRAY + ") killed " + player.getName() + "(" + ChatColor.RED + pm.getAbility().get().getName() + ChatColor.GRAY + ")");
 
-				final Stats killerStats = km.getStats();
-				killerStats.addKills();
-				killerStats.addKillStreak();
+					final Stats killerStats = km.getStats();
+					killerStats.addKills();
+					killerStats.addKillStreak();
 
-				final Economy killerEconomy = km.getEconomy();
-				killerEconomy.add(((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 20 : 10), MoneyType.BRONZE);
+					final Economy killerEconomy = km.getEconomy();
+					killerEconomy.add(((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 20 : 10), MoneyType.BRONZE);
+				}
 			}
 		}
 		pm.kill();
@@ -152,6 +154,7 @@ public class PlayerListener implements Listener {
 					dropsIt.remove();
 				}
 			}
+			this.applySpawnProtection(killed, false);
 			pm.kill();
 		}
 	}
@@ -323,18 +326,14 @@ public class PlayerListener implements Listener {
 			return;
 		}
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-		if (pm.isInSpawn()) {
-			if (!this.spawnCuboid.isIn(player)) {
-				final Ability ability = pm.getAbility();
-				ability.set(ability.getSelected());
-				this.plugin.getItemUtils().giveEquipment(player, ability.get());
-				return;
-			}
-			event.setCancelled(true);
+		if (pm.isInSpawn() && !this.spawnCuboid.isIn(player.getLocation())) {
+			final Ability ability = pm.getAbility();
+			ability.set(ability.getSelected());
+			this.plugin.getItemUtils().giveEquipment(player, ability.get());
+			this.applySpawnProtection(player, false);
 			return;
 		}
 		if (!pm.isInSpawn()) {
-			// TODO: SPAWN LOCKING BY CLIENT SIDE BLOCKS
 			final Block sponge = event.getTo().getBlock().getRelative(BlockFace.DOWN);
 			if (sponge.getType() == Material.SPONGE) {
 				final Block signBlock = sponge.getLocation().getBlock().getRelative(BlockFace.DOWN);
@@ -351,6 +350,23 @@ public class PlayerListener implements Listener {
 					player.sendMessage("The first line is not a valid double.");
 				}
 			}
+		}
+	}
+	private void applySpawnProtection(final Player player, final boolean remove) {
+		for (Location loc : this.spawnCuboid.getEdgeLocations()) {
+			if (loc.getY() < 99) {
+				continue;
+			}
+			Block block = loc.getBlock();
+			
+			if (block.getType() != Material.AIR) {
+				continue;
+			}
+			if (!remove) {
+				player.sendBlockChange(loc, Material.STAINED_GLASS.getId(), (byte)14);
+				continue;
+			}
+			player.sendBlockChange(loc, 0, (byte)0);
 		}
 	}
 }
