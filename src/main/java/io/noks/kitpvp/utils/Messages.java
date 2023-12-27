@@ -10,7 +10,7 @@ public class Messages {
 	
 	public Messages(String domain) {
 		WELCOME_MESSAGE = new String[]{ChatColor.DARK_GRAY.toString() + ChatColor.STRIKETHROUGH + "----------------------------------------------------",
-				ChatColor.GRAY + "Welcome on " + ChatColor.DARK_AQUA.toString() + ChatColor.BOLD + domain + ChatColor.GRAY + " the home of soup!",
+				ChatColor.GRAY + "Welcome on " + ChatColor.DARK_AQUA.toString() + ChatColor.BOLD + domain.split(".")[0] + ChatColor.GRAY + " the home of soup!",
 				"", 
 				ChatColor.GRAY + "Our Discord -> " + ChatColor.DARK_AQUA + "discord." + domain,
 				ChatColor.GRAY + "Our Website -> " + ChatColor.DARK_AQUA + domain,
