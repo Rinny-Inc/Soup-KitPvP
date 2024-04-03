@@ -1,7 +1,10 @@
 package io.noks.kitpvp;
 
+import java.util.Iterator;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -56,6 +59,8 @@ public class Main extends JavaPlugin {
 	public void onEnable() {
 		instance = this;
 		this.mathUtils = new MathUtils();
+		this.getConfig().options().copyDefaults(true);
+		this.saveDefaultConfig();
 		this.configManager = new ConfigManager(this);
 		this.database = new DBUtils(getConfig().getString("DATABASE.ADDRESS"), getConfig().getString("DATABASE.NAME"), getConfig().getString("DATABASE.USER"), getConfig().getString("DATABASE.PASSWORD"));
 		this.messages = new Messages(this.configManager.domainName);
@@ -69,10 +74,15 @@ public class Main extends JavaPlugin {
 	}
 
 	public void onDisable() {
-		for (Entity entity : Bukkit.getWorld("world").getEntities()) {
-			if (entity instanceof org.bukkit.entity.IronGolem || entity instanceof Item) {
-				entity.remove();
+		final World world = Bukkit.getWorld("world");
+		final Iterator<Entity> worldentities = world.getEntities().iterator();
+		while (worldentities.hasNext()) {
+			Entity entity = worldentities.next();
+			
+			if (entity == null || !(entity instanceof Item)) {
+				continue;
 			}
+			entity.remove();
 		}
 		PlayerManager.players.clear();
 		RefillInventoryManager.inventories.clear();

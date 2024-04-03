@@ -66,7 +66,8 @@ public class InventoryListener implements Listener {
 		if (item == null || item.getType() == null || item.getItemMeta() == null || item.getItemMeta().getDisplayName() == null) {
 			return;
 		}
-		if (inventory.getTitle().toLowerCase().contains("your abilities")) {
+		final String title = ChatColor.stripColor(inventory.getTitle()).toLowerCase();
+		if (title.equals("ability selector")) {
 			final Player player = (Player) event.getWhoClicked();
 			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 			final String itemName = item.getItemMeta().getDisplayName();
@@ -134,18 +135,12 @@ public class InventoryListener implements Listener {
 			player.sendMessage(ChatColor.GRAY + "You've chosen " + pm.getAbility().getSelected().getRarity().getColor() + pm.getAbility().getSelected().getName() + ChatColor.GRAY + " ability.");
 			return;
 		}
-		if (inventory.getTitle().toLowerCase().contains("settings")) {
+		if (title.contains("settings")) {
 			String itemName = item.getItemMeta().getDisplayName();
 			if (itemName.equals(" ") || itemName.length() < 3) {
 				return;
 			}
 			Player player = (Player) event.getWhoClicked();
-			PlayerManager pm = PlayerManager.get(player.getUniqueId());
-			if (itemName.toLowerCase().contains(":")) {
-				pm.getSettings().updateCompass();
-				inventory.setContents(this.plugin.getInventoryManager().loadSettingsInventory(player).getContents());
-				return;
-			}
 			player.closeInventory();
 			if (itemName.toLowerCase().equals(ChatColor.YELLOW + "previous page")) {
 				player.openInventory(this.plugin.getInventoryManager().loadKitsInventory(player));
@@ -159,7 +154,7 @@ public class InventoryListener implements Listener {
 			}
 			return;
 		}
-		if (inventory.getTitle().toLowerCase().contains("slot")) {
+		if (title.contains("slot")) {
 			Player player = (Player) event.getWhoClicked();
 			PlayerSettings settings = PlayerManager.get(player.getUniqueId()).getSettings();
 			String titleSplitted = inventory.getTitle().split(" ")[1];
@@ -174,8 +169,12 @@ public class InventoryListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onRefillInventoryLeave(InventoryCloseEvent event) {
+		if (event.getInventory().getType() != InventoryType.CHEST) {
+			return;
+		}
 		final Inventory inventory = event.getInventory();
-		if (inventory.getTitle().toLowerCase().contains("refill chest") && !inventory.contains(Material.MUSHROOM_SOUP)) {
+		final String title = ChatColor.stripColor(inventory.getTitle()).toLowerCase();
+		if (title.contains("refill chest") && !inventory.contains(Material.MUSHROOM_SOUP)) {
 			final RefillInventoryManager im = RefillInventoryManager.get(inventory, event.getPlayer().getLocation().getBlock().getBiome());
 			im.setCooldown(Long.valueOf(60L));
 			im.setFilled(false);

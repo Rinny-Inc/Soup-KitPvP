@@ -32,23 +32,22 @@ public class Stomper extends Abilities implements Listener {
 		if (event.getEntity() instanceof Player) {
 			final Player stomper = (Player) event.getEntity();
 			if (event.getCause() == DamageCause.FALL && !stomper.hasMetadata("Sponged") && PlayerManager.get(stomper.getUniqueId()).getAbility().hasAbility(this)) {
-				double damage = event.getDamage();
-				stomper.getWorld().playSound(stomper.getLocation(), Sound.ANVIL_LAND, 0.8F, 1.1F);
-				event.setDamage(Math.min(damage, 4.0D));
 				final List<Entity> stomped = stomper.getNearbyEntities(5.0D, 3.5D, 5.0D);
 				if (stomped.isEmpty()) {
 					return;
 				}
+				double damage = event.getDamage();
+				stomper.getWorld().playSound(stomper.getLocation(), Sound.ANVIL_LAND, 0.8F, 1.1F);
+				event.setDamage(Math.min(damage, 4.0D)); // TODO: base the damage by how many players have been touched
 				for (Entity nearbyPlayers : stomped) {
 					if (!(nearbyPlayers instanceof Player)) continue;
 					final Player nearby = (Player) nearbyPlayers;
 					if (!stomper.canSee(nearby) || !nearby.canSee(stomper))continue;
 					if (PlayerManager.get(nearby.getUniqueId()).getAbility().get() instanceof AntiStomper) {
-						stomper.damage(damage, nearby);
 						continue;
 					}
 					if (nearby.isSneaking()) {
-						damage = 1.0D;
+						damage = 2.0D;
 					}
 					nearby.damage(damage, stomper);
 				}

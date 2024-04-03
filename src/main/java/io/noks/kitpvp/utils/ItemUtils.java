@@ -11,6 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
@@ -66,8 +68,16 @@ public class ItemUtils {
 		return i;
 	}
 
-	public ItemStack getAbilitiesSelector() {
-		return getItemStack(new ItemStack(Material.BOOK), ChatColor.GRAY + "Your abilities", new String[] {ChatColor.GRAY + "Choose your ability to fight other players"});
+	public ItemStack[] getSpawnItems() {
+		return new ItemStack[] {getItemStack(new ItemStack(Material.BOOK), ChatColor.DARK_AQUA + "Ability Selector", new String[] {ChatColor.GRAY + "Choose your ability to fight other players"}),
+								null, // OLD USED KIT
+								null, 
+								null, 
+								null,
+								null,
+								null,
+								null,
+								null};
 	}
 	
 	public void giveEquipment(Player player, Abilities ability) {
@@ -83,15 +93,13 @@ public class ItemUtils {
 		if (ability.specialItem().getType() != Material.MUSHROOM_SOUP) {
 			inv.setItem(settings.getSlot(SlotType.ITEM), Main.getInstance().getItemUtils().getItemStack(ability.specialItem(), ChatColor.RED + ability.specialItemName(), null));
 		}
-		if (settings.hasCompass()) {
-			inv.setItem(settings.getSlot(SlotType.COMPASS), new ItemStack(Main.getInstance().getItemUtils().getItemMaterial(Material.COMPASS, ChatColor.YELLOW + "Tracker")));
+		if (ability instanceof Archer) {
+			inv.setItem(9, new ItemStack(Material.ARROW, 18));
 		}
 		while (inv.firstEmpty() != -1) {
 			inv.addItem(new ItemStack(Material.MUSHROOM_SOUP));
 		}
-		if (ability instanceof Archer) {
-			inv.setItem(9, new ItemStack(Material.ARROW, 18));
-		}
 		player.updateInventory();
+		player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0));
 	}
 }

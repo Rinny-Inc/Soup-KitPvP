@@ -62,4 +62,13 @@ public class CookieMonster extends Abilities implements Listener {
 			eater.setFoodLevel(20);
 		}
 	}
+	
+	@Override
+	public void onKill(Player killer) {
+		if (killer.getInventory().firstEmpty() == -1 && (!killer.getInventory().contains(this.specialItem()))) {
+			killer.getWorld().dropItem(killer.getLocation(), Main.getInstance().getItemUtils().getItemStack(new ItemStack(this.specialItem().getType(), 2), ChatColor.RED + this.specialItemName(), null));
+			return;
+		}
+		killer.getInventory().addItem(new ItemStack[] { Main.getInstance().getItemUtils().getItemStack(new ItemStack(this.specialItem().getType(), 2), ChatColor.RED + this.specialItemName(), null) });
+	}
 }

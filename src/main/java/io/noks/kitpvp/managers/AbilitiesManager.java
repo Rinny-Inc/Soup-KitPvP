@@ -12,7 +12,6 @@ import io.noks.kitpvp.listeners.abilities.Archer;
 import io.noks.kitpvp.listeners.abilities.Batman;
 import io.noks.kitpvp.listeners.abilities.Blink;
 import io.noks.kitpvp.listeners.abilities.Boxer;
-import io.noks.kitpvp.listeners.abilities.Camel;
 import io.noks.kitpvp.listeners.abilities.CookieMonster;
 import io.noks.kitpvp.listeners.abilities.Fireman;
 import io.noks.kitpvp.listeners.abilities.Fisherman;
@@ -28,6 +27,7 @@ import io.noks.kitpvp.listeners.abilities.PvP;
 import io.noks.kitpvp.listeners.abilities.Reaper;
 import io.noks.kitpvp.listeners.abilities.Snail;
 import io.noks.kitpvp.listeners.abilities.Specialist;
+import io.noks.kitpvp.listeners.abilities.Spider;
 import io.noks.kitpvp.listeners.abilities.Stomper;
 import io.noks.kitpvp.listeners.abilities.Switcher;
 import io.noks.kitpvp.listeners.abilities.Turtle;
@@ -42,7 +42,6 @@ public class AbilitiesManager {
 		abilities.add(new Archer(main));
 		abilities.add(new Blink(main));
 		abilities.add(new Boxer());
-		abilities.add(new Camel(main));
 		abilities.add(new Fireman(main));
 		abilities.add(new Fisherman(main));
 		abilities.add(new Gladiator(main));
@@ -65,6 +64,7 @@ public class AbilitiesManager {
 		abilities.add(new Magma(main));
 		abilities.add(new Monk(main));
 		abilities.add(new Batman(main));
+		abilities.add(new Spider(main));
 	}
 	
 	public Abilities getAbilityFromName(String name) {

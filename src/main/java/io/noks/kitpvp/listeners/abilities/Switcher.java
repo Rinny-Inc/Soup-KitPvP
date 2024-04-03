@@ -33,7 +33,7 @@ public class Switcher extends Abilities implements Listener {
 	}
 
 	@EventHandler
-	public void onwitch(ProjectileHitEvent event) {
+	public void onSwitch(ProjectileHitEvent event) {
 		if (event.getEntity() instanceof org.bukkit.entity.Snowball && event.getEntity().getShooter() instanceof Player && event.getHitEntity() instanceof Player) {
 			final Player shooter = (Player) event.getEntity().getShooter();
 
@@ -45,5 +45,14 @@ public class Switcher extends Abilities implements Listener {
 				shooter.teleport(hit.getLocation());
 			}
 		}
+	}
+	
+	@Override
+	public void onKill(Player killer) {
+		if (killer.getInventory().firstEmpty() == -1 && (!killer.getInventory().contains(this.specialItem()))) {
+			killer.getWorld().dropItem(killer.getLocation(), Main.getInstance().getItemUtils().getItemStack(new ItemStack(this.specialItem().getType(), 2), ChatColor.RED + this.specialItemName(), null));
+			return;
+		}
+		killer.getInventory().addItem(new ItemStack[] { Main.getInstance().getItemUtils().getItemStack(new ItemStack(this.specialItem().getType(), 2), ChatColor.RED + this.specialItemName(), null) });
 	}
 }

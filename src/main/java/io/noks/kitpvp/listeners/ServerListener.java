@@ -181,28 +181,20 @@ public class ServerListener implements Listener {
 	@EventHandler
 	public void onSponsorTouchGround(EntityChangeBlockEvent event) {
 		if (event.getEntity() instanceof FallingBlock) {
-			FallingBlock falling = (FallingBlock) event.getEntity();
+			final FallingBlock falling = (FallingBlock) event.getEntity();
 			if (falling.getMaterial() == Material.CHEST) {
 				event.setCancelled(true);
 				event.getBlock().setType(Material.CHEST);
 				final Chest sponsor = (Chest) event.getBlock().getState();
 				fillSponsor(sponsor);
 
-				(new BukkitRunnable() {
+				new BukkitRunnable() {
 					public void run() {
 						sponsor.getBlock().setType(Material.AIR);
 					}
-				}).runTaskLater(this.plugin, 200L);
+				}.runTaskLater(this.plugin, 200L);
 			}
 		}
-	}
-	
-	@EventHandler
-	public void onMobSpawn(CreatureSpawnEvent event) {
-		if (event.getSpawnReason() == SpawnReason.CUSTOM) {
-			return;
-		}
-		event.setCancelled(true);
 	}
 
 	private Long getBlockCooldown(Location location) {

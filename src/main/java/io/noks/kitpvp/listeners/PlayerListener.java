@@ -1,6 +1,5 @@
 package io.noks.kitpvp.listeners;
 
-import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -60,6 +59,7 @@ public class PlayerListener implements Listener {
 		event.setJoinMessage(null);
 		final Player player = event.getPlayer();
 		player.setScoreboard(this.plugin.getServer().getScoreboardManager().getMainScoreboard());
+		player.setGameMode(GameMode.SURVIVAL);
 		player.getInventory().clear();
 		player.getInventory().setArmorContents(null);
 		player.setHealth(20.0D);
@@ -203,7 +203,8 @@ public class PlayerListener implements Listener {
 		}
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			final Player player = event.getPlayer();
-			if (player.getItemInHand().getType() == Material.BOOK && player.getItemInHand().getItemMeta().getDisplayName().toLowerCase().equals(ChatColor.GRAY + "your abilities")) {
+			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
+			if (pm.isInSpawn() && player.getItemInHand().getType() == Material.BOOK && player.getItemInHand().getItemMeta().getDisplayName().toLowerCase().equals(ChatColor.DARK_AQUA + "ability selector")) {
 				player.openInventory(this.plugin.getInventoryManager().loadKitsInventory(player));
 			}
 		}
@@ -244,8 +245,10 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void onEntityDamageEntity(EntityDamageByEntityEvent event) {
 		if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
-			PlayerManager.get(event.getEntity().getUniqueId()).updateCombatTag(new CombatTag(event.getDamager().getUniqueId()));
-			PlayerManager.get(event.getDamager().getUniqueId()).updateCombatTag(new CombatTag(event.getEntity().getUniqueId()));
+			if (event.getEntity() != event.getDamager()) {
+				PlayerManager.get(event.getEntity().getUniqueId()).updateCombatTag(new CombatTag(event.getDamager().getUniqueId()));
+				PlayerManager.get(event.getDamager().getUniqueId()).updateCombatTag(new CombatTag(event.getEntity().getUniqueId()));
+			}
 			final Player damager = (Player) event.getDamager();
 			final ItemStack handItem = damager.getItemInHand();
 			if (handItem.getType() == Material.MUSHROOM_SOUP) {
@@ -289,35 +292,6 @@ public class PlayerListener implements Listener {
 			}
 		}
 	}
-
-	@EventHandler
-	public void onUseTracker(PlayerInteractEvent event) {
-		if (!event.hasItem()) {
-			return;
-		}
-		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK){
-			final Player player = event.getPlayer();
-	
-			if (player.getItemInHand().getType() == Material.COMPASS && player.getItemInHand().getItemMeta().getDisplayName().toLowerCase().equals(ChatColor.YELLOW + "tracker")) {
-				Player nearest = null;
-				double distance = 200.0D;
-				for (Player onlineWorld : player.getWorld().getPlayers()) {
-					final double calc = player.getLocation().distance(onlineWorld.getLocation());
-					if (calc > 1.0D && calc < distance) {
-						distance = calc;
-						if (onlineWorld == player || !player.canSee(onlineWorld) || !onlineWorld.canSee(player) || onlineWorld.getGameMode() != GameMode.SURVIVAL || onlineWorld.isDead())
-							continue;
-						nearest = onlineWorld;
-					}
-				}
-				if (nearest == null) {
-					return;
-				}
-				player.setCompassTarget(nearest.getLocation());
-				player.sendMessage(ChatColor.YELLOW + "Compass pointing at " + nearest.getName() + " (" + ChatColor.GOLD + (new DecimalFormat("#.#")).format(distance) + ChatColor.YELLOW + ")");
-			}
-		}
-	}
 	
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onMove(PlayerMoveEvent event) {
@@ -346,9 +320,7 @@ public class PlayerListener implements Listener {
 				try {
 					final double multiplier = Double.parseDouble(firstLine);
 					player.setVelocity(new Vector(0, multiplier, 0));
-				} catch (NumberFormatException e) {
-					player.sendMessage("The first line is not a valid double.");
-				}
+				} catch (NumberFormatException e) {}
 			}
 		}
 	}

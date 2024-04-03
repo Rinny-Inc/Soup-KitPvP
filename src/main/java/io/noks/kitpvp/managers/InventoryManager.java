@@ -33,7 +33,7 @@ public class InventoryManager {
 	}
 
 	public Inventory loadKitsInventory(Player player, @Nullable Rarity rarity, int page) {
-		Inventory[] inventories = { Bukkit.createInventory(player, 54, "-> Your abilities"), Bukkit.createInventory(player, 54) };
+		Inventory[] inventories = { Bukkit.createInventory(player, 54, ChatColor.DARK_AQUA + "Ability Selector"), Bukkit.createInventory(player, 54) };
 		for (Inventory inventory : inventories) {
 			fill(inventory, player);
 		}
@@ -48,9 +48,7 @@ public class InventoryManager {
 	}
 
 	public Inventory loadRefillInventory(Player player) {
-		RefillInventoryManager im = RefillInventoryManager.get(Bukkit.createInventory(null, 54, "-> "
-				+ WordUtils.capitalizeFully(player.getLocation().getBlock().getBiome().toString()) + " Refill Chest"),
-				player.getLocation().getBlock().getBiome());
+		RefillInventoryManager im = RefillInventoryManager.get(Bukkit.createInventory(null, 54, ChatColor.DARK_AQUA + WordUtils.capitalizeFully(player.getLocation().getBlock().getBiome().toString()) + " Refill Chest"), player.getLocation().getBlock().getBiome());
 		if (im.hasCooldown()) {
 			double cooldown = im.getCooldown().longValue() / 1000.0D;
 			player.sendMessage(ChatColor.RED + "Refill ends in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
@@ -68,24 +66,20 @@ public class InventoryManager {
 	}
 
 	public Inventory loadSettingsInventory(Player player) {
-		Inventory inv = Bukkit.createInventory(player, 27, "-> Settings");
+		Inventory inv = Bukkit.createInventory(player, 27, ChatColor.DARK_AQUA + "Your Settings");
 		inv.clear();
 		for (int i = 0; i < inv.getSize(); i++) {
 			inv.setItem(i, Main.getInstance().getItemUtils().getItemMaterial(Material.STAINED_GLASS_PANE, 15, " "));
 		}
 		inv.setItem(0, Main.getInstance().getItemUtils().getItemMaterial(Material.ARROW, ChatColor.YELLOW + "Previous page"));
 		PlayerSettings settings = PlayerManager.get(player.getUniqueId()).getSettings();
-		inv.setItem(10, Main.getInstance().getItemUtils().getItemMaterial(Material.COMPASS, ChatColor.GRAY + "Compass: " + (settings.hasCompass() ? (ChatColor.GREEN + "Enabled") : (ChatColor.RED + "Disabled"))));
 		inv.setItem(12, Main.getInstance().getItemUtils().getItemMaterial(Material.STONE_SWORD, ChatColor.GRAY + "Sword Slot", settings.getSlot(PlayerSettings.SlotType.SWORD) + 1));
 		inv.setItem(14, Main.getInstance().getItemUtils().getItemMaterial(Material.POTATO_ITEM, ChatColor.GRAY + "Item Slot", settings.getSlot(PlayerSettings.SlotType.ITEM) + 1));
-		if (settings.hasCompass()) {
-			inv.setItem(16, Main.getInstance().getItemUtils().getItemMaterial(Material.COMPASS, ChatColor.GRAY + "Compass Slot", settings.getSlot(PlayerSettings.SlotType.COMPASS) + 1));
-		}
 		return inv;
 	}
 
 	public Inventory loadSlotsInventory(Player player, String slots) {
-		Inventory inv = Bukkit.createInventory(player, 9, "-> " + slots + " Slot");
+		Inventory inv = Bukkit.createInventory(player, 9, ChatColor.DARK_AQUA + slots + " Slot");
 		inv.clear();
 		for (int i = 0; i < inv.getSize(); i++) {
 			int correctedI = i + 1;
@@ -94,8 +88,6 @@ public class InventoryManager {
 		PlayerSettings settings = PlayerManager.get(player.getUniqueId()).getSettings();
 		inv.setItem(settings.getSlot(PlayerSettings.SlotType.SWORD), Main.getInstance().getItemUtils().getItemMaterial(Material.STONE_SWORD, ChatColor.YELLOW + "Sword"));
 		inv.setItem(settings.getSlot(PlayerSettings.SlotType.ITEM), Main.getInstance().getItemUtils().getItemMaterial(Material.POTATO_ITEM, ChatColor.YELLOW + "Item"));
-		if (settings.hasCompass())
-			inv.setItem(settings.getSlot(PlayerSettings.SlotType.COMPASS), Main.getInstance().getItemUtils().getItemMaterial(Material.COMPASS, ChatColor.YELLOW + "Compass"));
 		return inv;
 	}
 
@@ -126,7 +118,7 @@ public class InventoryManager {
 	}
 
 	public void openRecraftInventory(Player player) {
-		Inventory inv = Bukkit.createInventory(player, 9, "-> Recraft");
+		Inventory inv = Bukkit.createInventory(player, 9, ChatColor.DARK_AQUA + "Recraft");
 		inv.setItem(3, new ItemStack(Material.RED_MUSHROOM, 32));
 		inv.setItem(4, new ItemStack(Material.BOWL, 32));
 		inv.setItem(5, new ItemStack(Material.BROWN_MUSHROOM, 32));
@@ -161,7 +153,7 @@ public class InventoryManager {
 			final Abilities lastAbility = ability.getSelected();
 			inventory.setItem(1, Main.getInstance().getItemUtils().getItemStack(lastAbility.getIcon(), ChatColor.YELLOW + "Last used ability: " + lastAbility.getRarity().getColor() + lastAbility.getName(), lastAbility.getLore()));
 		}
-		inventory.setItem(4, Main.getInstance().getItemUtils().getItemMaterial(Material.BEACON, 0, ChatColor.DARK_GRAY + "(" + ChatColor.DARK_AQUA + "Rastacraft" + ChatColor.DARK_GRAY + ")"));
+		inventory.setItem(4, Main.getInstance().getItemUtils().getItemMaterial(Material.BEACON, 0, ChatColor.DARK_GRAY + "(" + ChatColor.DARK_AQUA + "SoupWorld" + ChatColor.DARK_GRAY + ")"));
 		inventory.setItem(7, Main.getInstance().getItemUtils().getItemMaterial(Material.NAME_TAG, ChatColor.DARK_AQUA + "Settings"));
 		inventory.setItem(8, Main.getInstance().getItemUtils().getItemMaterial(Material.STAINED_GLASS_PANE, 14, ChatColor.RED + "Leave"));
 		int rarityStartSlot = inventory.getSize() - 8;

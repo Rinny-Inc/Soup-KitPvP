@@ -30,11 +30,11 @@ public class Stats {
 	}
 
 	private Double getRatio() {
-		DecimalFormat df = new DecimalFormat();
+		final DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(3);
 		df.setDecimalSeparatorAlwaysShown(true);
-		double kills = getKills();
-		double deaths = getDeaths();
+		final double kills = getKills();
+		final double deaths = getDeaths();
 		if (kills == 0.0D && deaths == 0.0D) {
 			return Double.valueOf(0.0D);
 		}

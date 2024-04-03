@@ -70,7 +70,9 @@ public class Ninja extends Abilities implements Listener {
 					behindTargetLocation = target.getLocation();
 				}
 				player.teleport(behindTargetLocation);
-				player.getWorld().playEffect(player.getLocation(), Effect.LARGE_SMOKE, 10);
+				for (int i = 0; i < 6; i++) {
+					player.getWorld().playEffect(player.getLocation(), Effect.LARGE_SMOKE, 10);
+				}
 				player.setFallDistance(0.0F);
 				this.ninja.remove(target.getUniqueId());
 				this.ninja.remove(player.getUniqueId());

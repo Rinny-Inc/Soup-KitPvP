@@ -18,24 +18,21 @@ import io.noks.kitpvp.managers.PlayerManager;
 
 public class Archer extends Abilities implements Listener {
 
+	private Main main;
 	public Archer(Main main) {
-		super("Archer", new ItemStack(Material.BOW), Rarity.COMMON, 0L, new String[] { "(Distance x 0.25) = damage" });
+		super("Archer", new ItemStack(Material.BOW), Rarity.COMMON, 0L, new String[] { "(Distance x 1.35) = damage" });
+		this.main = main;
 		main.getServer().getPluginManager().registerEvents(this, main);
 	}
 	
 	@Override
 	public ItemStack specialItem() {
-		return Main.getInstance().getItemUtils().getItemUnbreakable(Material.BOW);
+		return this.main.getItemUtils().getItemUnbreakable(Material.BOW);
 	}
 
 	@Override
 	public String specialItemName() {
 		return "Special Bow";
-	}
-
-	@Override
-	public Material sword() {
-		return null;
 	}
 	
 	@EventHandler
@@ -47,11 +44,20 @@ public class Archer extends Abilities implements Listener {
 			if (PlayerManager.get(shooter.getUniqueId()).getAbility().hasAbility(this)) {
 				final Player hitted = (Player) event.getHitEntity();
 				if (hitted == shooter) return;
-				final double damage = shooter.getLocation().distance(hitted.getLocation()) * 0.35D;
+				final double damage = shooter.getLocation().distance(hitted.getLocation()) * 1.35D;
 				hitted.damage(damage, shooter);
 				shooter.sendMessage(ChatColor.GRAY + "Damage given " + (new DecimalFormat("#.#")).format(damage));
 			}
 		}
+	}
+	
+	@Override
+	public void onKill(Player killer) {
+		if (killer.getInventory().firstEmpty() == -1 && !killer.getInventory().contains(Material.ARROW)) {
+			killer.getWorld().dropItem(killer.getLocation(), this.main.getItemUtils().getItemStack(new ItemStack(Material.ARROW, 2), null, null));
+			return;
+		}
+		killer.getInventory().addItem(new ItemStack[] { this.main.getItemUtils().getItemStack(new ItemStack(Material.ARROW, 2), null, null) });
 	}
 
 	/*@EventHandler

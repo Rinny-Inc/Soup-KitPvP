@@ -15,6 +15,7 @@ import io.noks.kitpvp.Main;
 import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.managers.caches.CombatTag;
 import io.noks.kitpvp.managers.caches.Economy;
+import io.noks.kitpvp.managers.caches.Perks;
 import io.noks.kitpvp.managers.caches.PlayerSettings;
 import io.noks.kitpvp.managers.caches.Stats;
 
@@ -23,6 +24,7 @@ public class PlayerManager {
 	private final @NotNull Player player;
 	private final @NotNull UUID playerUUID;
 	private final @NotNull Ability ability;
+	private final @NotNull Perks perks;
 	private boolean usedSponsor;
 	private boolean usedRecraft;
 	private boolean allowBuild;
@@ -35,6 +37,7 @@ public class PlayerManager {
 		this.playerUUID = playerUUID;
 		this.player = Bukkit.getPlayer(this.playerUUID);
 		this.ability = new Ability();
+		this.perks = new Perks();
 		this.usedSponsor = false;
 		this.usedRecraft = false;
 		this.allowBuild = false;
@@ -44,10 +47,11 @@ public class PlayerManager {
 		players.putIfAbsent(playerUUID, this);
 	}
 	
-	public PlayerManager(UUID playerUUID, Stats stats, PlayerSettings settings, Economy economy) {
+	public PlayerManager(UUID playerUUID, Stats stats, PlayerSettings settings, Economy economy, Perks perks) {
 		this.playerUUID = playerUUID;
 		this.player = Bukkit.getPlayer(this.playerUUID);
 		this.ability = new Ability();
+		this.perks = perks;
 		this.usedSponsor = false;
 		this.usedRecraft = false;
 		this.allowBuild = false;
@@ -132,6 +136,10 @@ public class PlayerManager {
 		return this.combatTag;
 	}
 	
+	public Perks getActivePerks() {
+		return this.perks;
+	}
+	
 	public void kill() {
 		if (this.player.getLastDamage() > 0.0D && hasCombatTag()) stats.addDeaths();
 		if (stats.getKillStreak() > stats.getBestKillStreak()) {
@@ -140,13 +148,17 @@ public class PlayerManager {
 		if (this.ability.hasAbility()) this.ability.remove();
 		if (hasUsedSponsor()) setUsedSponsor(false);
 		if (hasUsedRecraft()) setUsedRecraft(false);
-		if (hasCombatTag()) this.combatTag = null;
+		if (hasCombatTag()) {
+			final PlayerManager killer = players.get(this.combatTag.getLastAttackerUUID());
+			killer.combatTag = null;
+			this.combatTag = null;
+		}
 		this.player.eject();
 	}
 	
 	public void giveMainItem() {
 		player.getInventory().clear();
-		player.getInventory().setItem(0, Main.getInstance().getItemUtils().getAbilitiesSelector());
+		player.getInventory().setContents(Main.getInstance().getItemUtils().getSpawnItems());
 		player.updateInventory();
 		player.setWalkSpeed(0.2F);
 		player.setMaximumNoDamageTicks(20);

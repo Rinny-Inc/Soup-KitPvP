@@ -1,15 +1,10 @@
 package io.noks.kitpvp.abstracts;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import io.noks.kitpvp.Main;
 import io.noks.kitpvp.enums.Rarity;
-import io.noks.kitpvp.listeners.abilities.Archer;
-import io.noks.kitpvp.listeners.abilities.CookieMonster;
-import io.noks.kitpvp.listeners.abilities.Switcher;
 
 public abstract class Abilities {
 	private String name;
@@ -66,13 +61,5 @@ public abstract class Abilities {
 		return this.lore;
 	}
 	
-	public void onKill(Player killer) {
-		if (this instanceof Archer || this instanceof CookieMonster || this instanceof Switcher) {
-			if (killer.getInventory().firstEmpty() == -1 && (this instanceof Archer ? !killer.getInventory().contains(Material.ARROW) : !killer.getInventory().contains(this.specialItem()))) {
-				killer.getWorld().dropItem(killer.getLocation(), Main.getInstance().getItemUtils().getItemStack(new ItemStack((this instanceof Archer ? Material.ARROW : this.specialItem().getType()), 2), (this instanceof Archer ? null : ChatColor.RED + this.specialItemName()), null));
-				return;
-			}
-			killer.getInventory().addItem(new ItemStack[] { Main.getInstance().getItemUtils().getItemStack(new ItemStack((this instanceof Archer ? Material.ARROW : this.specialItem().getType()), 2), (this instanceof Archer ? null : ChatColor.RED + this.specialItemName()), null) });
-		}
-	}
+	public void onKill(Player killer) {}
 }

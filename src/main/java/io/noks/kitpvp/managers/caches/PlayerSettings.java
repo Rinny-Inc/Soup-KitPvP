@@ -1,42 +1,24 @@
 package io.noks.kitpvp.managers.caches;
 
 public class PlayerSettings {
-	private boolean compass;
 	private int swordSlot;
 	private int itemSlot;
-	private int compassSlot;
 
 	public PlayerSettings() {
-		this.compass = true;
 		this.swordSlot = 0;
 		this.itemSlot = 1;
-		this.compassSlot = 8;
 	}
-	public PlayerSettings(boolean compassEnabled, int sword, int item, int compass) {
-		this.compass = compassEnabled;
+	public PlayerSettings(int sword, int item) {
 		this.swordSlot = sword;
 		this.itemSlot = item;
-		this.compassSlot = compass;
 	}
-
-	public boolean hasCompass() {
-		return this.compass;
-	}
-
-	public void updateCompass() {
-		this.compass = !this.compass;
-	}
-
 	public int getSlot(SlotType type) {
 		switch (type) {
 		case SWORD:
 			return this.swordSlot;
 		case ITEM:
 			return this.itemSlot;
-		case COMPASS:
-			return this.compassSlot;
 		}
-
 		return 0;
 	}
 
@@ -52,26 +34,14 @@ public class PlayerSettings {
 		case SWORD:
 			if (toSwitch == SlotType.ITEM) {
 				this.itemSlot = this.swordSlot;
-			} else if (toSwitch == SlotType.COMPASS) {
-				this.compassSlot = this.swordSlot;
 			}
 			this.swordSlot = slot;
 			break;
 		case ITEM:
 			if (toSwitch == SlotType.SWORD) {
 				this.swordSlot = this.itemSlot;
-			} else if (toSwitch == SlotType.COMPASS) {
-				this.compassSlot = this.itemSlot;
 			}
 			this.itemSlot = slot;
-			break;
-		case COMPASS:
-			if (toSwitch == SlotType.SWORD) {
-				this.swordSlot = this.compassSlot;
-			} else if (toSwitch == SlotType.ITEM) {
-				this.itemSlot = this.compassSlot;
-			}
-			this.compassSlot = slot;
 			break;
 		}
 	}
@@ -83,18 +53,15 @@ public class PlayerSettings {
 		if (slot == this.itemSlot) {
 			return SlotType.ITEM;
 		}
-		if (slot == this.compassSlot) {
-			return SlotType.COMPASS;
-		}
 		return null;
 	}
 
 	private boolean isSlotTaken(int slot) {
-		return (this.swordSlot == slot || this.itemSlot == slot || this.compassSlot == slot);
+		return (this.swordSlot == slot || this.itemSlot == slot);
 	}
 
 	public enum SlotType {
-		SWORD("Sword"), ITEM("Item"), COMPASS("Compass");
+		SWORD("Sword"), ITEM("Item");
 
 		private String name;
 
