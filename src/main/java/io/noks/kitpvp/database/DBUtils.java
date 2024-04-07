@@ -85,7 +85,7 @@ public class DBUtils {
 
 	public void loadPlayer(UUID uuid) {
 		if (!isConnected()) {
-			new PlayerManager(uuid).giveMainItem();
+			new PlayerManager(uuid);
 			return;
 		}
 		Connection connection = null;
@@ -116,7 +116,7 @@ public class DBUtils {
 						new Stats(result.getInt("kills"), result.getInt("death"), result.getInt("bestks"), result.getInt("bounty")), 
 						new PlayerSettings(result.getInt("swordslot"), result.getInt("itemslot")), 
 						new Economy(result.getInt("money")),
-						new Perks(new PerksEnum[] {PerksEnum.getPerksFromName(result.getString("firstperk")), PerksEnum.getPerksFromName(result.getString("secondperk")), PerksEnum.getPerksFromName(result.getString("thirdperk"))})).giveMainItem();
+						new Perks(new PerksEnum[] {PerksEnum.getPerksFromName(result.getString("firstperk")), PerksEnum.getPerksFromName(result.getString("secondperk")), PerksEnum.getPerksFromName(result.getString("thirdperk"))}));
 			}
 			statement.close();
 			result.close();

@@ -1,6 +1,7 @@
 package io.noks.kitpvp.listeners.abilities;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -41,8 +42,9 @@ public class Switcher extends Abilities implements Listener {
 				final Player hit = (Player) event.getHitEntity();
 
 				if (hit == shooter)return;
+				final Location hittedLoc = hit.getLocation();
 				hit.teleport(shooter.getLocation());
-				shooter.teleport(hit.getLocation());
+				shooter.teleport(hittedLoc);
 			}
 		}
 	}

@@ -12,9 +12,8 @@ public class Messages {
 		WELCOME_MESSAGE = new String[]{ChatColor.DARK_GRAY.toString() + ChatColor.STRIKETHROUGH + "----------------------------------------------------",
 				ChatColor.GRAY + "Welcome on " + ChatColor.DARK_AQUA.toString() + ChatColor.BOLD + domain + ChatColor.GRAY + " the home of soup!",
 				"", 
+				ChatColor.GRAY + "Our Website -> " + ChatColor.DARK_AQUA + "Coming Soon",
 				ChatColor.GRAY + "Our Discord -> " + ChatColor.DARK_AQUA + "discord." + domain,
-				ChatColor.GRAY + "Our Website -> " + ChatColor.DARK_AQUA + domain,
-				ChatColor.GRAY + "Our Twitter -> " + ChatColor.DARK_AQUA + "twitter." + domain,
 				ChatColor.RED + "-> Keep in mind this is a beta ^^", 
 				ChatColor.DARK_GRAY.toString() + ChatColor.STRIKETHROUGH + "----------------------------------------------------" };
 		NO_PERMISSION = "No permission.";

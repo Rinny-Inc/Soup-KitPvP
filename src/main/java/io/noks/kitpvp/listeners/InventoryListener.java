@@ -88,11 +88,6 @@ public class InventoryListener implements Listener {
 				player.closeInventory();
 				return;
 			}
-			if (itemName.toLowerCase().equals(ChatColor.DARK_AQUA + "settings")) {
-				player.closeInventory();
-				player.openInventory(this.plugin.getInventoryManager().loadSettingsInventory(player));
-				return;
-			}
 			if (itemName.toLowerCase().equals(ChatColor.YELLOW + "your whole abilities")) {
 				inventory.setContents(this.plugin.getInventoryManager().loadKitsInventory(player).getContents());
 				return;
@@ -157,7 +152,7 @@ public class InventoryListener implements Listener {
 		if (title.contains("slot")) {
 			Player player = (Player) event.getWhoClicked();
 			PlayerSettings settings = PlayerManager.get(player.getUniqueId()).getSettings();
-			String titleSplitted = inventory.getTitle().split(" ")[1];
+			String titleSplitted = title.split(" ")[0];
 			if (!SlotType.contains(titleSplitted)) {
 				return;
 			}

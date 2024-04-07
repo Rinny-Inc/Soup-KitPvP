@@ -31,9 +31,11 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
 import io.noks.kitpvp.Main;
+import io.noks.kitpvp.enums.RefreshType;
 import io.noks.kitpvp.listeners.abilities.Boxer;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Ability;
@@ -42,6 +44,7 @@ import io.noks.kitpvp.managers.caches.Economy;
 import io.noks.kitpvp.managers.caches.Economy.MoneyType;
 import io.noks.kitpvp.managers.caches.Stats;
 import io.noks.kitpvp.utils.Cuboid;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class PlayerListener implements Listener {
 	private final Main plugin;
@@ -51,7 +54,7 @@ public class PlayerListener implements Listener {
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 		final World world = main.getServer().getWorld("world");
-		this.spawnCuboid = new Cuboid(new Location(world, -34, 96, 31), new Location(world, 23, 105, -15));
+		this.spawnCuboid = new Cuboid(new Location(world, -34, 96, 31), new Location(world, 23, 102, -15));
 	}
 
 	@EventHandler
@@ -67,11 +70,19 @@ public class PlayerListener implements Listener {
 		player.setSaturation(10000.0F);
 		player.setLevel(0);
 		player.setExp(0.0F);
+		if (!player.getActivePotionEffects().isEmpty()) {
+			for (PotionEffect activeEffects : player.getActivePotionEffects()) {
+				player.removePotionEffect(activeEffects.getType());
+			}
+		}
 		player.teleport(player.getWorld().getSpawnLocation());
 		player.setAllowFlight(false);
 		player.setFlying(false);
 		player.sendMessage(this.plugin.getMessages().WELCOME_MESSAGE);
+		player.setPlayerListHeaderFooter(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', this.plugin.getConfigManager().tabHeader)), TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', this.plugin.getConfigManager().tabFooter)));
 		this.plugin.getDataBase().loadPlayer(player.getUniqueId());
+		player.getInventory().setContents(this.plugin.getItemUtils().getSpawnItems(player.getName()));
+		player.updateInventory();
 	}
 
 	@EventHandler
@@ -94,15 +105,20 @@ public class PlayerListener implements Listener {
 				final Player killer = km.getPlayer();
 
 				if (killer != player) {
-					km.getAbility().get().onKill(killer);
-					killer.sendMessage(ChatColor.GRAY + killer.getName() + "(" + ChatColor.RED + km.getAbility().get().getName() + ChatColor.GRAY + ") killed " + player.getName() + "(" + ChatColor.RED + pm.getAbility().get().getName() + ChatColor.GRAY + ")");
+					if (km.getAbility().hasAbility()) {
+						km.getAbility().get().onKill(killer);
+					}
+					killer.sendMessage(ChatColor.GREEN + "You have killed " + player.getDisplayName());
 
 					final Stats killerStats = km.getStats();
 					killerStats.addKills();
+					km.refreshScoreboardLine(RefreshType.KILLS);
 					killerStats.addKillStreak();
+					km.refreshScoreboardLine(RefreshType.KILLSTREAK);
 
 					final Economy killerEconomy = km.getEconomy();
 					killerEconomy.add(((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 20 : 10), MoneyType.BRONZE);
+					km.refreshScoreboardLine(RefreshType.CREDITS);
 				}
 			}
 		}
@@ -129,19 +145,25 @@ public class PlayerListener implements Listener {
 			if (killed.getKiller() instanceof Player && pm.hasCombatTag()) {
 				final PlayerManager km = PlayerManager.get(pm.getCurrentCombatTag().getLastAttackerUUID());
 				final Player killer = km.getPlayer();
-				final String message = ChatColor.GRAY + killer.getName() + "(" + ChatColor.RED + km.getAbility().get().getName() + ChatColor.GRAY + ") killed " + killed.getName() + "(" + ChatColor.RED + killedAbility.get().getName() + ChatColor.GRAY + ")";
 
-				killed.sendMessage(message);
+				killed.sendMessage(ChatColor.RED + "You have been killed by" + killer.getDisplayName());
 				if (killer != killed) {
-					km.getAbility().get().onKill(killer);
-					killer.sendMessage(message);
+					if (km.getAbility().hasAbility()) {
+						km.getAbility().get().onKill(killer);
+					}
+					if (killer != null) {
+						killer.sendMessage(ChatColor.GREEN + "You have killed " + killed.getDisplayName());
+					}
 
 					final Stats killerStats = km.getStats();
 					killerStats.addKills();
+					km.refreshScoreboardLine(RefreshType.KILLS);
 					killerStats.addKillStreak();
+					km.refreshScoreboardLine(RefreshType.KILLSTREAK);
 
 					final Economy killerEconomy = km.getEconomy();
 					killerEconomy.add(((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 20 : 10), MoneyType.BRONZE);
+					km.refreshScoreboardLine(RefreshType.CREDITS);
 				}
 			}
 
@@ -169,7 +191,8 @@ public class PlayerListener implements Listener {
 		player.setFoodLevel(20);
 		player.setLevel(0);
 		player.setExp(0.0F);
-		PlayerManager.get(player.getUniqueId()).giveMainItem();
+		player.getInventory().setContents(this.plugin.getItemUtils().getSpawnItems(player.getName()));
+		player.updateInventory();
 	}
 
 	@EventHandler
@@ -204,8 +227,15 @@ public class PlayerListener implements Listener {
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			final Player player = event.getPlayer();
 			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-			if (pm.isInSpawn() && player.getItemInHand().getType() == Material.BOOK && player.getItemInHand().getItemMeta().getDisplayName().toLowerCase().equals(ChatColor.DARK_AQUA + "ability selector")) {
+			if (!pm.isInSpawn()) {
+				return;
+			}
+			if (player.getItemInHand().getType() == Material.ENCHANTED_BOOK && player.getItemInHand().getItemMeta().getDisplayName().toLowerCase().equals(ChatColor.DARK_AQUA + "ability selector")) {
 				player.openInventory(this.plugin.getInventoryManager().loadKitsInventory(player));
+				return;
+			}
+			if (player.getItemInHand().getType() == Material.WATCH && player.getItemInHand().getItemMeta().getDisplayName().toLowerCase().equals(ChatColor.DARK_AQUA + "settings")) {
+				player.openInventory(this.plugin.getInventoryManager().loadSettingsInventory(player));
 			}
 		}
 	}

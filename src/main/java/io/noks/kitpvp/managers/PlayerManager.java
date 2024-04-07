@@ -6,12 +6,17 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import com.avaje.ebean.validation.NotNull;
 import com.google.common.collect.Maps;
 
-import io.noks.kitpvp.Main;
+import io.noks.kitpvp.enums.RefreshType;
 import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.managers.caches.CombatTag;
 import io.noks.kitpvp.managers.caches.Economy;
@@ -45,6 +50,7 @@ public class PlayerManager {
 		this.settings = new PlayerSettings();
 		this.economy = new Economy();
 		players.putIfAbsent(playerUUID, this);
+		this.applyScoreboard();
 	}
 	
 	public PlayerManager(UUID playerUUID, Stats stats, PlayerSettings settings, Economy economy, Perks perks) {
@@ -59,6 +65,7 @@ public class PlayerManager {
 		this.settings = settings;
 		this.economy = economy;
 		players.putIfAbsent(playerUUID, this);
+		this.applyScoreboard();
 	}
 
 	public static PlayerManager get(UUID playerUUID) {
@@ -141,26 +148,92 @@ public class PlayerManager {
 	}
 	
 	public void kill() {
-		if (this.player.getLastDamage() > 0.0D && hasCombatTag()) stats.addDeaths();
+		if (hasCombatTag()) {
+			if (this.player.getLastDamage() > 0.0D) {
+				stats.addDeaths();
+			}
+			refreshScoreboardLine(RefreshType.DEATHS);
+			this.combatTag = null;
+		}
+		refreshScoreboardLine(RefreshType.KILLSTREAK);
 		if (stats.getKillStreak() > stats.getBestKillStreak()) {
 			stats.updateBestKillStreak();
 		}
 		if (this.ability.hasAbility()) this.ability.remove();
 		if (hasUsedSponsor()) setUsedSponsor(false);
 		if (hasUsedRecraft()) setUsedRecraft(false);
-		if (hasCombatTag()) {
-			final PlayerManager killer = players.get(this.combatTag.getLastAttackerUUID());
-			killer.combatTag = null;
-			this.combatTag = null;
-		}
 		this.player.eject();
+		this.player.setWalkSpeed(0.2F);
+		this.player.setMaximumNoDamageTicks(20);
+		this.player.setItemOnCursor(null);
 	}
 	
-	public void giveMainItem() {
-		player.getInventory().clear();
-		player.getInventory().setContents(Main.getInstance().getItemUtils().getSpawnItems());
-		player.updateInventory();
-		player.setWalkSpeed(0.2F);
-		player.setMaximumNoDamageTicks(20);
+	private void applyScoreboard() {
+		final Scoreboard scoreboard = this.player.getScoreboard();
+		if (scoreboard.getObjective(DisplaySlot.SIDEBAR) == null) {
+			final Objective sidebar = scoreboard.registerNewObjective("sidebar", "dummy");
+			sidebar.setDisplaySlot(DisplaySlot.SIDEBAR);
+			sidebar.setDisplayName(ChatColor.DARK_AQUA.toString() + ChatColor.BOLD + "SoupWorld");
+			Team line;
+			if (scoreboard.getTeam("line1") == null) {
+				line = scoreboard.registerNewTeam("line1");
+				line.setPrefix(ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "-------");
+				line.addEntry("-----");
+				line.setSuffix("-------");
+				sidebar.getScore("-----").setScore(15);
+			}
+			if (scoreboard.getTeam("kills") == null) {
+				line = scoreboard.registerNewTeam("kills");
+				line.addEntry("Kills: ");
+				line.setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getKills());
+				sidebar.getScore("Kills: ").setScore(14);
+			}
+			if (scoreboard.getTeam("ks") == null) {
+				line = scoreboard.registerNewTeam("ks");
+				line.addEntry("Killstreak: ");
+				line.setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getKillStreak());
+				sidebar.getScore("Killstreak: ").setScore(13);
+			}
+			if (scoreboard.getTeam("deaths") == null) {
+				line = scoreboard.registerNewTeam("deaths");
+				line.addEntry("Deaths: ");
+				line.setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getDeaths());
+				sidebar.getScore("Deaths: ").setScore(12);
+			}
+			if (scoreboard.getTeam("coins") == null) {
+				line = scoreboard.registerNewTeam("coins");
+				line.addEntry("Credits: ");
+				line.setSuffix(ChatColor.DARK_AQUA.toString() + this.economy.getMoney());
+				sidebar.getScore("Credits: ").setScore(11);
+			}
+			if (scoreboard.getTeam("line2") == null) {
+				line = scoreboard.registerNewTeam("line2");
+				line.setPrefix(ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "-------");
+				line.addEntry(ChatColor.RESET.toString() + ChatColor.GRAY + ChatColor.STRIKETHROUGH + "-----");
+				line.setSuffix("-------");
+				sidebar.getScore(ChatColor.RESET.toString() + ChatColor.GRAY + ChatColor.STRIKETHROUGH + "-----").setScore(10);
+			}
+		}
+	}
+	
+	public void refreshScoreboardLine(RefreshType type) {
+		final Scoreboard board = this.player.getScoreboard();
+		switch (type) {
+		case KILLS:
+			board.getTeam(type.getName()).setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getKills());
+			break;
+		case KILLSTREAK:
+			board.getTeam(type.getName()).setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getKillStreak());
+			break;
+		case DEATHS:
+			board.getTeam(type.getName()).setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getDeaths());
+			break;
+		case CREDITS:
+			board.getTeam(type.getName()).setSuffix(ChatColor.DARK_AQUA.toString() + this.economy.getMoney());
+			break;
+		// TODO: Do CombatTag
+		default:
+			break;
+		}
 	}
 }

@@ -16,3 +16,4 @@ commands:
   boot:
     aliases: [ddos]
   balance:
+  feast:

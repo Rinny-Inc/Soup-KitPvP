@@ -7,10 +7,12 @@ import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.SkullType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -67,17 +69,26 @@ public class ItemUtils {
 		i.setItemMeta(im);
 		return i;
 	}
+	
+	private ItemStack getPlayerHead(String name, String displayName) {
+		final ItemStack i = new ItemStack(Material.SKULL_ITEM, 1, (short)SkullType.PLAYER.ordinal());
+		final SkullMeta sm = (SkullMeta) i.getItemMeta();
+		sm.setOwner(name);
+		sm.setDisplayName(displayName);
+		i.setItemMeta(sm);
+		return i;
+	}
 
-	public ItemStack[] getSpawnItems() {
-		return new ItemStack[] {getItemStack(new ItemStack(Material.BOOK), ChatColor.DARK_AQUA + "Ability Selector", new String[] {ChatColor.GRAY + "Choose your ability to fight other players"}),
-								null, // OLD USED KIT
+	public ItemStack[] getSpawnItems(String name) {
+		return new ItemStack[] {getItemStack(new ItemStack(Material.ENCHANTED_BOOK), ChatColor.DARK_AQUA + "Ability Selector", new String[] {ChatColor.GRAY + "Choose your ability to fight other players"}),
+								getItemStack(new ItemStack(Material.CHEST), ChatColor.DARK_AQUA + "Shop", new String[] {ChatColor.RED + "Coming Soon"}), 
+								null,
 								null, 
-								null, 
+								getPlayerHead(name, ChatColor.DARK_AQUA + "Stats"),
 								null,
 								null,
-								null,
-								null,
-								null};
+								getItemStack(new ItemStack(Material.WATCH), ChatColor.DARK_AQUA + "Settings", new String[] {ChatColor.RED + "Edit your settings"}),
+								getItemStack(new ItemStack(Material.NETHER_STAR), ChatColor.RED + "??", new String[] {ChatColor.RED + "Coming Soon"})};
 	}
 	
 	public void giveEquipment(Player player, Abilities ability) {

@@ -22,4 +22,28 @@ public class Tournament {
 		this.attendees = new ArrayList<UUID>(size);
 		this.state = TournamentState.WAITING;
 	}
+	
+	public void addAttendee(UUID uuid) {
+		this.attendees.add(uuid);
+	}
+	
+	public void removeAttendee(UUID uuid) {
+		this.attendees.remove(uuid);
+	}
+	
+	public List<UUID> getAttendees() {
+		return this.attendees;
+	}
+	
+	public boolean hasHost() {
+		return this.hostUUID != null;
+	}
+	
+	public TournamentState getState() {
+		return this.state;
+	}
+	
+	public boolean hasWinner() {
+		return this.attendees.size() == 1;
+	}
 }

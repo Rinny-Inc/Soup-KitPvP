@@ -147,15 +147,14 @@ public class InventoryManager {
 		for (int i = inventory.getSize() - 9; i < inventory.getSize(); i++) {
 			inventory.setItem(i, Main.getInstance().getItemUtils().getItemMaterial(Material.STAINED_GLASS_PANE, 15, " "));
 		}
-		inventory.setItem(0, Main.getInstance().getItemUtils().getItemMaterial(Material.WATCH, 0, ChatColor.YELLOW + "Random Abilities"));
+		inventory.setItem(2, Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.NOTE_BLOCK), ChatColor.YELLOW + "Ability Rotation", new String[] {null, ChatColor.GRAY + "Get free abilities!"}));
+		inventory.setItem(4, Main.getInstance().getItemUtils().getItemMaterial(Material.BEACON, 0, ChatColor.DARK_GRAY + "(" + ChatColor.DARK_AQUA + "SoupWorld" + ChatColor.DARK_GRAY + ")"));
 		final Ability ability = PlayerManager.get(player.getUniqueId()).getAbility();
 		if (ability.getSelected() != null) {
 			final Abilities lastAbility = ability.getSelected();
-			inventory.setItem(1, Main.getInstance().getItemUtils().getItemStack(lastAbility.getIcon(), ChatColor.YELLOW + "Last used ability: " + lastAbility.getRarity().getColor() + lastAbility.getName(), lastAbility.getLore()));
+			inventory.setItem(6, Main.getInstance().getItemUtils().getItemStack(lastAbility.getIcon(), ChatColor.YELLOW + "Last used ability: " + lastAbility.getRarity().getColor() + lastAbility.getName(), lastAbility.getLore()));
 		}
-		inventory.setItem(4, Main.getInstance().getItemUtils().getItemMaterial(Material.BEACON, 0, ChatColor.DARK_GRAY + "(" + ChatColor.DARK_AQUA + "SoupWorld" + ChatColor.DARK_GRAY + ")"));
-		inventory.setItem(7, Main.getInstance().getItemUtils().getItemMaterial(Material.NAME_TAG, ChatColor.DARK_AQUA + "Settings"));
-		inventory.setItem(8, Main.getInstance().getItemUtils().getItemMaterial(Material.STAINED_GLASS_PANE, 14, ChatColor.RED + "Leave"));
+		inventory.setItem(8, Main.getInstance().getItemUtils().getItemMaterial(Material.WATCH, 0, ChatColor.YELLOW + "Random Abilities"));
 		int rarityStartSlot = inventory.getSize() - 8;
 		for (Rarity rarity : Rarity.values()) {
 			if (rarity != Rarity.USELESS) {

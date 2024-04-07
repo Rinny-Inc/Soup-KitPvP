@@ -2,6 +2,8 @@ package io.noks.kitpvp;
 
 import java.util.Iterator;
 
+import javax.annotation.Nullable;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -18,6 +20,7 @@ import io.noks.kitpvp.commands.AbilityListCommand;
 import io.noks.kitpvp.commands.BalanceCommand;
 import io.noks.kitpvp.commands.BootCommand;
 import io.noks.kitpvp.commands.BuildCommand;
+import io.noks.kitpvp.commands.FeastCommand;
 import io.noks.kitpvp.commands.PingCommand;
 import io.noks.kitpvp.commands.ReportCommand;
 import io.noks.kitpvp.commands.ShoutCommand;
@@ -34,6 +37,7 @@ import io.noks.kitpvp.managers.InventoryManager;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.RefillInventoryManager;
 import io.noks.kitpvp.managers.TournamentManager;
+import io.noks.kitpvp.managers.caches.Feast;
 import io.noks.kitpvp.task.event.EventsTask;
 import io.noks.kitpvp.task.event.FallenGolemTask;
 import io.noks.kitpvp.utils.ItemUtils;
@@ -50,6 +54,7 @@ public class Main extends JavaPlugin {
 	private @NotNull TournamentManager tournamentManager;
 	private @NotNull Messages messages;
 	private @NotNull EventsTask eventsTask;
+	public @Nullable Feast feast = null;
 	
 	private static Main instance;
 	public static Main getInstance() {
@@ -74,6 +79,9 @@ public class Main extends JavaPlugin {
 	}
 
 	public void onDisable() {
+		if (this.feast != null) {
+			this.feast.clearFeast();
+		}
 		final World world = Bukkit.getWorld("world");
 		final Iterator<Entity> worldentities = world.getEntities().iterator();
 		while (worldentities.hasNext()) {
@@ -124,6 +132,7 @@ public class Main extends JavaPlugin {
 		new BuildCommand(this);
 		getCommand("balance").setExecutor(new BalanceCommand());
 		new BootCommand(this);
+		new FeastCommand(this);
 	}
 	
 	public MathUtils getMathUtils() {

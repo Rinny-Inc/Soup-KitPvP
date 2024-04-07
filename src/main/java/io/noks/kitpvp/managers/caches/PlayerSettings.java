@@ -75,7 +75,7 @@ public class PlayerSettings {
 
 		public static SlotType getSlotTypeFromName(String name) {
 			for (SlotType type : values()) {
-				if (type.getName().toLowerCase().equals(name.toLowerCase())) {
+				if (type.getName().equalsIgnoreCase(name)) {
 					return type;
 				}
 			}
