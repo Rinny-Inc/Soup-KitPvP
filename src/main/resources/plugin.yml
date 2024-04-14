@@ -17,3 +17,4 @@ commands:
     aliases: [ddos]
   balance:
   feast:
+  spawn:

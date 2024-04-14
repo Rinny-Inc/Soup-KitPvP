@@ -9,6 +9,7 @@ public class KoTH {
 	private Queue<UUID> inZone;
 	private boolean guildAllowed;
 	private Cuboid zone;
+	private int duration;
 	
 	public KoTH() {
 		

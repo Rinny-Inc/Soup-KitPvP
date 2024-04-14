@@ -26,9 +26,9 @@ public class DBUtils {
 
 	private HikariDataSource hikari;
 
-	private final String SAVE = "UPDATE players SET kills=?, death=?, bestks=?, bounty=?, swordslot=?, itemslot=?, money=?, firstperk=?, secondperk=?, thirdperk=? WHERE uuid=?";
-	private final String INSERT = "INSERT INTO players VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE uuid=?";
-	private final String SELECT = "SELECT kills,death,bestks,bounty,swordslot,itemslot,money,firstperk,secondperk,thirdperk FROM players WHERE uuid=?";
+	private final String SAVE = "UPDATE players SET kills=?, death=?, bestks=?, bounty=?, scoreboard=?, swordslot=?, itemslot=?, money=?, firstperk=?, secondperk=?, thirdperk=? WHERE uuid=?";
+	private final String INSERT = "INSERT INTO players VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE uuid=?";
+	private final String SELECT = "SELECT kills,death,bestks,bounty,scoreboard,swordslot,itemslot,money,firstperk,secondperk,thirdperk FROM players WHERE uuid=?";
 
 	public DBUtils(String address, String name, String user, String password) {
 		this.address = address;
@@ -68,7 +68,7 @@ public class DBUtils {
 		try {
 			connection = this.hikari.getConnection();
 			final PreparedStatement statement = (PreparedStatement) connection.createStatement();
-			statement.executeUpdate("CREATE TABLE IF NOT EXISTS players(uuid varchar(36), kills int(11), death int(11), bestks int(11), bounty int(11), swordslot int(11), itemslot int(11), money int(11), firstperk text(16). seondperk text(20), thirdperk text(18), PRIMARY KEY(`uuid`), UNIQUE(`uuid`));");
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS players(uuid varchar(36), kills int(11), death int(11), bestks int(11), bounty int(11), scoreboard TINYINT(1), swordslot int(11), itemslot int(11), money int(11), firstperk text(16). seondperk text(20), thirdperk text(18), PRIMARY KEY(`uuid`), UNIQUE(`uuid`));");
 			statement.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -98,13 +98,14 @@ public class DBUtils {
 			statement.setInt(3, 0);
 			statement.setInt(4, 0);
 			statement.setInt(5, 0); // Bounty
-			statement.setInt(6, 0);
-			statement.setInt(7, 1);
-			statement.setInt(8, 0); // Money
-			statement.setString(9, "none");
+			statement.setBoolean(6, true);
+			statement.setInt(7, 0);
+			statement.setInt(8, 1);
+			statement.setInt(9, 0); // Money
 			statement.setString(10, "none");
 			statement.setString(11, "none");
-			statement.setString(12, uuid.toString());
+			statement.setString(12, "none");
+			statement.setString(13, uuid.toString());
 			statement.executeUpdate();
 			statement.close();
 
@@ -114,7 +115,7 @@ public class DBUtils {
 			if (result.next()) {
 				new PlayerManager(uuid, 
 						new Stats(result.getInt("kills"), result.getInt("death"), result.getInt("bestks"), result.getInt("bounty")), 
-						new PlayerSettings(result.getInt("swordslot"), result.getInt("itemslot")), 
+						new PlayerSettings(result.getBoolean("scoreboard"), result.getInt("swordslot"), result.getInt("itemslot")), 
 						new Economy(result.getInt("money")),
 						new Perks(new PerksEnum[] {PerksEnum.getPerksFromName(result.getString("firstperk")), PerksEnum.getPerksFromName(result.getString("secondperk")), PerksEnum.getPerksFromName(result.getString("thirdperk"))}));
 			}
@@ -148,13 +149,14 @@ public class DBUtils {
 			statement.setInt(3, pm.getStats().getBestKillStreak());
 			statement.setInt(4, pm.getStats().getBestKillStreak());
 			statement.setInt(5, pm.getStats().getBounty());
-			statement.setInt(6, pm.getSettings().getSlot(SlotType.SWORD));
-			statement.setInt(7, pm.getSettings().getSlot(SlotType.ITEM));
-			statement.setInt(8, pm.getEconomy().getMoney());
-			statement.setString(9, pm.getActivePerks().first().getName());
-			statement.setString(10, pm.getActivePerks().second().getName());
-			statement.setString(11, pm.getActivePerks().third().getName());
-			statement.setString(12, pm.getPlayerUUID().toString());
+			statement.setBoolean(6, pm.getSettings().hasScoreboardEnabled());
+			statement.setInt(7, pm.getSettings().getSlot(SlotType.SWORD));
+			statement.setInt(8, pm.getSettings().getSlot(SlotType.ITEM));
+			statement.setInt(9, pm.getEconomy().getMoney());
+			statement.setString(10, pm.getActivePerks().first().getName());
+			statement.setString(11, pm.getActivePerks().second().getName());
+			statement.setString(12, pm.getActivePerks().third().getName());
+			statement.setString(13, pm.getPlayerUUID().toString());
 			statement.execute();
 			statement.close();
 		} catch (SQLException e) {

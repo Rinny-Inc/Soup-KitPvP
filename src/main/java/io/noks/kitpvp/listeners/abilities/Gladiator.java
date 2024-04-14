@@ -18,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -123,7 +124,13 @@ public class Gladiator extends Abilities implements Listener {
 
 	@EventHandler
 	public void onGladiatorsQuit(PlayerQuitEvent e) {
-		final Player p = e.getPlayer();
+		this.leaveAction(e.getPlayer());
+	}
+	@EventHandler
+	public void onGladiatorsKick(PlayerKickEvent e) {
+		this.leaveAction(e.getPlayer());
+	}
+	private void leaveAction(Player p) {
 		if (this.gladiators.containsKey(p.getUniqueId())) {
 			final Player enemy = ((Gladiators) this.gladiators.get(p.getUniqueId())).getOpponentPlayer();
 			for (Player allPlayers : this.plugin.getServer().getOnlinePlayers()) {

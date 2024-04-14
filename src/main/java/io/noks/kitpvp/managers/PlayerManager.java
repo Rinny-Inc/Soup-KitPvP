@@ -65,6 +65,9 @@ public class PlayerManager {
 		this.settings = settings;
 		this.economy = economy;
 		players.putIfAbsent(playerUUID, this);
+		if (!settings.hasScoreboardEnabled()) {
+			return;
+		}
 		this.applyScoreboard();
 	}
 
@@ -147,17 +150,19 @@ public class PlayerManager {
 		return this.perks;
 	}
 	
-	public void kill() {
-		if (hasCombatTag()) {
-			if (this.player.getLastDamage() > 0.0D) {
-				stats.addDeaths();
+	public void kill(boolean backToSpawn) {
+		if (!backToSpawn) {
+			if (hasCombatTag()) {
+				if (this.player.getLastDamage() > 0.0D) {
+					stats.addDeaths();
+				}
+				refreshScoreboardLine(RefreshType.DEATHS);
+				this.combatTag = null;
 			}
-			refreshScoreboardLine(RefreshType.DEATHS);
-			this.combatTag = null;
-		}
-		refreshScoreboardLine(RefreshType.KILLSTREAK);
-		if (stats.getKillStreak() > stats.getBestKillStreak()) {
-			stats.updateBestKillStreak();
+			refreshScoreboardLine(RefreshType.KILLSTREAK);
+			if (stats.getKillStreak() > stats.getBestKillStreak()) {
+				stats.updateBestKillStreak();
+			}
 		}
 		if (this.ability.hasAbility()) this.ability.remove();
 		if (hasUsedSponsor()) setUsedSponsor(false);
@@ -168,7 +173,7 @@ public class PlayerManager {
 		this.player.setItemOnCursor(null);
 	}
 	
-	private void applyScoreboard() {
+	public void applyScoreboard() {
 		final Scoreboard scoreboard = this.player.getScoreboard();
 		if (scoreboard.getObjective(DisplaySlot.SIDEBAR) == null) {
 			final Objective sidebar = scoreboard.registerNewObjective("sidebar", "dummy");
@@ -206,6 +211,10 @@ public class PlayerManager {
 				line.setSuffix(ChatColor.DARK_AQUA.toString() + this.economy.getMoney());
 				sidebar.getScore("Credits: ").setScore(11);
 			}
+			if (scoreboard.getTeam("tag") == null) {
+				line = scoreboard.registerNewTeam("tag");
+				line.addEntry(ChatColor.RED + "Combat Tag: ");
+			}
 			if (scoreboard.getTeam("line2") == null) {
 				line = scoreboard.registerNewTeam("line2");
 				line.setPrefix(ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "-------");
@@ -231,9 +240,35 @@ public class PlayerManager {
 		case CREDITS:
 			board.getTeam(type.getName()).setSuffix(ChatColor.DARK_AQUA.toString() + this.economy.getMoney());
 			break;
-		// TODO: Do CombatTag
+		case COMBATTAG:
+			final Objective sidebar = board.getObjective(DisplaySlot.SIDEBAR);
+			if (sidebar.getScore(ChatColor.RED + "Combat Tag: ") != null && this.combatTag == null) {
+				if (board.getTeam(type.getName()) == null) {
+					break;
+				}
+				board.getScores(ChatColor.RED + "Combat Tag: ").clear();
+				sidebar.getScore(ChatColor.RESET.toString() + ChatColor.GRAY + ChatColor.STRIKETHROUGH + "-----").setScore(10);
+				this.combatTag = null;
+				break;
+			}
+			if (board.getTeam(type.getName()) != null) {
+				board.getTeam(type.getName()).setSuffix(ChatColor.RESET + ": " + this.format(this.combatTag.getRemainingTime()));
+				if (sidebar.getScore(ChatColor.RED + "Combat Tag: ") == null) {
+					sidebar.getScore(ChatColor.RED + "Combat Tag: ").setScore(10);
+					sidebar.getScore(ChatColor.RESET.toString() + ChatColor.GRAY + ChatColor.STRIKETHROUGH + "-----").setScore(9);
+				}
+				break;
+			}
+			break;
 		default:
 			break;
 		}
+	}
+	
+	private String format(double sec) {
+	    int seconds = (int) sec;
+	    int milliseconds = (int) ((sec - seconds) * 1000);
+
+	    return String.format("%d.%03ds", seconds, milliseconds);
 	}
 }

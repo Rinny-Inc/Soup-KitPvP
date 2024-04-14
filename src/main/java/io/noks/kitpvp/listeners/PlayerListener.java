@@ -1,7 +1,10 @@
 package io.noks.kitpvp.listeners;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -34,6 +37,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
+import com.avaje.ebean.validation.NotNull;
+
+import io.noks.custom.utils.EntityNPC;
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.enums.RefreshType;
 import io.noks.kitpvp.listeners.abilities.Boxer;
@@ -42,6 +48,7 @@ import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.managers.caches.CombatTag;
 import io.noks.kitpvp.managers.caches.Economy;
 import io.noks.kitpvp.managers.caches.Economy.MoneyType;
+import io.noks.kitpvp.task.MapTask;
 import io.noks.kitpvp.managers.caches.Stats;
 import io.noks.kitpvp.utils.Cuboid;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -49,6 +56,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 public class PlayerListener implements Listener {
 	private final Main plugin;
 	private final Cuboid spawnCuboid;
+	private @NotNull MapTask mapTask;
 	
 	public PlayerListener(Main main) {
 		this.plugin = main;
@@ -122,8 +130,16 @@ public class PlayerListener implements Listener {
 				}
 			}
 		}
-		pm.kill();
+		pm.kill(false);
 		this.plugin.getDataBase().savePlayer(pm);
+		if (this.mapTask == null) {
+			return;
+		}
+		final List<PlayerManager> playersInMap = PlayerManager.players.values().stream().filter(not(PlayerManager::isInSpawn)).collect(Collectors.toList());
+		if (playersInMap.isEmpty()) {
+			this.mapTask.clearTask();
+			this.mapTask = null;
+		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -177,8 +193,20 @@ public class PlayerListener implements Listener {
 				}
 			}
 			this.applySpawnProtection(killed, false);
-			pm.kill();
+			pm.kill(false);
+			if (this.mapTask == null) {
+				return;
+			}
+			final List<PlayerManager> playersInMap = PlayerManager.players.values().stream().filter(not(PlayerManager::isInSpawn)).collect(Collectors.toList());
+			if (playersInMap.isEmpty()) {
+				this.mapTask.clearTask();
+				this.mapTask = null;
+			}
 		}
+	}
+	
+	private static <T> Predicate<T> not(Predicate<T> p) { 
+		return p.negate();
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -193,6 +221,7 @@ public class PlayerListener implements Listener {
 		player.setExp(0.0F);
 		player.getInventory().setContents(this.plugin.getItemUtils().getSpawnItems(player.getName()));
 		player.updateInventory();
+		this.applySpawnProtection(player, true);
 	}
 
 	@EventHandler
@@ -274,6 +303,10 @@ public class PlayerListener implements Listener {
 	// TODO: FIX DOUBLE HIT????
 	@EventHandler
 	public void onEntityDamageEntity(EntityDamageByEntityEvent event) {
+		if (event.getEntity() instanceof EntityNPC) {
+			event.setCancelled(true);
+			return;
+		}
 		if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
 			if (event.getEntity() != event.getDamager()) {
 				PlayerManager.get(event.getEntity().getUniqueId()).updateCombatTag(new CombatTag(event.getDamager().getUniqueId()));
@@ -338,6 +371,7 @@ public class PlayerListener implements Listener {
 			return;
 		}
 		if (!pm.isInSpawn()) {
+			// TODO: KOTH CODE HERE
 			final Block sponge = event.getTo().getBlock().getRelative(BlockFace.DOWN);
 			if (sponge.getType() == Material.SPONGE) {
 				final Block signBlock = sponge.getLocation().getBlock().getRelative(BlockFace.DOWN);
@@ -370,5 +404,12 @@ public class PlayerListener implements Listener {
 			}
 			player.sendBlockChange(loc, 0, (byte)0);
 		}
+		if (!remove && this.mapTask == null) {
+			this.mapTask = new MapTask(this.plugin).startTask();
+		}
+	}
+	
+	public MapTask getMapTask() {
+		return this.mapTask;
 	}
 }

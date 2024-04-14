@@ -17,7 +17,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockBurnEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
+import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -52,7 +53,7 @@ public class ServerListener implements Listener {
 	public void onServerPing(ServerListPingEvent event) {
 		final String line1 = ChatColor.translateAlternateColorCodes('&', this.plugin.getConfigManager().motdFirstLine) + "\n";
 		final String line2 = ChatColor.translateAlternateColorCodes('&', this.plugin.getConfigManager().motdSecondLine);
-		event.setMotd(line1 + line2 + (Bukkit.hasWhitelist() ? (ChatColor.RED + " Whitelisted") : ""));
+		event.setMotd(line1 + line2 /*+ (Bukkit.hasWhitelist() ? (ChatColor.RED + " Whitelisted") : "")*/);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -102,19 +103,6 @@ public class ServerListener implements Listener {
 			return;
 		}
 		event.setCancelled(true);
-	}
-
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onBlockBurn(BlockBurnEvent event) {
-		event.setCancelled(true);
-	}
-
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onFireSpread(BlockSpreadEvent event) {
-		if (event.getSource().getType() == Material.FIRE) {
-			event.setCancelled(true);
-			event.getSource().setType(Material.AIR);
-		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -210,6 +198,21 @@ public class ServerListener implements Listener {
 		if (!this.blockCooldown.containsKey(location))
 			return false;
 		return (((Long) this.blockCooldown.get(location)).longValue() > System.currentTimeMillis());
+	}
+	
+	@EventHandler(priority=EventPriority.LOWEST)
+	public void onBlockIgnite(BlockIgniteEvent event) {
+		if (event.getCause() == IgniteCause.FLINT_AND_STEEL) {
+			return;
+		}
+		event.setCancelled(true);
+	}
+	@EventHandler(priority=EventPriority.LOWEST)
+	public void onBlockSpread(BlockSpreadEvent event) {
+		if (event.getSource().getType() != Material.VINE) {
+			return;
+		}
+		event.setCancelled(true);
 	}
 	
 	/*@EventHandler

@@ -15,6 +15,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scoreboard.DisplaySlot;
 
 import com.google.common.collect.Lists;
 
@@ -131,17 +132,30 @@ public class InventoryListener implements Listener {
 			return;
 		}
 		if (title.contains("settings")) {
-			String itemName = item.getItemMeta().getDisplayName();
+			String itemName = ChatColor.stripColor(item.getItemMeta().getDisplayName().toLowerCase());
 			if (itemName.equals(" ") || itemName.length() < 3) {
 				return;
 			}
 			Player player = (Player) event.getWhoClicked();
 			player.closeInventory();
-			if (itemName.toLowerCase().equals(ChatColor.YELLOW + "previous page")) {
+			if (itemName.equals("previous page")) {
 				player.openInventory(this.plugin.getInventoryManager().loadKitsInventory(player));
 				return;
 			}
-			if (itemName.toLowerCase().contains("slot")) {
+			if (itemName.equals("scoreboard")) {
+				final PlayerManager pm = PlayerManager.get(player.getUniqueId());
+				pm.getSettings().updateScoreboardState();
+				if (pm.getSettings().hasScoreboardEnabled()) {
+					pm.applyScoreboard();
+				} else {
+					if (player.getScoreboard().getObjective(DisplaySlot.SIDEBAR) != null) {
+						player.getScoreboard().getObjective(DisplaySlot.SIDEBAR).unregister();
+					}
+				}
+				player.openInventory(this.plugin.getInventoryManager().loadSettingsInventory(player));
+				return;
+			}
+			if (itemName.contains("slot")) {
 				String name = itemName.split(" ")[0];
 				name = name.substring(2, name.length());
 				player.openInventory(this.plugin.getInventoryManager().loadSlotsInventory(player, name));

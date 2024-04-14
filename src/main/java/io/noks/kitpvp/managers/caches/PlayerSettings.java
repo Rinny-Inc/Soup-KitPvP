@@ -1,14 +1,17 @@
 package io.noks.kitpvp.managers.caches;
 
 public class PlayerSettings {
+	private boolean scoreboard;
 	private int swordSlot;
 	private int itemSlot;
 
 	public PlayerSettings() {
+		this.scoreboard = true;
 		this.swordSlot = 0;
 		this.itemSlot = 1;
 	}
-	public PlayerSettings(int sword, int item) {
+	public PlayerSettings(boolean scoreboard, int sword, int item) {
+		this.scoreboard = scoreboard;
 		this.swordSlot = sword;
 		this.itemSlot = item;
 	}
@@ -20,6 +23,14 @@ public class PlayerSettings {
 			return this.itemSlot;
 		}
 		return 0;
+	}
+	
+	public boolean hasScoreboardEnabled() {
+		return this.scoreboard;
+	}
+	
+	public void updateScoreboardState() {
+		this.scoreboard = !this.scoreboard;
 	}
 
 	public void setSlot(SlotType type, int slot) {

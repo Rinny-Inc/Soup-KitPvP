@@ -73,6 +73,7 @@ public class InventoryManager {
 		}
 		inv.setItem(0, Main.getInstance().getItemUtils().getItemMaterial(Material.ARROW, ChatColor.YELLOW + "Previous page"));
 		PlayerSettings settings = PlayerManager.get(player.getUniqueId()).getSettings();
+		inv.setItem(10, Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.COMMAND), ChatColor.GRAY + "Scoreboard", new String[] { (settings.hasScoreboardEnabled() ? ChatColor.GREEN + "Enabled" : ChatColor.RED + "Disabled") }));
 		inv.setItem(12, Main.getInstance().getItemUtils().getItemMaterial(Material.STONE_SWORD, ChatColor.GRAY + "Sword Slot", settings.getSlot(PlayerSettings.SlotType.SWORD) + 1));
 		inv.setItem(14, Main.getInstance().getItemUtils().getItemMaterial(Material.POTATO_ITEM, ChatColor.GRAY + "Item Slot", settings.getSlot(PlayerSettings.SlotType.ITEM) + 1));
 		return inv;
