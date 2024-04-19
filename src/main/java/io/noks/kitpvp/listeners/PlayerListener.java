@@ -6,6 +6,8 @@ import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nullable;
+
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -14,7 +16,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
@@ -42,14 +43,14 @@ import com.avaje.ebean.validation.NotNull;
 import io.noks.custom.utils.EntityNPC;
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.enums.RefreshType;
-import io.noks.kitpvp.listeners.abilities.Boxer;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.managers.caches.CombatTag;
 import io.noks.kitpvp.managers.caches.Economy;
 import io.noks.kitpvp.managers.caches.Economy.MoneyType;
-import io.noks.kitpvp.task.MapTask;
+import io.noks.kitpvp.managers.caches.KoTH;
 import io.noks.kitpvp.managers.caches.Stats;
+import io.noks.kitpvp.task.MapTask;
 import io.noks.kitpvp.utils.Cuboid;
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -57,6 +58,7 @@ public class PlayerListener implements Listener {
 	private final Main plugin;
 	private final Cuboid spawnCuboid;
 	private @NotNull MapTask mapTask;
+	private @Nullable KoTH koth;
 	
 	public PlayerListener(Main main) {
 		this.plugin = main;
@@ -132,6 +134,9 @@ public class PlayerListener implements Listener {
 		}
 		pm.kill(false);
 		this.plugin.getDataBase().savePlayer(pm);
+		if (koth != null && koth.getPlayers().containsKey(player.getUniqueId())) {
+			koth.removePlayer(player.getUniqueId());
+		}
 		if (this.mapTask == null) {
 			return;
 		}
@@ -194,6 +199,9 @@ public class PlayerListener implements Listener {
 			}
 			this.applySpawnProtection(killed, false);
 			pm.kill(false);
+			if (koth != null && koth.getPlayers().containsKey(killed.getUniqueId())) {
+				koth.removePlayer(killed.getUniqueId());
+			}
 			if (this.mapTask == null) {
 				return;
 			}
@@ -301,32 +309,20 @@ public class PlayerListener implements Listener {
 	
 	// TODO: remake with critical damage and enchantment
 	// TODO: FIX DOUBLE HIT????
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onEntityDamageEntity(EntityDamageByEntityEvent event) {
 		if (event.getEntity() instanceof EntityNPC) {
 			event.setCancelled(true);
 			return;
 		}
 		if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
-			if (event.getEntity() != event.getDamager()) {
-				PlayerManager.get(event.getEntity().getUniqueId()).updateCombatTag(new CombatTag(event.getDamager().getUniqueId()));
-				PlayerManager.get(event.getDamager().getUniqueId()).updateCombatTag(new CombatTag(event.getEntity().getUniqueId()));
-			}
-			final Player damager = (Player) event.getDamager();
-			final ItemStack handItem = damager.getItemInHand();
-			if (handItem.getType() == Material.MUSHROOM_SOUP) {
+			if (event.getEntity() == event.getDamager()) {
 				return;
 			}
-			double damage = event.getDamage();
-			if (handItem.getType() == Material.AIR && PlayerManager.get(damager.getUniqueId()).getAbility().get() instanceof Boxer)
-				damage += 2.0D;
-			if (handItem.getType() == Material.WOOD_SWORD || handItem.getType() == Material.STONE_SWORD)
-				damage -= 2.5D;
-			if (handItem.getType() == Material.IRON_SWORD)
-				damage -= 2.5D;
-			if (handItem.containsEnchantment(Enchantment.DAMAGE_ALL))
-				damage += (handItem.getEnchantmentLevel(Enchantment.DAMAGE_ALL) / 2) + 0.25D;
-			event.setDamage(damage);
+			final Player damaged = (Player) event.getEntity();
+			final Player damager = (Player) event.getDamager();
+			PlayerManager.get(damaged.getUniqueId()).updateCombatTag(new CombatTag(damager.getUniqueId()));
+			PlayerManager.get(damager.getUniqueId()).updateCombatTag(new CombatTag(damaged.getUniqueId()));
 		}
 	}
 
@@ -371,7 +367,16 @@ public class PlayerListener implements Listener {
 			return;
 		}
 		if (!pm.isInSpawn()) {
-			// TODO: KOTH CODE HERE
+			if (koth != null) {
+				if (koth.getPlayers().containsKey(player.getUniqueId()) && !koth.isLocationInZone(player.getLocation())) {
+					koth.removePlayer(player.getUniqueId());
+					return;
+				}
+				if (!koth.getPlayers().containsKey(player.getUniqueId()) && koth.isLocationInZone(player.getLocation())) {
+					koth.addPlayer(player.getUniqueId());
+					return;
+				}
+			}
 			final Block sponge = event.getTo().getBlock().getRelative(BlockFace.DOWN);
 			if (sponge.getType() == Material.SPONGE) {
 				final Block signBlock = sponge.getLocation().getBlock().getRelative(BlockFace.DOWN);

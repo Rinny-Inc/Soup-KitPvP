@@ -99,8 +99,9 @@ public class ItemUtils {
 		inv.setItem(14, new ItemStack(Material.BOWL, 32));
 		inv.setItem(13, new ItemStack(Material.RED_MUSHROOM, 32));
 		inv.setItem(15, new ItemStack(Material.BROWN_MUSHROOM, 32));
+		inv.setArmorContents(ability.armors());
 		final PlayerSettings settings = PlayerManager.get(player.getUniqueId()).getSettings();
-		inv.setItem(settings.getSlot(SlotType.SWORD), new ItemStack(Main.getInstance().getItemUtils().getItemUnbreakable(ability.sword())));
+		inv.setItem(settings.getSlot(SlotType.SWORD), ability.sword());
 		if (ability.specialItem().getType() != Material.MUSHROOM_SOUP) {
 			inv.setItem(settings.getSlot(SlotType.ITEM), Main.getInstance().getItemUtils().getItemStack(ability.specialItem(), ChatColor.RED + ability.specialItemName(), null));
 		}

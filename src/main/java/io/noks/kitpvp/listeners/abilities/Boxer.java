@@ -13,7 +13,8 @@ public class Boxer extends Abilities {
 		super("Boxer", new ItemStack(Material.WOOD_SWORD), Rarity.COMMON, 0L, new String[] { ChatColor.AQUA + "Your hands are doing more damage" });
 	}
 	
-	public Material sword() {
-		return Material.WOOD_SWORD;
+	@Override
+	public ItemStack sword() {
+		return new ItemStack(Material.WOOD_SWORD);
 	}
 }

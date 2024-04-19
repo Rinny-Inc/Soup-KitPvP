@@ -1,3 +1,6 @@
  1. TOURNAMENT
  2. GUILD
- 3. 
+ 3. KoTH
+ 4. Perks
+ 5. Bosses
+ 6. 

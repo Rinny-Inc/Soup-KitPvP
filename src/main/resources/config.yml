@@ -12,3 +12,9 @@ tab:
 motd:
   first-line: "noks.io"
   second-line: "soup server"
+# Setup KOTH Locations with names you can also use /koth setup <KOTH NAME>
+KoTH:
+  NAME:
+    LOCATION: 
+  NAME2:
+    LOCATION: 

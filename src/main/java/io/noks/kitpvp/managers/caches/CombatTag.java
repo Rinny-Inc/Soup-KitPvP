@@ -19,6 +19,10 @@ public class CombatTag {
 		return this.time;
 	}
 	
+	public void resetTime() {
+		this.time = System.currentTimeMillis() + (14 * 1000);
+	}
+	
 	public Long getRemainingTime() {
 		final Long current = System.currentTimeMillis();
 		return (current > this.time ? 0L : this.time - current);

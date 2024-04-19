@@ -1,8 +1,10 @@
 package io.noks.kitpvp.abstracts;
 
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import io.noks.kitpvp.enums.Rarity;
 
@@ -29,12 +31,17 @@ public abstract class Abilities {
 		return null;
 	}
 
-	public Material sword() {
-		return Material.STONE_SWORD;
+	public ItemStack sword() {
+		final ItemStack item = new ItemStack(Material.DIAMOND_SWORD);
+		final ItemMeta meta = item.getItemMeta();
+		meta.spigot().setUnbreakable(true);
+		item.setItemMeta(meta);
+		item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1);
+		return item;
 	}
 	
 	public ItemStack[] armors() {
-		return new ItemStack[] {null, null, null, null};
+		return new ItemStack[] {new ItemStack(Material.IRON_BOOTS), new ItemStack(Material.IRON_LEGGINGS), new ItemStack(Material.IRON_CHESTPLATE), new ItemStack(Material.IRON_HELMET)};
 	}
 	
 	public boolean hasCooldown() {
