@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Random;
 
 import org.apache.commons.lang.WordUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,8 +25,6 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
-import org.bukkit.event.player.PlayerPortalEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
@@ -114,15 +111,6 @@ public class ServerListener implements Listener {
 	public void onPrepareCraft(PrepareItemCraftEvent event) {
 		if (event.getInventory().getResult().getType() != Material.MUSHROOM_SOUP) {
 			event.getInventory().setResult(null);
-		}
-	}
-
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onPortalTook(PlayerPortalEvent event) {
-		event.setCancelled(true);
-		if (event.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) {
-			event.getPlayer().sendMessage(ChatColor.RED + "No event in progress!");
-			return;
 		}
 	}
 

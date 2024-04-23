@@ -18,7 +18,7 @@ public class SpawnCommand implements CommandExecutor {
 		this.main = main;
 		main.getCommand("spawn").setExecutor(this);
 	}
-
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (!(sender instanceof Player)) {
@@ -40,10 +40,10 @@ public class SpawnCommand implements CommandExecutor {
 		if (!pm.isInSpawn() && pm.hasCombatTag()) {
 			return false;
 		}
+		final Location oldLocation = player.getLocation();
 		new BukkitRunnable() {
 			int i = 5;
 			int ticks = 10;
-			final Location oldLocation = player.getLocation();
 			
 			@Override
 			public void run() {
@@ -56,6 +56,9 @@ public class SpawnCommand implements CommandExecutor {
 					if (i == 0) {
 						player.sendMessage("Teleporting now!");
 						pm.kill(true);
+						player.teleport(player.getLocation().getWorld().getSpawnLocation());
+						player.getInventory().clear();
+						player.getInventory().setContents(SpawnCommand.this.main.getItemUtils().getSpawnItems(player.getName()));
 						this.cancel();
 						return;
 					}

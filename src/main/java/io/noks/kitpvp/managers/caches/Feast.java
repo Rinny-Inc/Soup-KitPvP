@@ -11,7 +11,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.inventory.ItemStack;
 
@@ -19,14 +18,14 @@ import io.noks.kitpvp.Main;
 
 public class Feast {
 	private World world = Bukkit.getWorld("world");
-	private Map<Location, Block> blocks = new HashMap<Location, Block>(13);
+	private Map<Location, Material> blocks = new HashMap<Location, Material>(13);
 	
 	public Feast(Location location) {
 		this.setupFeast(location);
 	}
 	
 	private void setupFeast(Location enchantmentTableLocation) {
-		blocks.put(enchantmentTableLocation, this.world.getBlockAt(enchantmentTableLocation));
+		blocks.put(enchantmentTableLocation, this.world.getBlockAt(enchantmentTableLocation).getType());
 		this.world.getBlockAt(enchantmentTableLocation).setType(Material.ENCHANTMENT_TABLE);
 		
 		final double[][] offsets = {
@@ -48,7 +47,7 @@ public class Feast {
 	        double offsetX = offset[0];
 	        double offsetZ = offset[1];
 	        Location chestLocation = enchantmentTableLocation.clone().add(offsetX, 0, offsetZ);
-	        blocks.put(chestLocation, this.world.getBlockAt(chestLocation));
+	        blocks.put(chestLocation, this.world.getBlockAt(chestLocation).getType());
 	        this.world.getBlockAt(chestLocation).setType(Material.CHEST);
 			Chest chest = (Chest) this.world.getBlockAt(chestLocation).getState();
 			fillFeast(chest);
@@ -80,10 +79,10 @@ public class Feast {
 	}
 	
 	public void clearFeast() {
-		for (Entry<Location, Block> entry : this.blocks.entrySet()) {
+		for (Entry<Location, Material> entry : this.blocks.entrySet()) {
 			Location loc = entry.getKey();
-			Block oldBlock = entry.getValue();
-			this.world.getBlockAt(loc).setType(oldBlock.getType());
+			Material oldMaterial = entry.getValue();
+			this.world.getBlockAt(loc).setType(oldMaterial);
 		}
 		Bukkit.broadcastMessage(ChatColor.RED + "The feast just disappeared!");
 	}

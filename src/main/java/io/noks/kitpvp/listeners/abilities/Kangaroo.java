@@ -2,15 +2,13 @@ package io.noks.kitpvp.listeners.abilities;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerOnGroundEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import io.noks.kitpvp.Main;
@@ -19,10 +17,10 @@ import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
 
 public class Kangaroo extends Abilities implements Listener {
+	private boolean used;
 	private Main plugin;
-
 	public Kangaroo(Main main) {
-		super("Kangaroo", new ItemStack(Material.FIREWORK), Rarity.UNIQUE, 0L /* LUNAR = 10L */, new String[] { ChatColor.AQUA + "Jump like a kangaroo" });
+		super("Kangaroo", new ItemStack(Material.FIREWORK), Rarity.UNIQUE, 10L, new String[] { ChatColor.AQUA + "Jump like a kangaroo" });
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}
@@ -36,6 +34,16 @@ public class Kangaroo extends Abilities implements Listener {
 	public String specialItemName() {
 		return "Kangaroo Rocket";
 	}
+	
+	@Override
+	public ItemStack[] armors() {
+		final ItemStack h = new ItemStack(Material.IRON_HELMET);
+		final ItemStack c = new ItemStack(Material.IRON_CHESTPLATE);
+		final ItemStack l = new ItemStack(Material.GOLD_LEGGINGS);
+		l.addUnsafeEnchantment(Enchantment.DURABILITY, 4);
+		final ItemStack b = new ItemStack(Material.IRON_BOOTS);
+		return new ItemStack[] {b, l, c, h};
+	}
 
 	@EventHandler
 	public void onKangarooInteract(PlayerInteractEvent event) {
@@ -45,14 +53,14 @@ public class Kangaroo extends Abilities implements Listener {
 		final Player player = event.getPlayer();
 		if (player.getItemInHand().getType() != null && player.getItemInHand().getType() == Material.FIREWORK && PlayerManager.get(player.getUniqueId()).getAbility().hasAbility(this)) {
 			event.setCancelled(true);
-			if (!player.hasMetadata("kangaroo")) {
+			if (!this.used) {
 				final boolean sneak = player.isSneaking();
-				final float multiplier = !sneak ? 0.6F : 1.5F;
-				final float vertical = !sneak ? 0.8F : 0.5F;
+				final float multiplier = !sneak ? 0.775F : 1.5F;
+				final float vertical = !sneak ? 0.885F : 0.5F;
 				final Vector kangaVel = player.getEyeLocation().getDirection();
 				player.setVelocity(kangaVel.multiply(multiplier).setY(vertical));
 				player.setFallDistance(0.0F);
-				player.setMetadata("kangaroo", new FixedMetadataValue(this.plugin, Boolean.valueOf(true)));
+				this.used = true;
 			}
 		}
 	}
@@ -62,28 +70,8 @@ public class Kangaroo extends Abilities implements Listener {
 		if (!event.getOnGround()) {
 			return;
 		}
-		final Player player = event.getPlayer();
-		if (player.hasMetadata("kangaroo")) {
-			player.removeMetadata("kangaroo", this.plugin);
-		}
-	}
-
-	@EventHandler
-	public void onDisconnect(PlayerQuitEvent event) {
-		final Player player = event.getPlayer();
-		if (player.hasMetadata("kangaroo")) {
-			player.removeMetadata("kangaroo", this.plugin);
-		}
-	}
-
-	@EventHandler
-	public void onDeath(PlayerDeathEvent event) {
-		if (event.getEntity() instanceof Player) {
-			final Player player = event.getEntity();
-
-			if (player.hasMetadata("kangaroo")) {
-				player.removeMetadata("kangaroo", this.plugin);
-			}
+		if (this.used) {
+			this.used = false;
 		}
 	}
 }

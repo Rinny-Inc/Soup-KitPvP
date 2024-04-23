@@ -48,10 +48,8 @@ public class InventoryManager {
 	}
 
 	public Inventory loadRefillInventory(Player player) {
-		RefillInventoryManager im = RefillInventoryManager.get(Bukkit.createInventory(null, 54, ChatColor.DARK_AQUA + WordUtils.capitalizeFully(player.getLocation().getBlock().getBiome().toString()) + " Refill Chest"), player.getLocation().getBlock().getBiome());
+		RefillInventoryManager im = RefillInventoryManager.get(Bukkit.createInventory(null, 54, ChatColor.DARK_AQUA + WordUtils.capitalizeFully(player.getLocation().getBlock().getBiome().toString()) + " Refill Chest"), player.getLocation());
 		if (im.hasCooldown()) {
-			double cooldown = im.getCooldown().longValue() / 1000.0D;
-			player.sendMessage(ChatColor.RED + "Refill ends in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 			return null;
 		}
 		if (!im.isFilled()) {
@@ -148,7 +146,7 @@ public class InventoryManager {
 		for (int i = inventory.getSize() - 9; i < inventory.getSize(); i++) {
 			inventory.setItem(i, Main.getInstance().getItemUtils().getItemMaterial(Material.STAINED_GLASS_PANE, 15, " "));
 		}
-		inventory.setItem(2, Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.NOTE_BLOCK), ChatColor.YELLOW + "Ability Rotation", new String[] {null, ChatColor.GRAY + "Get free abilities!"}));
+		inventory.setItem(2, Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.NOTE_BLOCK), ChatColor.YELLOW + "Ability Rotation", new String[] {null, ChatColor.GRAY + "Get free abilities!", "", ChatColor.RED + " Coming soon"}));
 		inventory.setItem(4, Main.getInstance().getItemUtils().getItemMaterial(Material.BEACON, 0, ChatColor.DARK_GRAY + "(" + ChatColor.DARK_AQUA + "SoupWorld" + ChatColor.DARK_GRAY + ")"));
 		final Ability ability = PlayerManager.get(player.getUniqueId()).getAbility();
 		if (ability.getSelected() != null) {

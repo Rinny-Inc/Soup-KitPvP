@@ -19,6 +19,7 @@ import org.bukkit.potion.PotionEffectType;
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.listeners.abilities.Archer;
+import io.noks.kitpvp.listeners.abilities.Chemist;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.PlayerSettings;
 import io.noks.kitpvp.managers.caches.PlayerSettings.SlotType;
@@ -107,6 +108,9 @@ public class ItemUtils {
 		}
 		if (ability instanceof Archer) {
 			inv.setItem(9, new ItemStack(Material.ARROW, 18));
+		}
+		if (ability instanceof Chemist) {
+			inv.setItem(2, new ItemStack(Material.POTION, 1, (short) 16420));
 		}
 		while (inv.firstEmpty() != -1) {
 			inv.addItem(new ItemStack(Material.MUSHROOM_SOUP));

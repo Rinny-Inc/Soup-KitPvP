@@ -5,6 +5,7 @@ DATABASE:
   USER:
   PASSWORD:
 domain-name: noks.io
+send-join-and-quit-message-to-op: true
 # \n for newLine
 tab:
   header: "Noks.io"

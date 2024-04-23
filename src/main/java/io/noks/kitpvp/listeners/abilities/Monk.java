@@ -4,13 +4,17 @@ import java.text.DecimalFormat;
 import java.util.Random;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
@@ -34,6 +38,29 @@ public class Monk extends Abilities implements Listener {
 	@Override
 	public String specialItemName() {
 		return "Monk Staff";
+	}
+	
+	@Override
+	public ItemStack sword() {
+		final ItemStack sword = new ItemStack(Material.WOOD_SWORD);
+		final ItemMeta meta = sword.getItemMeta();
+		meta.spigot().setUnbreakable(true);
+		sword.setItemMeta(meta);
+		sword.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 3);
+		return sword;
+	}
+	
+	@Override
+	public ItemStack[] armors() {
+		final ItemStack h = new ItemStack(Material.LEATHER_HELMET);
+		final LeatherArmorMeta meta = (LeatherArmorMeta) h.getItemMeta();
+		meta.setColor(Color.ORANGE);
+		h.setItemMeta(meta);
+		h.addUnsafeEnchantment(Enchantment.DURABILITY, 4);
+		final ItemStack c = new ItemStack(Material.IRON_CHESTPLATE);
+		final ItemStack l = new ItemStack(Material.IRON_LEGGINGS);
+		final ItemStack b = new ItemStack(Material.IRON_BOOTS);
+		return new ItemStack[] {b, l, c, h};
 	}
 
 	@EventHandler

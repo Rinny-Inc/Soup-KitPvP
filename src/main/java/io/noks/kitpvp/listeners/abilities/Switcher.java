@@ -3,6 +3,7 @@ package io.noks.kitpvp.listeners.abilities;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,12 +26,25 @@ public class Switcher extends Abilities implements Listener {
 	
 	@Override
 	public ItemStack specialItem() {
-		return new ItemStack(this.getIcon().getType(), 6);
+		return new ItemStack(this.getIcon().getType(), 4);
 	}
 	
 	@Override
 	public String specialItemName() {
 		return "Switcher Ball";
+	}
+	
+	@Override
+	public ItemStack[] armors() {
+		final ItemStack h = new ItemStack(Material.LEATHER_HELMET);
+		h.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
+		h.addUnsafeEnchantment(Enchantment.DURABILITY, 3);
+		final ItemStack c = new ItemStack(Material.IRON_CHESTPLATE);
+		final ItemStack l = new ItemStack(Material.IRON_LEGGINGS);
+		final ItemStack b = new ItemStack(Material.LEATHER_BOOTS);
+		b.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
+		b.addUnsafeEnchantment(Enchantment.DURABILITY, 3);
+		return new ItemStack[] {b, l, c, h};
 	}
 
 	@EventHandler
@@ -42,6 +56,9 @@ public class Switcher extends Abilities implements Listener {
 				final Player hit = (Player) event.getHitEntity();
 
 				if (hit == shooter)return;
+				if (PlayerManager.get(hit.getUniqueId()).isInSpawn()) {
+					return;
+				}
 				final Location hittedLoc = hit.getLocation();
 				hit.teleport(shooter.getLocation());
 				shooter.teleport(hittedLoc);

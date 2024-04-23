@@ -5,7 +5,9 @@ import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -157,7 +159,7 @@ public class InventoryListener implements Listener {
 			}
 			if (itemName.contains("slot")) {
 				String name = itemName.split(" ")[0];
-				name = name.substring(2, name.length());
+				name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
 				player.openInventory(this.plugin.getInventoryManager().loadSlotsInventory(player, name));
 				return;
 			}
@@ -184,7 +186,22 @@ public class InventoryListener implements Listener {
 		final Inventory inventory = event.getInventory();
 		final String title = ChatColor.stripColor(inventory.getTitle()).toLowerCase();
 		if (title.contains("refill chest") && !inventory.contains(Material.MUSHROOM_SOUP)) {
-			final RefillInventoryManager im = RefillInventoryManager.get(inventory, event.getPlayer().getLocation().getBlock().getBiome());
+			final Player player = (Player) event.getPlayer();
+			final Location playerLocation = player.getLocation();
+			Block ender = null;
+			
+	        for (int x = -5; x <= 5; x++) {
+	            for (int y = -4; y <= 4; y++) {
+	                for (int z = -5; z <= 5; z++) {
+	                    ender = playerLocation.getWorld().getBlockAt(playerLocation.getBlockX() + x, playerLocation.getBlockY() + y, playerLocation.getBlockZ() + z);
+
+	                    if (ender.getType() == Material.ENDER_CHEST) {
+	                        break;
+	                    }
+	                }
+	            }
+	        }
+			final RefillInventoryManager im = RefillInventoryManager.get(inventory, ender.getLocation());
 			im.setCooldown(Long.valueOf(60L));
 			im.setFilled(false);
 		}

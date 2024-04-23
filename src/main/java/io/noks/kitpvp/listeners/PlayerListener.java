@@ -3,6 +3,7 @@ package io.noks.kitpvp.listeners;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -32,6 +33,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
@@ -69,6 +71,9 @@ public class PlayerListener implements Listener {
 
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
+		if (this.plugin.getConfigManager().sendJoinAndQuitMessageToOP && this.plugin.getServer().getOnlinePlayers().size() > 1) {
+		    this.plugin.getServer().getOnlinePlayers().stream().filter(opPlayers -> opPlayers.isOp()).forEach(opPlayers -> opPlayers.sendMessage(event.getJoinMessage()));
+		}
 		event.setJoinMessage(null);
 		final Player player = event.getPlayer();
 		player.setScoreboard(this.plugin.getServer().getScoreboardManager().getMainScoreboard());
@@ -97,6 +102,9 @@ public class PlayerListener implements Listener {
 
 	@EventHandler
 	public void onQuit(PlayerQuitEvent event) {
+		if (this.plugin.getConfigManager().sendJoinAndQuitMessageToOP && this.plugin.getServer().getOnlinePlayers().size() > 1) {
+		    this.plugin.getServer().getOnlinePlayers().stream().filter(opPlayers -> opPlayers.isOp()).forEach(opPlayers -> opPlayers.sendMessage(event.getQuitMessage()));
+		}
 		event.setQuitMessage(null);
 		this.leaveAction(event.getPlayer());
 	}
@@ -163,7 +171,7 @@ public class PlayerListener implements Listener {
 				event.getDrops().clear();
 				return;
 			}
-			if (killed.getKiller() instanceof Player && pm.hasCombatTag()) {
+			if (pm.hasCombatTag()) {
 				final PlayerManager km = PlayerManager.get(pm.getCurrentCombatTag().getLastAttackerUUID());
 				final Player killer = km.getPlayer();
 
@@ -267,12 +275,17 @@ public class PlayerListener implements Listener {
 			if (!pm.isInSpawn()) {
 				return;
 			}
-			if (player.getItemInHand().getType() == Material.ENCHANTED_BOOK && player.getItemInHand().getItemMeta().getDisplayName().toLowerCase().equals(ChatColor.DARK_AQUA + "ability selector")) {
+			final String itemName = ChatColor.stripColor(event.getItem().getItemMeta().getDisplayName().toLowerCase());
+			if (player.getItemInHand().getType() == Material.ENCHANTED_BOOK && itemName.equals("ability selector")) {
 				player.openInventory(this.plugin.getInventoryManager().loadKitsInventory(player));
 				return;
 			}
-			if (player.getItemInHand().getType() == Material.WATCH && player.getItemInHand().getItemMeta().getDisplayName().toLowerCase().equals(ChatColor.DARK_AQUA + "settings")) {
+			if (player.getItemInHand().getType() == Material.WATCH && itemName.equals("settings")) {
 				player.openInventory(this.plugin.getInventoryManager().loadSettingsInventory(player));
+				return;
+			}
+			if (player.getItemInHand().getType() == Material.SKULL_ITEM && itemName.equals("stats")) {
+				player.performCommand("stats");
 			}
 		}
 	}
@@ -319,10 +332,10 @@ public class PlayerListener implements Listener {
 			if (event.getEntity() == event.getDamager()) {
 				return;
 			}
-			final Player damaged = (Player) event.getEntity();
-			final Player damager = (Player) event.getDamager();
-			PlayerManager.get(damaged.getUniqueId()).updateCombatTag(new CombatTag(damager.getUniqueId()));
-			PlayerManager.get(damager.getUniqueId()).updateCombatTag(new CombatTag(damaged.getUniqueId()));
+			final UUID damaged = event.getEntity().getUniqueId();
+			final UUID damager = event.getDamager().getUniqueId();
+			PlayerManager.get(damaged).updateCombatTag(new CombatTag(damager));
+			PlayerManager.get(damager).updateCombatTag(new CombatTag(damaged));
 		}
 	}
 
@@ -350,6 +363,15 @@ public class PlayerListener implements Listener {
 				player.openInventory(this.plugin.getInventoryManager().loadRefillInventory(player));
 			}
 		}
+	}
+	
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onPortalTook(PlayerPortalEvent event) {
+		if (this.koth == null) {
+			event.setCancelled(true);
+			return;
+		}
+		// TODO: Portal TP
 	}
 	
 	@EventHandler(priority=EventPriority.LOWEST)

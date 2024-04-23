@@ -135,7 +135,7 @@ public class PlayerManager {
 	}
 	
 	public boolean hasCombatTag() {
-		return this.combatTag != null;
+		return this.combatTag != null && this.combatTag.getTime() > System.currentTimeMillis();
 	}
 	
 	public void updateCombatTag(CombatTag newTag) {
@@ -177,8 +177,8 @@ public class PlayerManager {
 		this.player.setItemOnCursor(null);
 	}
 	
-	public void applyScoreboard() {
-		final Scoreboard scoreboard = this.player.getScoreboard();
+	/*public void applyScoreboard() {
+		final Scoreboard scoreboard = this.player.getServer().getScoreboardManager().getNewScoreboard();
 		if (scoreboard.getObjective(DisplaySlot.SIDEBAR) == null) {
 			final Objective sidebar = scoreboard.registerNewObjective("sidebar", "dummy");
 			sidebar.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -189,32 +189,32 @@ public class PlayerManager {
 				line.setPrefix(ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "-------");
 				line.addEntry("-----");
 				line.setSuffix("-------");
+				sidebar.getScore("-----").setScore(15);
 			}
-			sidebar.getScore("-----").setScore(15);
 			if (scoreboard.getTeam("kills") == null) {
 				line = scoreboard.registerNewTeam("kills");
 				line.addEntry("Kills: ");
 				line.setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getKills());
+				sidebar.getScore("Kills: ").setScore(14);
 			}
-			sidebar.getScore("Kills: ").setScore(14);
 			if (scoreboard.getTeam("ks") == null) {
 				line = scoreboard.registerNewTeam("ks");
 				line.addEntry("Killstreak: ");
 				line.setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getKillStreak());
+				sidebar.getScore("Killstreak: ").setScore(13);
 			}
-			sidebar.getScore("Killstreak: ").setScore(13);
 			if (scoreboard.getTeam("deaths") == null) {
 				line = scoreboard.registerNewTeam("deaths");
 				line.addEntry("Deaths: ");
 				line.setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getDeaths());
+				sidebar.getScore("Deaths: ").setScore(12);
 			}
-			sidebar.getScore("Deaths: ").setScore(12);
 			if (scoreboard.getTeam("coins") == null) {
 				line = scoreboard.registerNewTeam("coins");
 				line.addEntry("Credits: ");
 				line.setSuffix(ChatColor.DARK_AQUA.toString() + this.economy.getMoney());
+				sidebar.getScore("Credits: ").setScore(11);
 			}
-			sidebar.getScore("Credits: ").setScore(11);
 			if (scoreboard.getTeam("bounty") == null) {
 				line = scoreboard.registerNewTeam("bounty");
 				line.addEntry("Bounty: ");
@@ -228,9 +228,69 @@ public class PlayerManager {
 				line.setPrefix(ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "-------");
 				line.addEntry(ChatColor.RESET.toString() + ChatColor.GRAY + ChatColor.STRIKETHROUGH + "-----");
 				line.setSuffix("-------");
+				sidebar.getScore(ChatColor.RESET.toString() + ChatColor.GRAY + ChatColor.STRIKETHROUGH + "-----").setScore(10);
 			}
-			sidebar.getScore(ChatColor.RESET.toString() + ChatColor.GRAY + ChatColor.STRIKETHROUGH + "-----").setScore(10);
+			this.player.setScoreboard(scoreboard);
 		}
+	}*/
+	
+	public void applyScoreboard() {
+		final Scoreboard scoreboard = this.player.getScoreboard();
+		Objective sidebar = null;
+		if (scoreboard.getObjective(DisplaySlot.SIDEBAR) == null) {
+			sidebar = scoreboard.registerNewObjective("sidebar", "dummy");
+			sidebar.setDisplaySlot(DisplaySlot.SIDEBAR);
+			sidebar.setDisplayName(ChatColor.DARK_AQUA.toString() + ChatColor.BOLD + "SoupWorld");
+		} else {
+			sidebar = scoreboard.getObjective(DisplaySlot.SIDEBAR);
+		}
+		Team line;
+		if (scoreboard.getTeam("line1") == null) {
+			line = scoreboard.registerNewTeam("line1");
+			line.setPrefix(ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "-------");
+			line.addEntry("-----");
+			line.setSuffix("-------");
+		}
+		sidebar.getScore("-----").setScore(15);
+		if (scoreboard.getTeam("kills") == null) {
+			line = scoreboard.registerNewTeam("kills");
+			line.addEntry("Kills: ");
+			line.setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getKills());
+		}
+		sidebar.getScore("Kills: ").setScore(14);
+		if (scoreboard.getTeam("ks") == null) {
+			line = scoreboard.registerNewTeam("ks");
+			line.addEntry("Killstreak: ");
+			line.setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getKillStreak());
+		}
+		sidebar.getScore("Killstreak: ").setScore(13);
+		if (scoreboard.getTeam("deaths") == null) {
+			line = scoreboard.registerNewTeam("deaths");
+			line.addEntry("Deaths: ");
+			line.setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getDeaths());
+		}
+		sidebar.getScore("Deaths: ").setScore(12);
+		if (scoreboard.getTeam("coins") == null) {
+			line = scoreboard.registerNewTeam("coins");
+			line.addEntry("Credits: ");
+			line.setSuffix(ChatColor.DARK_AQUA.toString() + this.economy.getMoney());
+		}
+		sidebar.getScore("Credits: ").setScore(11);
+		if (scoreboard.getTeam("bounty") == null) {
+			line = scoreboard.registerNewTeam("bounty");
+			line.addEntry("Bounty: ");
+		}
+		if (scoreboard.getTeam("tag") == null) {
+			line = scoreboard.registerNewTeam("tag");
+			line.addEntry(ChatColor.RED + "Combat Tag: ");
+		}
+		if (scoreboard.getTeam("line2") == null) {
+			line = scoreboard.registerNewTeam("line2");
+			line.setPrefix(ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH + "-------");
+			line.addEntry(ChatColor.RESET.toString() + ChatColor.GRAY + ChatColor.STRIKETHROUGH + "-----");
+			line.setSuffix("-------");
+		}
+		sidebar.getScore(ChatColor.RESET.toString() + ChatColor.GRAY + ChatColor.STRIKETHROUGH + "-----").setScore(10);
 	}
 	
 	public void refreshScoreboardLine(RefreshType type) {

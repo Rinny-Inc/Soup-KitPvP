@@ -2,6 +2,7 @@ package io.noks.kitpvp.listeners.abilities;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,6 +33,26 @@ public class Fisherman extends Abilities implements Listener {
 	public String specialItemName() {
 		return "Fisherman Rod";
 	}
+	
+	@Override
+	public ItemStack sword() {
+		final ItemStack sword = super.sword();
+		sword.removeEnchantment(Enchantment.DAMAGE_ALL);
+		return sword;
+	}
+	
+	@Override
+	public ItemStack[] armors() {
+		final ItemStack h = new ItemStack(Material.GOLD_HELMET);
+		h.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
+		h.addUnsafeEnchantment(Enchantment.DURABILITY, 3);
+		final ItemStack c = new ItemStack(Material.IRON_CHESTPLATE);
+		final ItemStack l = new ItemStack(Material.IRON_LEGGINGS);
+		final ItemStack b = new ItemStack(Material.GOLD_BOOTS);
+		b.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
+		b.addUnsafeEnchantment(Enchantment.DURABILITY, 3);
+		return new ItemStack[] {b, l, c, h};
+	}
 
 	@EventHandler
 	public void onFish(PlayerFishEvent event) {
@@ -44,6 +65,10 @@ public class Fisherman extends Abilities implements Listener {
 			if (PlayerManager.get(player.getUniqueId()).getAbility().hasAbility(this)) {
 				final Player target = (Player) event.getCaught();
 				if (target == player) return;
+				if (PlayerManager.get(target.getUniqueId()).isInSpawn()) {
+					event.setCancelled(true);
+					return;
+				}
 				target.teleport(player.getLocation()); // TODO: teleport player in front of the fisherman
 				target.setFallDistance(0.0F);
 			}
