@@ -9,11 +9,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 import io.noks.kitpvp.enums.Rarity;
 
 public abstract class Abilities {
-	private String name;
-	private ItemStack icon;
-	private Rarity rarity;
-	private Long cooldown;
-	private String[] lore;
+	private final String name;
+	private final ItemStack icon;
+	private final Rarity rarity;
+	private final Long cooldown;
+	private final String[] lore;
 	
 	public Abilities(String name, ItemStack icon, Rarity rarity, Long cooldown, String[] lore) {
 		this.name = name;

@@ -19,8 +19,9 @@ import io.noks.kitpvp.managers.PlayerManager;
 public class Archer extends Abilities implements Listener {
 
 	private Main main;
+	
 	public Archer(Main main) {
-		super("Archer", new ItemStack(Material.BOW), Rarity.COMMON, 0L, new String[] { "(Distance x 1.35) = damage" });
+		super("Archer", new ItemStack(Material.BOW), Rarity.COMMON, 0L, new String[] { "(Distance x 1.3) = damage" });
 		this.main = main;
 		main.getServer().getPluginManager().registerEvents(this, main);
 	}
@@ -32,7 +33,7 @@ public class Archer extends Abilities implements Listener {
 
 	@Override
 	public String specialItemName() {
-		return "Special Bow";
+		return "Enchanced Bow";
 	}
 	
 	@EventHandler
@@ -44,7 +45,7 @@ public class Archer extends Abilities implements Listener {
 			if (PlayerManager.get(shooter.getUniqueId()).getAbility().hasAbility(this)) {
 				final Player hitted = (Player) event.getHitEntity();
 				if (hitted == shooter) return;
-				final double damage = shooter.getLocation().distance(hitted.getLocation()) * 1.35D;
+				final double damage = shooter.getLocation().distance(hitted.getLocation()) * 1.3D;
 				hitted.damage(damage, shooter);
 				shooter.sendMessage(ChatColor.GRAY + "Damage given " + (new DecimalFormat("#.#")).format(damage));
 			}

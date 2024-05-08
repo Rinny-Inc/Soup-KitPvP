@@ -7,7 +7,10 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -35,6 +38,7 @@ import io.noks.kitpvp.listeners.PlayerListener;
 import io.noks.kitpvp.listeners.ServerListener;
 import io.noks.kitpvp.managers.AbilitiesManager;
 import io.noks.kitpvp.managers.ConfigManager;
+import io.noks.kitpvp.managers.HologramManager;
 import io.noks.kitpvp.managers.InventoryManager;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.RefillInventoryManager;
@@ -58,6 +62,7 @@ public class Main extends JavaPlugin {
 	private @NotNull EventsTask eventsTask;
 	public @Nullable Feast feast = null;
 	public @NotNull PlayerListener playerListener;
+	public @NotNull HologramManager hologramManager;
 	
 	private static Main instance;
 	public static Main getInstance() {
@@ -79,16 +84,16 @@ public class Main extends JavaPlugin {
 		this.registerListeners();
 		this.registerCommands();
 		this.eventsTask = new EventsTask(this); // TODO: need to execute it (see in class)
+		this.hologramManager = new HologramManager();
 		final World world = this.getServer().getWorld("world");
 		this.getServer().newHologram(new Location(world, 5.5, 102, -5.5), ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "Active Event");
-		this.getServer().newHologram(new Location(world, 5.5, 101.7, -5.5), ChatColor.RED + "Coming Soon..");
-		this.getServer().newHologram(new Location(world, -4.5, 102, -5.5), ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "Leaderboard");
-		this.getServer().newHologram(new Location(world, -4.5, 101.7, -5.5), ChatColor.RED + "Coming Soon..");
+		this.getServer().newHologram(new Location(world, 5.5, 101.7, -5.5), ChatColor.RED + "Coming Soon :)");
 		/*final String fs = "ewogICJ0aW1lc3RhbXAiIDogMTY5NzQzMDY1NjUxOCwKICAicHJvZmlsZUlkIiA6ICIzNWIxMjg0OWYxYTY0YTc4YTM0ZTMyMzc5NjIxOGNmMiIsCiAgInByb2ZpbGVOYW1lIiA6ICJOb2tzaW8iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTBmYjhkZmMyNTliZmIxYzBlZGIzNGFlYmNlMmVkZjQ2YmFjZWEzNTQ2ODllOTQ1ZDFkMDAwNWM5NWRhZmMwZCIKICAgIH0sCiAgICAiQ0FQRSIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjM0MGMwZTAzZGQyNGExMWIxNWE4YjMzYzJhN2U5ZTMyYWJiMjA1MWIyNDgxZDBiYTdkZWZkNjM1Y2E3YTkzMyIKICAgIH0KICB9Cn0=";
 		final String ss = "Edwcaev9uctdzc8q2r3SOfn4It5x735SNf4tHP7kZJ3hGY7F+Aa/9kXkMVAbBokWWkQ71ZdXbg7K4NRK0++gu4OJ8WBaPLYVA5GXzBpYS4XMChitweEkqoeV58Gb4F4FxOEdbRckwnGXEyCqC8lobLXhz1sOn7e5DC7DqX0GElS3dp4RpzV7jWrqVeMTw1dRZZ2Wfqr2rixf5zWEagJSPyzh9hqZPbp6wygZToLya9w+7jzfgM0QOD8M85N+awRuAU90VVcvB2TG4ekB6SjYqt+GC0YTD/Yoy2wY4R9Nf5v6Vc1M+VXITqtKQ2Ie5vsmJaDc0X+fkGZrFNj+5HPo5qXbW/BITGhwVRooOF5tI2xv+ecK0suj7XWRk34yu/eJSf2z4rNod6YZaaVjm6NCJtlOuklUC4aXScjIXdr1a5ag49TaWa/JC8yDdkmKCWTADKzrl0MotarIchUL6SZPZMCw+mO+yzW0qyYs5WlBaMo9B4p9MYRSba3+xtTd2m0ZIvty1JhVfUDOH+wQ35nDmemqThJh32DoWas761iiWhSfGnMIxmm/4oifP74jIk9KzrwDmlcZWAgKwsNVfpyb3DypQWWRwZdn/ntdVnFMjorISd+nIDauCV9lD6iZXgd+mH9eZaVjUa2FDyCs3S7bOjDELA6f3SmWzbhtRKCkOSQ=";
 		world.spawnNPC(UUID.randomUUID(), "Storage", fs, ss, new Location(world, -19.5, 99.0D, 8.5D, -63.0F, 0.0F));
 		world.spawnNPC(UUID.randomUUID(), "Battle Pass", fs, ss, new Location(world, -17.5, 99.0D, 5.5D, -49.0F, 0.0F));
 		world.spawnNPC(UUID.randomUUID(), "Shop", fs, ss, new Location(world, -13.5, 99.0D, -0.5D, -54.0F, 0.0F));*/
+		this.initRefillChest();
 	}
 
 	public void onDisable() {
@@ -152,6 +157,28 @@ public class Main extends JavaPlugin {
 		new SpawnCommand(this);
 	}
 	
+	private void initRefillChest() {
+		final int RADIUS = 200;
+		final World world = this.getServer().getWorld("world");
+        // Get the center coordinates
+        int centerX = world.getSpawnLocation().getBlockX();
+        int centerZ = world.getSpawnLocation().getBlockZ();
+
+        // Loop within the specified radius
+        for (int x = centerX - RADIUS; x <= centerX + RADIUS; x++) {
+            for (int z = centerZ - RADIUS; z <= centerZ + RADIUS; z++) {
+                Block block = world.getHighestBlockAt(x, z);
+                if (block.getType() == Material.AIR) {
+                    continue;
+                }
+                // Check if the block is an ender chest
+                if (block.getType() == Material.ENDER_CHEST && block.getRelative(BlockFace.DOWN).getType() == Material.GLOWSTONE) {
+                	new RefillInventoryManager(block.getLocation());
+                }
+            }
+        }
+	}
+	
 	public MathUtils getMathUtils() {
 		return this.mathUtils;
 	}
@@ -186,5 +213,9 @@ public class Main extends JavaPlugin {
 	
 	public ConfigManager getConfigManager() {
 		return this.configManager;
+	}
+	
+	public HologramManager getHologramManager() {
+		return this.hologramManager;
 	}
 }

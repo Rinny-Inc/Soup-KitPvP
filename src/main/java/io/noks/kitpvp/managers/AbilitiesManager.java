@@ -1,8 +1,9 @@
 package io.noks.kitpvp.managers;
 
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+
+import com.avaje.ebean.validation.NotNull;
 
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
@@ -16,7 +17,6 @@ import io.noks.kitpvp.listeners.abilities.Chemist;
 import io.noks.kitpvp.listeners.abilities.CookieMonster;
 import io.noks.kitpvp.listeners.abilities.Fireman;
 import io.noks.kitpvp.listeners.abilities.Fisherman;
-import io.noks.kitpvp.listeners.abilities.Gladiator;
 import io.noks.kitpvp.listeners.abilities.Grandpa;
 import io.noks.kitpvp.listeners.abilities.Hulk;
 import io.noks.kitpvp.listeners.abilities.Kangaroo;
@@ -36,7 +36,7 @@ import io.noks.kitpvp.listeners.abilities.Viper;
 import io.noks.kitpvp.listeners.abilities.Zeus;
 
 public class AbilitiesManager {
-	private final Set<Abilities> abilities = Collections.newSetFromMap(new ConcurrentHashMap<>());
+	private final @NotNull Set<Abilities> abilities = new HashSet<Abilities>();
 	
 	public AbilitiesManager(Main main) {
 		abilities.add(new PvP());

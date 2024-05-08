@@ -1,6 +1,5 @@
 package io.noks.kitpvp.managers;
 
-import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.List;
 
@@ -9,7 +8,6 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -20,7 +18,6 @@ import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.managers.caches.PlayerSettings;
 import net.minecraft.util.com.google.common.collect.Lists;
-import net.minecraft.util.org.apache.commons.lang3.text.WordUtils;
 
 public class InventoryManager {
 
@@ -45,22 +42,6 @@ public class InventoryManager {
 		if (rarity != null)
 			inventories[0].setItem(inventories[0].getSize() - 9, new ItemStack(Main.getInstance().getItemUtils().getItemMaterial(Material.PAPER, 0, ChatColor.YELLOW + "Your whole abilities")));
 		return inventories[page - 1];
-	}
-
-	public Inventory loadRefillInventory(Player player) {
-		RefillInventoryManager im = RefillInventoryManager.get(Bukkit.createInventory(null, 54, ChatColor.DARK_AQUA + WordUtils.capitalizeFully(player.getLocation().getBlock().getBiome().toString()) + " Refill Chest"), player.getLocation());
-		if (im.hasCooldown()) {
-			return null;
-		}
-		if (!im.isFilled()) {
-			ItemStack soup = new ItemStack(Material.MUSHROOM_SOUP);
-			while (im.getInventory().firstEmpty() != -1) {
-				im.getInventory().addItem(new ItemStack[] { soup });
-			}
-			im.setFilled(true);
-		}
-		player.playSound(player.getLocation(), Sound.CHEST_OPEN, 0.95F, 1.05F);
-		return im.getInventory();
 	}
 
 	public Inventory loadSettingsInventory(Player player) {

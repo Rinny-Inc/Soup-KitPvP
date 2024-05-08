@@ -40,8 +40,8 @@ public class SpawnCommand implements CommandExecutor {
 		if (!pm.isInSpawn() && pm.hasCombatTag()) {
 			return false;
 		}
-		final Location oldLocation = player.getLocation();
 		new BukkitRunnable() {
+			final Location oldLocation = player.getLocation();
 			int i = 5;
 			int ticks = 10;
 			
@@ -54,11 +54,12 @@ public class SpawnCommand implements CommandExecutor {
 				ticks += 10;
 				if (ticks % 20 == 0) {
 					if (i == 0) {
-						player.sendMessage("Teleporting now!");
+						player.sendMessage(spawnMessage);
 						pm.kill(true);
 						player.teleport(player.getLocation().getWorld().getSpawnLocation());
 						player.getInventory().clear();
 						player.getInventory().setContents(SpawnCommand.this.main.getItemUtils().getSpawnItems(player.getName()));
+						SpawnCommand.this.main.playerListener.applySpawnProtection(player, true);
 						this.cancel();
 						return;
 					}

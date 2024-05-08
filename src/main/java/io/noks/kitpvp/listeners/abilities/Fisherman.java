@@ -43,15 +43,16 @@ public class Fisherman extends Abilities implements Listener {
 	
 	@Override
 	public ItemStack[] armors() {
+		ItemStack[] armor = super.armors();
 		final ItemStack h = new ItemStack(Material.GOLD_HELMET);
 		h.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
 		h.addUnsafeEnchantment(Enchantment.DURABILITY, 3);
-		final ItemStack c = new ItemStack(Material.IRON_CHESTPLATE);
-		final ItemStack l = new ItemStack(Material.IRON_LEGGINGS);
 		final ItemStack b = new ItemStack(Material.GOLD_BOOTS);
 		b.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
 		b.addUnsafeEnchantment(Enchantment.DURABILITY, 3);
-		return new ItemStack[] {b, l, c, h};
+		armor[3] = h;
+		armor[0] = b;
+		return armor;
 	}
 
 	@EventHandler

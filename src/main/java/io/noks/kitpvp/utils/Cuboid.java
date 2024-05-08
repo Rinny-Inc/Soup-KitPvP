@@ -1,9 +1,11 @@
 package io.noks.kitpvp.utils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -20,7 +22,7 @@ public class Cuboid {
     private final double yMinCentered, yMaxCentered;
     private final double zMinCentered, zMaxCentered;
     private @NotNull final World world;
-    private @NotNull final List<Location> cachedEdgeLocations;
+    private @NotNull final Set<Location> cachedEdgeLocations;
 
     public Cuboid(final Location point1, final Location point2) {
         this.xMin = Math.min(point1.getBlockX(), point2.getBlockX());
@@ -37,7 +39,7 @@ public class Cuboid {
         this.zMinCentered = this.zMin + 0.5;
         this.zMaxCentered = this.zMax + 0.5;
         
-        final List<Location> edgeLocations = new ArrayList<>();
+        final Set<Location> edgeLocations = new HashSet<>();
         for (int x = this.xMin; x <= this.xMax; x++) {
             for (int y = this.yMin; y <= this.yMax; y++) {
                 for (int z = this.zMin; z <= this.zMax; z++) {
@@ -120,7 +122,7 @@ public class Cuboid {
         return loc.getWorld() == this.world && loc.getX() >= this.xMinCentered - marge && loc.getX() <= this.xMaxCentered + marge && loc.getY() >= this.yMinCentered - marge && loc.getY() <= this.yMaxCentered + marge && loc.getZ() >= this.zMinCentered - marge && loc.getZ() <= this.zMaxCentered + marge;
     }
     
-    public List<Location> getEdgeLocations() {
+    public Set<Location> getEdgeLocations() {
     	return cachedEdgeLocations;
     }
 }

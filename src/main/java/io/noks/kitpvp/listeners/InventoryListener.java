@@ -8,10 +8,12 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -46,8 +48,7 @@ public class InventoryListener implements Listener {
 		if (inventory.getType().equals(InventoryType.CREATIVE) || inventory.getType().equals(InventoryType.CRAFTING) || inventory.getType().equals(InventoryType.PLAYER)) {
 			final Player player = (Player) event.getWhoClicked();
 			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-
-			if (pm.isInSpawn() && player.getGameMode() != GameMode.CREATIVE) {
+			if (pm.isInSpawn() && player.getGameMode() != GameMode.CREATIVE || !pm.isInSpawn() && event.getInventory().getTitle().toLowerCase().contains("refill chest") && event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
 				event.setCancelled(true);
 				player.updateInventory();
 			}
@@ -63,7 +64,6 @@ public class InventoryListener implements Listener {
 		if (inventory.getType() != InventoryType.CHEST) {
 			return;
 		}
-		event.setCancelled(true);
 		final ItemStack item = event.getCurrentItem();
 		
 		if (item == null || item.getType() == null || item.getItemMeta() == null || item.getItemMeta().getDisplayName() == null) {
@@ -71,6 +71,7 @@ public class InventoryListener implements Listener {
 		}
 		final String title = ChatColor.stripColor(inventory.getTitle()).toLowerCase();
 		if (title.equals("ability selector")) {
+			event.setCancelled(true);
 			final Player player = (Player) event.getWhoClicked();
 			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 			final String itemName = item.getItemMeta().getDisplayName();
@@ -134,6 +135,7 @@ public class InventoryListener implements Listener {
 			return;
 		}
 		if (title.contains("settings")) {
+			event.setCancelled(true);
 			String itemName = ChatColor.stripColor(item.getItemMeta().getDisplayName().toLowerCase());
 			if (itemName.equals(" ") || itemName.length() < 3) {
 				return;
@@ -166,6 +168,7 @@ public class InventoryListener implements Listener {
 			return;
 		}
 		if (title.contains("slot")) {
+			event.setCancelled(true);
 			Player player = (Player) event.getWhoClicked();
 			PlayerSettings settings = PlayerManager.get(player.getUniqueId()).getSettings();
 			String titleSplitted = title.split(" ")[0];
@@ -185,25 +188,22 @@ public class InventoryListener implements Listener {
 		}
 		final Inventory inventory = event.getInventory();
 		final String title = ChatColor.stripColor(inventory.getTitle()).toLowerCase();
-		if (title.contains("refill chest") && !inventory.contains(Material.MUSHROOM_SOUP)) {
+		if (title.equals("refill chest") && !inventory.contains(Material.MUSHROOM_SOUP)) {
 			final Player player = (Player) event.getPlayer();
-			final Location playerLocation = player.getLocation();
-			Block ender = null;
+			Location enderLocation = null;
+			Block block = null;
 			
-	        for (int x = -5; x <= 5; x++) {
-	            for (int y = -4; y <= 4; y++) {
-	                for (int z = -5; z <= 5; z++) {
-	                    ender = playerLocation.getWorld().getBlockAt(playerLocation.getBlockX() + x, playerLocation.getBlockY() + y, playerLocation.getBlockZ() + z);
-
-	                    if (ender.getType() == Material.ENDER_CHEST) {
-	                        break;
-	                    }
-	                }
-	            }
+			for (int i = 0; i < 10; i++) {
+				block = player.getTargetBlock(null, i);
+				if (block.getType() == Material.ENDER_CHEST && block.getRelative(BlockFace.DOWN).getType() == Material.GLOWSTONE) {
+					enderLocation = block.getLocation();
+					break;
+				}
+			}
+	        if (enderLocation == null) {
+	        	return;
 	        }
-			final RefillInventoryManager im = RefillInventoryManager.get(inventory, ender.getLocation());
-			im.setCooldown(Long.valueOf(60L));
-			im.setFilled(false);
+			RefillInventoryManager.get(enderLocation).setCooldown(60L);
 		}
 	}
 }

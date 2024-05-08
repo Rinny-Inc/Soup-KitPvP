@@ -52,15 +52,14 @@ public class Monk extends Abilities implements Listener {
 	
 	@Override
 	public ItemStack[] armors() {
+		ItemStack[] armor = super.armors();
 		final ItemStack h = new ItemStack(Material.LEATHER_HELMET);
 		final LeatherArmorMeta meta = (LeatherArmorMeta) h.getItemMeta();
 		meta.setColor(Color.ORANGE);
 		h.setItemMeta(meta);
 		h.addUnsafeEnchantment(Enchantment.DURABILITY, 4);
-		final ItemStack c = new ItemStack(Material.IRON_CHESTPLATE);
-		final ItemStack l = new ItemStack(Material.IRON_LEGGINGS);
-		final ItemStack b = new ItemStack(Material.IRON_BOOTS);
-		return new ItemStack[] {b, l, c, h};
+		armor[3] = h;
+		return armor;
 	}
 
 	@EventHandler

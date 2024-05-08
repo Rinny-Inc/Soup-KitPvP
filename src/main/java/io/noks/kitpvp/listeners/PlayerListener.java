@@ -1,11 +1,8 @@
 package io.noks.kitpvp.listeners;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
 import java.util.UUID;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -42,10 +39,10 @@ import org.bukkit.util.Vector;
 
 import com.avaje.ebean.validation.NotNull;
 
-import io.noks.custom.utils.EntityNPC;
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.enums.RefreshType;
 import io.noks.kitpvp.managers.PlayerManager;
+import io.noks.kitpvp.managers.RefillInventoryManager;
 import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.managers.caches.CombatTag;
 import io.noks.kitpvp.managers.caches.Economy;
@@ -54,6 +51,7 @@ import io.noks.kitpvp.managers.caches.KoTH;
 import io.noks.kitpvp.managers.caches.Stats;
 import io.noks.kitpvp.task.MapTask;
 import io.noks.kitpvp.utils.Cuboid;
+import io.noks.utils.EntityNPC;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class PlayerListener implements Listener {
@@ -148,8 +146,10 @@ public class PlayerListener implements Listener {
 		if (this.mapTask == null) {
 			return;
 		}
-		final List<PlayerManager> playersInMap = PlayerManager.players.values().stream().filter(not(PlayerManager::isInSpawn)).collect(Collectors.toList());
-		if (playersInMap.isEmpty()) {
+		if (this.mapTask.playersInMap.contains(pm)) {
+			this.mapTask.playersInMap.remove(pm);
+		}
+		if (this.mapTask.playersInMap.isEmpty()) {
 			this.mapTask.clearTask();
 			this.mapTask = null;
 		}
@@ -195,16 +195,14 @@ public class PlayerListener implements Listener {
 					km.refreshScoreboardLine(RefreshType.CREDITS);
 				}
 			}
-
-			if (killedAbility.get().specialItem().getType() != Material.MUSHROOM_SOUP) {
-				Iterator<ItemStack> dropsIt = event.getDrops().iterator();
-				while (dropsIt.hasNext()) {
-					final ItemStack loot = (ItemStack) dropsIt.next();
-					if (!loot.getItemMeta().hasDisplayName())
-						continue;
-					dropsIt.remove();
-				}
+			Iterator<ItemStack> dropsIt = event.getDrops().iterator();
+			while (dropsIt.hasNext()) {
+				final ItemStack loot = (ItemStack) dropsIt.next();
+				// TODO: DO BETTER TO KNOW IF ITS THE ARMOR
+				if (killedAbility.get().specialItem() != loot || killedAbility.get().sword() != loot || killedAbility.get().armors()[0] != loot || killedAbility.get().armors()[1] != loot || killedAbility.get().armors()[2] != loot || killedAbility.get().armors()[3] != loot) continue;
+				dropsIt.remove();
 			}
+			
 			this.applySpawnProtection(killed, false);
 			pm.kill(false);
 			if (koth != null && koth.getPlayers().containsKey(killed.getUniqueId())) {
@@ -213,16 +211,11 @@ public class PlayerListener implements Listener {
 			if (this.mapTask == null) {
 				return;
 			}
-			final List<PlayerManager> playersInMap = PlayerManager.players.values().stream().filter(not(PlayerManager::isInSpawn)).collect(Collectors.toList());
-			if (playersInMap.isEmpty()) {
+			if (this.mapTask.playersInMap.isEmpty()) {
 				this.mapTask.clearTask();
 				this.mapTask = null;
 			}
 		}
-	}
-	
-	private static <T> Predicate<T> not(Predicate<T> p) { 
-		return p.negate();
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -251,7 +244,13 @@ public class PlayerListener implements Listener {
 				event.setUseItemInHand(Result.DENY);
 				final double newHealth = Math.min(player.getHealth() + 7.0D, player.getMaxHealth());
 				player.setHealth(newHealth);
-				player.getItemInHand().setType(Material.BOWL);
+				if (player.getItemInHand().getAmount() > 1) {
+					final int amount = player.getItemInHand().getAmount();
+					player.getInventory().addItem(new ItemStack(Material.BOWL, 1));
+					player.getItemInHand().setAmount(amount - 1);
+				} else {
+					player.getItemInHand().setType(Material.BOWL);
+				}
 				player.updateInventory();
 			} 
 		} 
@@ -269,22 +268,26 @@ public class PlayerListener implements Listener {
 		if (!event.hasItem()) {
 			return;
 		}
+		ItemStack item = event.getItem();
+		if (item.getItemMeta().getDisplayName() == null) {
+			return;
+		}
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			final Player player = event.getPlayer();
 			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 			if (!pm.isInSpawn()) {
 				return;
 			}
-			final String itemName = ChatColor.stripColor(event.getItem().getItemMeta().getDisplayName().toLowerCase());
-			if (player.getItemInHand().getType() == Material.ENCHANTED_BOOK && itemName.equals("ability selector")) {
+			final String itemName = ChatColor.stripColor(item.getItemMeta().getDisplayName().toLowerCase());
+			if (item.getType() == Material.ENCHANTED_BOOK && itemName.equals("ability selector")) {
 				player.openInventory(this.plugin.getInventoryManager().loadKitsInventory(player));
 				return;
 			}
-			if (player.getItemInHand().getType() == Material.WATCH && itemName.equals("settings")) {
+			if (item.getType() == Material.WATCH && itemName.equals("settings")) {
 				player.openInventory(this.plugin.getInventoryManager().loadSettingsInventory(player));
 				return;
 			}
-			if (player.getItemInHand().getType() == Material.SKULL_ITEM && itemName.equals("stats")) {
+			if (item.getType() == Material.SKULL_ITEM && itemName.equals("stats")) {
 				player.performCommand("stats");
 			}
 		}
@@ -353,6 +356,8 @@ public class PlayerListener implements Listener {
 		}
 	}
 
+	
+	// TODO: DO BETTER
 	@EventHandler
 	public void onWantRefill(PlayerInteractEvent event) {
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENDER_CHEST && event.getClickedBlock().getRelative(BlockFace.DOWN).getType() == Material.GLOWSTONE) {
@@ -360,7 +365,14 @@ public class PlayerListener implements Listener {
 
 			if (PlayerManager.get(player.getUniqueId()).getAbility().hasAbility()) {
 				event.setCancelled(true);
-				player.openInventory(this.plugin.getInventoryManager().loadRefillInventory(player));
+				final RefillInventoryManager im = RefillInventoryManager.get(event.getClickedBlock().getLocation());
+				if (im.hasCooldown()) {
+					return;
+				}
+				if (!im.isFilled()) {
+					im.setFilled(true);
+				}
+				player.openInventory(im.getInventory());
 			}
 		}
 	}
@@ -415,7 +427,7 @@ public class PlayerListener implements Listener {
 			}
 		}
 	}
-	private void applySpawnProtection(final Player player, final boolean remove) {
+	public void applySpawnProtection(final Player player, final boolean remove) {
 		for (Location loc : this.spawnCuboid.getEdgeLocations()) {
 			if (loc.getY() < 99) {
 				continue;
@@ -433,6 +445,17 @@ public class PlayerListener implements Listener {
 		}
 		if (!remove && this.mapTask == null) {
 			this.mapTask = new MapTask(this.plugin).startTask();
+			return;
+		}
+		if (this.mapTask != null) {
+			PlayerManager pm = PlayerManager.get(player.getUniqueId());
+			if (!remove && !this.mapTask.playersInMap.contains(pm)) {
+				this.mapTask.playersInMap.add(pm);
+				return;
+			}
+			if (this.mapTask.playersInMap.contains(pm)) {
+				this.mapTask.playersInMap.remove(pm);
+			}
 		}
 	}
 	

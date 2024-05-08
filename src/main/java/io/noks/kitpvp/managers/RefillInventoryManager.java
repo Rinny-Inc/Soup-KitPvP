@@ -1,47 +1,49 @@
 package io.noks.kitpvp.managers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.DecimalFormat;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.annotation.Nullable;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.block.Biome;
+import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
-import io.noks.custom.Hologram;
+import com.avaje.ebean.validation.NotNull;
+
+import io.noks.Hologram;
+import io.noks.kitpvp.Main;
 
 public class RefillInventoryManager {
-	public static final List<RefillInventoryManager> inventories = new ArrayList<RefillInventoryManager>();
+	public static final Set<RefillInventoryManager> inventories = new HashSet<RefillInventoryManager>();
+	public static @Nullable BukkitTask cooldownTask;
 	private Inventory inventory;
 	private boolean filled;
-	private Biome biome;
-	private Map<Biome, Long> cooldown;
-	private Hologram hologram;
+	private long cooldown;
+	private @NotNull final Location location;
+	private @NotNull Hologram hologram;
 
-	public RefillInventoryManager(Inventory inv, Location location) {
-		this.cooldown = new HashMap<Biome, Long>();
-		this.inventory = inv;
-		this.filled = false;
-		this.biome = location.getBlock().getBiome();
-		this.hologram = Bukkit.getServer().newHologram(location, null);
+	public RefillInventoryManager(Location location) {
+		this.cooldown = 0l;
+		this.location = location;
+		setFilled(true);
+		this.hologram = Bukkit.getServer().newHologram(location.clone().add(0.5, 1.5, 0.5), ChatColor.GREEN.toString() + ChatColor.BOLD + "Free Soup");
+		inventories.add(this);
 	}
-	
-	// countdown
-	// double cooldown = im.getCooldown().longValue() / 1000.0D;
-	// player.sendMessage(ChatColor.RED + "Refill ends in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 
-	public static RefillInventoryManager get(Inventory inv, Location location) {
-		final Biome biome = location.getBlock().getBiome();
+	public static RefillInventoryManager get(Location location) {
 		for (RefillInventoryManager im : inventories) {
-			if (im.getBiome().equals(biome)) {
+			if (im.getLocation().equals(location)) {
 				return im;
 			}
 		}
-		final RefillInventoryManager im = new RefillInventoryManager(inv, location);
-		inventories.add(im);
-		return im;
+		return new RefillInventoryManager(location);
 	}
 
 	public void remove() {
@@ -57,30 +59,71 @@ public class RefillInventoryManager {
 	}
 
 	public void setFilled(boolean filled) {
+		if (filled) {
+			if (this.inventory == null) {
+				this.inventory = Bukkit.createInventory(null, 54, ChatColor.DARK_AQUA + "Refill Chest");
+			}
+			final ItemStack soup = new ItemStack(Material.MUSHROOM_SOUP);
+			while (this.inventory.firstEmpty() != -1) {
+				this.inventory.addItem(soup);
+			}
+		}
 		this.filled = filled;
 	}
-
-	public Biome getBiome() {
-		return this.biome;
+	
+	public Location getLocation() {
+		return this.location;
 	}
-
-	public void setBiome(Biome biome) {
-		this.biome = biome;
+	
+	public String getHologramMessage() {
+		return this.hologram.getMessage();
+	}
+	
+	public void updateHologramMessage(String msg) {
+		this.hologram.setMessage(msg);
 	}
 
 	public Long getCooldown() {
-		if (this.cooldown.containsKey(this.biome))
-			return Long.valueOf(Math.max(0L, ((Long) this.cooldown.get(this.biome)).longValue() - System.currentTimeMillis()));
-		return Long.valueOf(0L);
+		return Long.valueOf(Math.max(0L, this.cooldown - System.currentTimeMillis()));
 	}
 
 	public void setCooldown(Long cooldown) {
-		this.cooldown.put(this.biome, Long.valueOf(System.currentTimeMillis() + cooldown.longValue() * 1000L));
+		if (cooldown != 0L && cooldownTask == null) {
+			//this.startTask();
+		}
+		this.cooldown = System.currentTimeMillis() + (cooldown * 1000L);
+		this.filled = false;
 	}
 
 	public boolean hasCooldown() {
-		if (!this.cooldown.containsKey(this.biome))
-			return false;
-		return (((Long) this.cooldown.get(this.biome)).longValue() > System.currentTimeMillis());
+		return this.cooldown > System.currentTimeMillis();
+	}
+	
+	private void startTask() {
+		cooldownTask = new BukkitRunnable() {
+			private final DecimalFormat format = new DecimalFormat("#.#");
+			private final int inventoriesSize = inventories.size();
+			
+			@Override
+			public void run() {
+				int inventoryNotCooldown = 0;
+				for (RefillInventoryManager invs : inventories) {
+					if (!invs.hasCooldown()) {
+						inventoryNotCooldown++;
+						if (!invs.getHologramMessage().contains("free")) {
+							invs.updateHologramMessage(ChatColor.GREEN.toString() + ChatColor.BOLD + "Free Soup");
+							invs.setFilled(true);
+						}
+						continue;
+					}
+					double cooldown = invs.getCooldown().longValue() / 1000.0D;
+					invs.updateHologramMessage(ChatColor.RED + format.format(cooldown) + "s");
+				}
+				if (inventoryNotCooldown == this.inventoriesSize) {
+					this.cancel();
+					cooldownTask = null;
+				}
+			}
+		}.runTaskTimerAsynchronously(Main.getInstance(), 0, 1);
 	}
 }
