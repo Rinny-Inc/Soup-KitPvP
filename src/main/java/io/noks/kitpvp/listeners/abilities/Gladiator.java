@@ -69,7 +69,7 @@ public class Gladiator extends Abilities implements Listener {
 					return;
 				}
 				final Ability clickedAbility = PlayerManager.get(r.getUniqueId()).getAbility();
-				if (clickedAbility.get() instanceof AntiGladiator) {
+				if (clickedAbility.ability() instanceof AntiGladiator) {
 					ability.applyCooldown();
 					return;
 				}

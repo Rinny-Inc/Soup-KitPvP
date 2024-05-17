@@ -3,6 +3,7 @@ package io.noks.kitpvp.abstracts;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -69,4 +70,6 @@ public abstract class Abilities {
 	}
 	
 	public void onKill(Player killer) {}
+	
+	public void onInteract(PlayerInteractEvent e) {}
 }

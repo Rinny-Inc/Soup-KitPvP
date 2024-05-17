@@ -43,7 +43,7 @@ public class Stomper extends Abilities implements Listener {
 					if (!(nearbyPlayers instanceof Player)) continue;
 					final Player nearby = (Player) nearbyPlayers;
 					if (!stomper.canSee(nearby) || !nearby.canSee(stomper))continue;
-					if (PlayerManager.get(nearby.getUniqueId()).getAbility().get() instanceof AntiStomper) {
+					if (PlayerManager.get(nearby.getUniqueId()).getAbility().ability() instanceof AntiStomper) {
 						continue;
 					}
 					if (nearby.isSneaking()) {

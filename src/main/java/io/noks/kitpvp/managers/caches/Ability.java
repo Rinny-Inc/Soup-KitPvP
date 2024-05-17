@@ -11,16 +11,16 @@ public class Ability {
 	private @Nullable Abilities ability;
 	private @NotNull Abilities selectedAbility;
 	private Long abilityCooldown;
-	private int abilityUseTime;
+	private boolean receivedEndCooldownMessage;
 	
 	public Ability() {
 		this.ability = null;
 		this.selectedAbility = new PvP();
 		this.abilityCooldown = 0L;
-		this.abilityUseTime = 0;
+		this.receivedEndCooldownMessage = false;
 	}
 
-	public Abilities get() {
+	public Abilities ability() {
 		return this.ability;
 	}
 
@@ -46,7 +46,6 @@ public class Ability {
 
 	public void remove() {
 		removeCooldown();
-		this.abilityUseTime = 0;
 		if (this.selectedAbility != this.ability) {
 			this.selectedAbility = this.ability;
 		}
@@ -61,6 +60,9 @@ public class Ability {
 	public void applyCooldown() {
 		if (!this.ability.hasCooldown()) return;
 		this.abilityCooldown = Long.valueOf(System.currentTimeMillis() + this.ability.getCooldown().longValue() * 1000L);
+		if (this.receivedEndCooldownMessage) {
+			this.receivedEndCooldownMessage = false;
+		}
 	}
 
 	public boolean hasActiveCooldown() {
@@ -72,16 +74,12 @@ public class Ability {
 		if (this.abilityCooldown == 0L) return;
 		this.abilityCooldown = 0L;
 	}
-
-	public int getUseTime() {
-		return this.abilityUseTime;
+	
+	public boolean hasReceivedEndCooldownMessage() {
+		return this.receivedEndCooldownMessage;
 	}
-
-	public void resetUseTime() {
-		this.abilityUseTime = 0;
-	}
-
-	public void addUseTime() {
-		this.abilityUseTime++;
+	
+	public void updateHasReceivedEndCooldownMessage() {
+		this.receivedEndCooldownMessage = !this.receivedEndCooldownMessage;
 	}
 }

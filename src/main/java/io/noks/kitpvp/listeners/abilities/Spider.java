@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -14,7 +13,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -59,43 +57,11 @@ public class Spider extends Abilities implements Listener {
 				p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 				return;
 			}
-			final Snowball web = p.getLocation().getWorld().spawn(p.getLocation().add(0, 1, 0), Snowball.class);
+			final Snowball web = p.launchProjectile(Snowball.class);
 			web.setShooter(p);
 			web.setMetadata("web", new FixedMetadataValue(this.main, Boolean.valueOf(true)));
 			web.setVelocity(p.getLocation().getDirection().multiply(2.5D));
 			ability.applyCooldown();
-		}
-	}
-	
-	@EventHandler
-	public void onProjectileLaunch(ProjectileLaunchEvent event) {
-		if (event.getEntity() instanceof Snowball && event.getEntity().getShooter() instanceof Player) {
-			final Player player = (Player) event.getEntity().getShooter();
-			final Ability pa = PlayerManager.get(player.getUniqueId()).getAbility();
-			
-			if (!pa.hasAbility(this)) {
-				return;
-			}
-			final Snowball ball = (Snowball) event.getEntity();
-			
-			if (ball.getMetadata("web") == null) {
-				return;
-			}
-			new BukkitRunnable() {
-				
-                @Override
-                public void run() {
-                    if (ball.isValid()) {
-                        Location location = ball.getLocation();
-                        location.getWorld().playEffect(location, org.bukkit.Effect.ZOMBIE_CHEW_IRON_DOOR, 1);
-                        if (location.getBlock().getType() != Material.AIR) {
-                            this.cancel();
-                        }
-                    } else {
-                        this.cancel();
-                    }
-                }
-            }.runTaskTimer(this.main, 1L, 2L);
 		}
 	}
 	

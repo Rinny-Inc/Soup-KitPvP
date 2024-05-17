@@ -13,7 +13,7 @@ import io.noks.kitpvp.managers.PlayerManager;
 
 public class SpawnCommand implements CommandExecutor {
 	
-	private Main main;
+	private final Main main;
 	public SpawnCommand(Main main) {
 		this.main = main;
 		main.getCommand("spawn").setExecutor(this);
@@ -47,8 +47,9 @@ public class SpawnCommand implements CommandExecutor {
 			
 			@Override
 			public void run() {
-				if (oldLocation.getX() != player.getLocation().getX() || oldLocation.getY() != player.getLocation().getY() || oldLocation.getZ() != player.getLocation().getZ()) {
+				if ((oldLocation.getBlockX() != player.getLocation().getBlockX() || oldLocation.getBlockY() != player.getLocation().getBlockY() || oldLocation.getBlockZ() != player.getLocation().getBlockZ()) || pm.hasCombatTag()) {
 					this.cancel();
+					player.sendMessage(ChatColor.RED + "Back to spawn cancelled!");
 					return;
 				}
 				ticks += 10;
@@ -58,8 +59,8 @@ public class SpawnCommand implements CommandExecutor {
 						pm.kill(true);
 						player.teleport(player.getLocation().getWorld().getSpawnLocation());
 						player.getInventory().clear();
-						player.getInventory().setContents(SpawnCommand.this.main.getItemUtils().getSpawnItems(player.getName()));
-						SpawnCommand.this.main.playerListener.applySpawnProtection(player, true);
+						player.getInventory().setContents(main.getItemUtils().getSpawnItems(player.getName()));
+						main.applySpawnProtection(player, true);
 						this.cancel();
 						return;
 					}

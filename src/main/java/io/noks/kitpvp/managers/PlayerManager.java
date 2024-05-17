@@ -333,10 +333,10 @@ public class PlayerManager {
 		}
 	}
 	
-	private String format(double sec) {
+	/*private String format(double sec) {
 	    int seconds = (int) sec;
 	    int milliseconds = (int) ((sec - seconds) * 1000);
 
 	    return String.format("%d.%03ds", seconds, milliseconds);
-	}
+	}*/
 }

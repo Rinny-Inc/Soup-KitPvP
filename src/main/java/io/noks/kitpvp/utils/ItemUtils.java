@@ -19,6 +19,7 @@ import org.bukkit.potion.PotionEffectType;
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.listeners.abilities.Archer;
 import io.noks.kitpvp.listeners.abilities.Chemist;
+import io.noks.kitpvp.listeners.abilities.Ninja;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.PlayerSettings;
 import io.noks.kitpvp.managers.caches.PlayerSettings.SlotType;
@@ -115,6 +116,10 @@ public class ItemUtils {
 			inv.addItem(new ItemStack(Material.MUSHROOM_SOUP));
 		}
 		player.updateInventory();
+		if (ability instanceof Ninja) {
+			player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
+			return;
+		}
 		player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0));
 	}
 }

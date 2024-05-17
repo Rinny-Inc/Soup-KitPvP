@@ -1,20 +1,18 @@
 package io.noks.kitpvp.listeners;
 
-import java.util.Iterator;
 import java.util.Random;
 import java.util.UUID;
-
-import javax.annotation.Nullable;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -30,14 +28,12 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
-
-import com.avaje.ebean.validation.NotNull;
 
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.enums.RefreshType;
@@ -47,24 +43,16 @@ import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.managers.caches.CombatTag;
 import io.noks.kitpvp.managers.caches.Economy;
 import io.noks.kitpvp.managers.caches.Economy.MoneyType;
-import io.noks.kitpvp.managers.caches.KoTH;
 import io.noks.kitpvp.managers.caches.Stats;
-import io.noks.kitpvp.task.MapTask;
-import io.noks.kitpvp.utils.Cuboid;
 import io.noks.utils.EntityNPC;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class PlayerListener implements Listener {
 	private final Main plugin;
-	private final Cuboid spawnCuboid;
-	private @NotNull MapTask mapTask;
-	private @Nullable KoTH koth;
 	
 	public PlayerListener(Main main) {
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
-		final World world = main.getServer().getWorld("world");
-		this.spawnCuboid = new Cuboid(new Location(world, -34, 96, 31), new Location(world, 23, 102, -15));
 	}
 
 	@EventHandler
@@ -98,7 +86,7 @@ public class PlayerListener implements Listener {
 		player.updateInventory();
 	}
 
-	@EventHandler
+	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onQuit(PlayerQuitEvent event) {
 		if (this.plugin.getConfigManager().sendJoinAndQuitMessageToOP && this.plugin.getServer().getOnlinePlayers().size() > 1) {
 		    this.plugin.getServer().getOnlinePlayers().stream().filter(opPlayers -> opPlayers.isOp()).forEach(opPlayers -> opPlayers.sendMessage(event.getQuitMessage()));
@@ -122,7 +110,7 @@ public class PlayerListener implements Listener {
 
 				if (killer != player) {
 					if (km.getAbility().hasAbility()) {
-						km.getAbility().get().onKill(killer);
+						km.getAbility().ability().onKill(killer);
 					}
 					killer.sendMessage(ChatColor.GREEN + "You have killed " + player.getDisplayName());
 
@@ -139,20 +127,16 @@ public class PlayerListener implements Listener {
 			}
 		}
 		pm.kill(false);
+		if (this.plugin.mapTask != null) {
+			if (this.plugin.mapTask.playersInMap.contains(pm)) {
+				this.plugin.mapTask.playersInMap.remove(pm);
+			}
+			if (this.plugin.mapTask.playersInMap.isEmpty()) {
+				this.plugin.mapTask.clearTask();
+				this.plugin.mapTask = null;
+			}
+		}
 		this.plugin.getDataBase().savePlayer(pm);
-		if (koth != null && koth.getPlayers().containsKey(player.getUniqueId())) {
-			koth.removePlayer(player.getUniqueId());
-		}
-		if (this.mapTask == null) {
-			return;
-		}
-		if (this.mapTask.playersInMap.contains(pm)) {
-			this.mapTask.playersInMap.remove(pm);
-		}
-		if (this.mapTask.playersInMap.isEmpty()) {
-			this.mapTask.clearTask();
-			this.mapTask = null;
-		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -162,23 +146,18 @@ public class PlayerListener implements Listener {
 		if (event.getEntity() instanceof Player) {
 			final Player killed = event.getEntity();
 			final PlayerManager pm = PlayerManager.get(killed.getUniqueId());
-			final Ability killedAbility = pm.getAbility();
 
 			if (killed.getItemOnCursor() != null) {
 				killed.setItemOnCursor(null);
-			}
-			if (!killedAbility.hasAbility()) {
-				event.getDrops().clear();
-				return;
 			}
 			if (pm.hasCombatTag()) {
 				final PlayerManager km = PlayerManager.get(pm.getCurrentCombatTag().getLastAttackerUUID());
 				final Player killer = km.getPlayer();
 
-				killed.sendMessage(ChatColor.RED + "You have been killed by" + killer.getDisplayName());
+				killed.sendMessage(ChatColor.RED + "You have been killed by " + killer.getDisplayName());
 				if (killer != killed) {
 					if (km.getAbility().hasAbility()) {
-						km.getAbility().get().onKill(killer);
+						km.getAbility().ability().onKill(killer);
 					}
 					if (killer != null) {
 						killer.sendMessage(ChatColor.GREEN + "You have killed " + killed.getDisplayName());
@@ -195,25 +174,19 @@ public class PlayerListener implements Listener {
 					km.refreshScoreboardLine(RefreshType.CREDITS);
 				}
 			}
-			Iterator<ItemStack> dropsIt = event.getDrops().iterator();
-			while (dropsIt.hasNext()) {
-				final ItemStack loot = (ItemStack) dropsIt.next();
-				// TODO: DO BETTER TO KNOW IF ITS THE ARMOR
-				if (killedAbility.get().specialItem() != loot || killedAbility.get().sword() != loot || killedAbility.get().armors()[0] != loot || killedAbility.get().armors()[1] != loot || killedAbility.get().armors()[2] != loot || killedAbility.get().armors()[3] != loot) continue;
-				dropsIt.remove();
+			event.getDrops().clear();
+			int random = new Random().nextInt(10) + 10;
+			for (int i = 0; i < random; i++) {
+				event.getDrops().add(new ItemStack(Material.MUSHROOM_SOUP, 1));
 			}
-			
-			this.applySpawnProtection(killed, false);
+			this.plugin.applySpawnProtection(killed, false);
 			pm.kill(false);
-			if (koth != null && koth.getPlayers().containsKey(killed.getUniqueId())) {
-				koth.removePlayer(killed.getUniqueId());
-			}
-			if (this.mapTask == null) {
+			if (this.plugin.mapTask == null) {
 				return;
 			}
-			if (this.mapTask.playersInMap.isEmpty()) {
-				this.mapTask.clearTask();
-				this.mapTask = null;
+			if (this.plugin.mapTask.playersInMap.isEmpty()) {
+				this.plugin.mapTask.clearTask();
+				this.plugin.mapTask = null;
 			}
 		}
 	}
@@ -230,7 +203,7 @@ public class PlayerListener implements Listener {
 		player.setExp(0.0F);
 		player.getInventory().setContents(this.plugin.getItemUtils().getSpawnItems(player.getName()));
 		player.updateInventory();
-		this.applySpawnProtection(player, true);
+		this.plugin.applySpawnProtection(player, true);
 	}
 
 	@EventHandler
@@ -276,6 +249,7 @@ public class PlayerListener implements Listener {
 			final Player player = event.getPlayer();
 			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 			if (!pm.isInSpawn()) {
+				pm.getAbility().ability().onInteract(event);
 				return;
 			}
 			final String itemName = ChatColor.stripColor(item.getItemMeta().getDisplayName().toLowerCase());
@@ -304,23 +278,27 @@ public class PlayerListener implements Listener {
 			event.setCancelled(true);
 			return;
 		}
-		final ItemStack dropppedItem = event.getItemDrop().getItemStack();
-		if (dropppedItem.getType() == Material.MUSHROOM_SOUP) return;
-		if (dropppedItem.getType() == pm.getAbility().get().specialItem().getType()) {
+		final ItemStack droppedItem = event.getItemDrop().getItemStack();
+		if (droppedItem.getType() == Material.BOWL) {
+			event.getItemDrop().remove();
+			return;
+		}
+		/*if (droppedItem == pm.getAbility().ability().sword()) {
+			int swords = 0;
+			for (ItemStack item : player.getInventory().getContents()) {
+				if (item == droppedItem) {
+					swords++;
+				}
+			}
+			if (swords == 1) {
+				event.setCancelled(true);
+			}
+			return;
+		}*/
+		if (pm.getAbility().ability().specialItem().getType() != Material.MUSHROOM_SOUP && droppedItem.getType() == pm.getAbility().ability().specialItem().getType()) {
 			event.setCancelled(true);
 			return;
 		}
-			/*if (dropppedItem.getType().toString().toLowerCase().contains("sword")) {
-				int swords = 0;
-				for (ItemStack item : player.getInventory().getContents()) {
-					if (item.getType().toString().toLowerCase().contains("sword")) {
-						swords++;
-					}
-				}
-				if (swords == 1) {
-					event.setCancelled(true);
-				}
-			}*/
 	}
 	
 	// TODO: remake with critical damage and enchantment
@@ -344,6 +322,10 @@ public class PlayerListener implements Listener {
 
 	@EventHandler
 	public void onDamage(EntityDamageEvent event) {
+		if (event.getEntity() instanceof Villager) {
+			event.setCancelled(true);
+			return;
+		}
 		if (event.getEntity() instanceof Player) {
 			final Player player = (Player) event.getEntity();
 			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
@@ -357,34 +339,46 @@ public class PlayerListener implements Listener {
 	}
 
 	
-	// TODO: DO BETTER
 	@EventHandler
 	public void onWantRefill(PlayerInteractEvent event) {
-		if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENDER_CHEST && event.getClickedBlock().getRelative(BlockFace.DOWN).getType() == Material.GLOWSTONE) {
-			final Player player = event.getPlayer();
-
-			if (PlayerManager.get(player.getUniqueId()).getAbility().hasAbility()) {
-				event.setCancelled(true);
-				final RefillInventoryManager im = RefillInventoryManager.get(event.getClickedBlock().getLocation());
-				if (im.hasCooldown()) {
-					return;
+		if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.WALL_SIGN && event.getClickedBlock().getState() instanceof Sign) {
+			final Block signBlock = event.getClickedBlock(); 
+			final Sign sign = (Sign) event.getClickedBlock().getState();
+			final Block block = this.getBlockBehindSign(signBlock, sign);
+			if (block.getType() == Material.GLOWSTONE && block.getRelative(BlockFace.UP).getType() == Material.WOOL) {
+				final Player player = event.getPlayer();
+				// GET THE SIGN LINES
+				if (PlayerManager.get(player.getUniqueId()).getAbility().hasAbility()) {
+					Location loc = block.getLocation();
+					final RefillInventoryManager im = RefillInventoryManager.get(loc);
+					if (im.hasCooldown()) {
+						return;
+					}
+					if (!im.isFilled()) {
+						im.setFilled(true);
+					}
+					player.openInventory(im.getInventory());
 				}
-				if (!im.isFilled()) {
-					im.setFilled(true);
-				}
-				player.openInventory(im.getInventory());
 			}
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onPortalTook(PlayerPortalEvent event) {
-		if (this.koth == null) {
-			event.setCancelled(true);
-			return;
-		}
-		// TODO: Portal TP
-	}
+	private Block getBlockBehindSign(Block signBlock, Sign sign) {
+        MaterialData signData = sign.getData();
+
+        switch (signData.getData()) {
+            case 2:
+                return signBlock.getRelative(0, 0, 1);
+            case 3:
+                return signBlock.getRelative(0, 0, -1);
+            case 4:
+                return signBlock.getRelative(1, 0, 0);
+            case 5:
+                return signBlock.getRelative(-1, 0, 0);
+            default:
+                return null;
+        }
+    }
 	
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onMove(PlayerMoveEvent event) {
@@ -393,24 +387,14 @@ public class PlayerListener implements Listener {
 			return;
 		}
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-		if (pm.isInSpawn() && !this.spawnCuboid.isIn(player.getLocation())) {
+		if (pm.isInSpawn() && !this.plugin.spawnCuboid().isIn(player.getLocation())) {
 			final Ability ability = pm.getAbility();
 			ability.set(ability.getSelected());
-			this.plugin.getItemUtils().giveEquipment(player, ability.get());
-			this.applySpawnProtection(player, false);
+			this.plugin.getItemUtils().giveEquipment(player, ability.ability());
+			this.plugin.applySpawnProtection(player, false);
 			return;
 		}
 		if (!pm.isInSpawn()) {
-			if (koth != null) {
-				if (koth.getPlayers().containsKey(player.getUniqueId()) && !koth.isLocationInZone(player.getLocation())) {
-					koth.removePlayer(player.getUniqueId());
-					return;
-				}
-				if (!koth.getPlayers().containsKey(player.getUniqueId()) && koth.isLocationInZone(player.getLocation())) {
-					koth.addPlayer(player.getUniqueId());
-					return;
-				}
-			}
 			final Block sponge = event.getTo().getBlock().getRelative(BlockFace.DOWN);
 			if (sponge.getType() == Material.SPONGE) {
 				final Block signBlock = sponge.getLocation().getBlock().getRelative(BlockFace.DOWN);
@@ -423,43 +407,9 @@ public class PlayerListener implements Listener {
 				try {
 					final double multiplier = Double.parseDouble(firstLine);
 					player.setVelocity(new Vector(0, multiplier, 0));
+					player.playSound(player.getLocation(), Sound.CHICKEN_EGG_POP, 1.0f, 1.0f);
 				} catch (NumberFormatException e) {}
 			}
 		}
-	}
-	public void applySpawnProtection(final Player player, final boolean remove) {
-		for (Location loc : this.spawnCuboid.getEdgeLocations()) {
-			if (loc.getY() < 99) {
-				continue;
-			}
-			Block block = loc.getBlock();
-			
-			if (block.getType() != Material.AIR) {
-				continue;
-			}
-			if (!remove) {
-				player.sendBlockChange(loc, Material.STAINED_GLASS.getId(), (byte)14);
-				continue;
-			}
-			player.sendBlockChange(loc, 0, (byte)0);
-		}
-		if (!remove && this.mapTask == null) {
-			this.mapTask = new MapTask(this.plugin).startTask();
-			return;
-		}
-		if (this.mapTask != null) {
-			PlayerManager pm = PlayerManager.get(player.getUniqueId());
-			if (!remove && !this.mapTask.playersInMap.contains(pm)) {
-				this.mapTask.playersInMap.add(pm);
-				return;
-			}
-			if (this.mapTask.playersInMap.contains(pm)) {
-				this.mapTask.playersInMap.remove(pm);
-			}
-		}
-	}
-	
-	public MapTask getMapTask() {
-		return this.mapTask;
 	}
 }

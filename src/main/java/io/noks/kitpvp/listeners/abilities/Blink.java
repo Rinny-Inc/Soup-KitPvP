@@ -8,8 +8,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -21,15 +19,14 @@ import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Ability;
 
-public class Blink extends Abilities implements Listener {
+public class Blink extends Abilities {
 	private Main plugin;
-	private int maxUseTime;
+	private int amountUsed;
 
 	public Blink(Main main) {
 		super("Blink", new ItemStack(Material.NETHER_STAR), Rarity.UNCOMMON, 15L, new String[] { ChatColor.AQUA + "Use your star to get", ChatColor.AQUA + "away from dangerous situations" });
-		this.maxUseTime = 3;
+		this.amountUsed = 0;
 		this.plugin = main;
-		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}
 	
 	@Override
@@ -42,8 +39,8 @@ public class Blink extends Abilities implements Listener {
 		return "Blink Star";
 	}
 
-	@EventHandler
-	public void onBlink(PlayerInteractEvent e) {
+	@Override
+	public void onInteract(PlayerInteractEvent e) {
 		if (!e.hasItem()) {
 			return;
 		}
@@ -58,7 +55,7 @@ public class Blink extends Abilities implements Listener {
 			}
 			final Block block = p.getTargetBlock(null, 10);
 			if (block.getType() != Material.AIR) return;
-			ability.addUseTime();
+			amountUsed++;
 			block.setType(Material.LEAVES_2);
 			p.teleport(new Location(block.getWorld(), block.getX() + 0.5D, block.getY() + 1.5D, block.getZ() + 0.5D, p.getLocation().getYaw(), p.getLocation().getPitch()));
 			p.getWorld().spawnEntity(p.getLocation(), EntityType.FIREWORK);
@@ -70,9 +67,9 @@ public class Blink extends Abilities implements Listener {
 					block.setType(Material.AIR);
 				}
 			}.runTaskLaterAsynchronously(this.plugin, 100L);
-			if (ability.getUseTime() == this.maxUseTime) {
+			if (amountUsed == 3) {
 				ability.applyCooldown();
-				ability.resetUseTime();
+				amountUsed = 0;
 			}
 		}
 	}

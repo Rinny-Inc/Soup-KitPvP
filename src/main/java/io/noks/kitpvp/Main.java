@@ -12,7 +12,10 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
+import org.bukkit.entity.Villager.Profession;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -44,8 +47,10 @@ import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.RefillInventoryManager;
 import io.noks.kitpvp.managers.TournamentManager;
 import io.noks.kitpvp.managers.caches.Feast;
+import io.noks.kitpvp.task.MapTask;
 import io.noks.kitpvp.task.event.EventsTask;
 import io.noks.kitpvp.task.event.FallenGolemTask;
+import io.noks.kitpvp.utils.Cuboid;
 import io.noks.kitpvp.utils.ItemUtils;
 import io.noks.kitpvp.utils.MathUtils;
 import io.noks.kitpvp.utils.Messages;
@@ -61,8 +66,9 @@ public class Main extends JavaPlugin {
 	private @NotNull Messages messages;
 	private @NotNull EventsTask eventsTask;
 	public @Nullable Feast feast = null;
-	public @NotNull PlayerListener playerListener;
 	public @NotNull HologramManager hologramManager;
+	private @NotNull Cuboid spawnCuboid;
+	public @Nullable MapTask mapTask = null;
 	
 	private static Main instance;
 	public static Main getInstance() {
@@ -71,6 +77,8 @@ public class Main extends JavaPlugin {
 
 	public void onEnable() {
 		instance = this;
+		final World world = this.getServer().getWorld("world");
+		this.spawnCuboid = new Cuboid(new Location(world, -34, 96, 31), new Location(world, 23, 102, -15));
 		this.mathUtils = new MathUtils();
 		this.getConfig().options().copyDefaults(true);
 		this.saveDefaultConfig();
@@ -85,21 +93,12 @@ public class Main extends JavaPlugin {
 		this.registerCommands();
 		this.eventsTask = new EventsTask(this); // TODO: need to execute it (see in class)
 		this.hologramManager = new HologramManager();
-		final World world = this.getServer().getWorld("world");
 		this.getServer().newHologram(new Location(world, 5.5, 102, -5.5), ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "Active Event");
 		this.getServer().newHologram(new Location(world, 5.5, 101.7, -5.5), ChatColor.RED + "Coming Soon :)");
-		/*final String fs = "ewogICJ0aW1lc3RhbXAiIDogMTY5NzQzMDY1NjUxOCwKICAicHJvZmlsZUlkIiA6ICIzNWIxMjg0OWYxYTY0YTc4YTM0ZTMyMzc5NjIxOGNmMiIsCiAgInByb2ZpbGVOYW1lIiA6ICJOb2tzaW8iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTBmYjhkZmMyNTliZmIxYzBlZGIzNGFlYmNlMmVkZjQ2YmFjZWEzNTQ2ODllOTQ1ZDFkMDAwNWM5NWRhZmMwZCIKICAgIH0sCiAgICAiQ0FQRSIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjM0MGMwZTAzZGQyNGExMWIxNWE4YjMzYzJhN2U5ZTMyYWJiMjA1MWIyNDgxZDBiYTdkZWZkNjM1Y2E3YTkzMyIKICAgIH0KICB9Cn0=";
-		final String ss = "Edwcaev9uctdzc8q2r3SOfn4It5x735SNf4tHP7kZJ3hGY7F+Aa/9kXkMVAbBokWWkQ71ZdXbg7K4NRK0++gu4OJ8WBaPLYVA5GXzBpYS4XMChitweEkqoeV58Gb4F4FxOEdbRckwnGXEyCqC8lobLXhz1sOn7e5DC7DqX0GElS3dp4RpzV7jWrqVeMTw1dRZZ2Wfqr2rixf5zWEagJSPyzh9hqZPbp6wygZToLya9w+7jzfgM0QOD8M85N+awRuAU90VVcvB2TG4ekB6SjYqt+GC0YTD/Yoy2wY4R9Nf5v6Vc1M+VXITqtKQ2Ie5vsmJaDc0X+fkGZrFNj+5HPo5qXbW/BITGhwVRooOF5tI2xv+ecK0suj7XWRk34yu/eJSf2z4rNod6YZaaVjm6NCJtlOuklUC4aXScjIXdr1a5ag49TaWa/JC8yDdkmKCWTADKzrl0MotarIchUL6SZPZMCw+mO+yzW0qyYs5WlBaMo9B4p9MYRSba3+xtTd2m0ZIvty1JhVfUDOH+wQ35nDmemqThJh32DoWas761iiWhSfGnMIxmm/4oifP74jIk9KzrwDmlcZWAgKwsNVfpyb3DypQWWRwZdn/ntdVnFMjorISd+nIDauCV9lD6iZXgd+mH9eZaVjUa2FDyCs3S7bOjDELA6f3SmWzbhtRKCkOSQ=";
-		world.spawnNPC(UUID.randomUUID(), "Storage", fs, ss, new Location(world, -19.5, 99.0D, 8.5D, -63.0F, 0.0F));
-		world.spawnNPC(UUID.randomUUID(), "Battle Pass", fs, ss, new Location(world, -17.5, 99.0D, 5.5D, -49.0F, 0.0F));
-		world.spawnNPC(UUID.randomUUID(), "Shop", fs, ss, new Location(world, -13.5, 99.0D, -0.5D, -54.0F, 0.0F));*/
-		this.initRefillChest();
+		this.spawnNPC(world);
 	}
 
 	public void onDisable() {
-		if (this.playerListener.getMapTask() != null) {
-			this.playerListener.getMapTask().clearTask();
-		}
 		final World world = Bukkit.getWorld("world");
 		if (this.feast != null) {
 			this.feast.clearFeast();
@@ -108,13 +107,25 @@ public class Main extends JavaPlugin {
 		while (worldentities.hasNext()) {
 			Entity entity = worldentities.next();
 			
-			if (entity == null || !(entity instanceof Item)) {
+			if (entity == null) {
 				continue;
 			}
 			entity.remove();
 		}
+		this.getServer().getScheduler().cancelAllTasks();
 		PlayerManager.players.clear();
-		RefillInventoryManager.inventories.clear();
+		if (!RefillInventoryManager.inventories.isEmpty()) {
+			for (RefillInventoryManager invs : RefillInventoryManager.inventories) {
+				Block blockAbove = invs.getLocation().getBlock().getRelative(BlockFace.UP);
+				if (blockAbove.getData() != (byte)5) {
+					blockAbove.setTypeIdAndData(35, (byte)5, false);
+				}
+			}
+			RefillInventoryManager.inventories.clear();
+		}
+		if (RefillInventoryManager.cooldownTask != null) {
+			RefillInventoryManager.cooldownTask = null;
+		}
 		if (this.database.getHikari() != null) {
 			this.database.getHikari().close();
 		}
@@ -136,7 +147,7 @@ public class Main extends JavaPlugin {
 	}
 	
 	private void registerListeners() {
-		this.playerListener = new PlayerListener(this);
+		new PlayerListener(this);
 		new ServerListener(this);
 		new InventoryListener(this);
 		getServer().getPluginManager().registerEvents(new FallenGolemTask(), this);
@@ -157,26 +168,20 @@ public class Main extends JavaPlugin {
 		new SpawnCommand(this);
 	}
 	
-	private void initRefillChest() {
-		final int RADIUS = 200;
-		final World world = this.getServer().getWorld("world");
-        // Get the center coordinates
-        int centerX = world.getSpawnLocation().getBlockX();
-        int centerZ = world.getSpawnLocation().getBlockZ();
-
-        // Loop within the specified radius
-        for (int x = centerX - RADIUS; x <= centerX + RADIUS; x++) {
-            for (int z = centerZ - RADIUS; z <= centerZ + RADIUS; z++) {
-                Block block = world.getHighestBlockAt(x, z);
-                if (block.getType() == Material.AIR) {
-                    continue;
-                }
-                // Check if the block is an ender chest
-                if (block.getType() == Material.ENDER_CHEST && block.getRelative(BlockFace.DOWN).getType() == Material.GLOWSTONE) {
-                	new RefillInventoryManager(block.getLocation());
-                }
-            }
-        }
+	private void spawnNPC(World world) {
+		final Villager shopVillager = (Villager) world.spawnEntity(new Location(world, -13.5, 99.0D, -0.5D, -54.0F, 0.0F), EntityType.VILLAGER);
+		shopVillager.setAdult();
+		shopVillager.setProfession(Profession.LIBRARIAN);
+		shopVillager.setCustomName("Shop");
+		shopVillager.setCustomNameVisible(true);
+		shopVillager.clearAIGoals();
+		shopVillager.setRemoveWhenFarAway(false);
+		shopVillager.setCanPickupItems(false);
+		
+		/*final String fs = "ewogICJ0aW1lc3RhbXAiIDogMTY5NzQzMDY1NjUxOCwKICAicHJvZmlsZUlkIiA6ICIzNWIxMjg0OWYxYTY0YTc4YTM0ZTMyMzc5NjIxOGNmMiIsCiAgInByb2ZpbGVOYW1lIiA6ICJOb2tzaW8iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTBmYjhkZmMyNTliZmIxYzBlZGIzNGFlYmNlMmVkZjQ2YmFjZWEzNTQ2ODllOTQ1ZDFkMDAwNWM5NWRhZmMwZCIKICAgIH0sCiAgICAiQ0FQRSIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjM0MGMwZTAzZGQyNGExMWIxNWE4YjMzYzJhN2U5ZTMyYWJiMjA1MWIyNDgxZDBiYTdkZWZkNjM1Y2E3YTkzMyIKICAgIH0KICB9Cn0=";
+		final String ss = "Edwcaev9uctdzc8q2r3SOfn4It5x735SNf4tHP7kZJ3hGY7F+Aa/9kXkMVAbBokWWkQ71ZdXbg7K4NRK0++gu4OJ8WBaPLYVA5GXzBpYS4XMChitweEkqoeV58Gb4F4FxOEdbRckwnGXEyCqC8lobLXhz1sOn7e5DC7DqX0GElS3dp4RpzV7jWrqVeMTw1dRZZ2Wfqr2rixf5zWEagJSPyzh9hqZPbp6wygZToLya9w+7jzfgM0QOD8M85N+awRuAU90VVcvB2TG4ekB6SjYqt+GC0YTD/Yoy2wY4R9Nf5v6Vc1M+VXITqtKQ2Ie5vsmJaDc0X+fkGZrFNj+5HPo5qXbW/BITGhwVRooOF5tI2xv+ecK0suj7XWRk34yu/eJSf2z4rNod6YZaaVjm6NCJtlOuklUC4aXScjIXdr1a5ag49TaWa/JC8yDdkmKCWTADKzrl0MotarIchUL6SZPZMCw+mO+yzW0qyYs5WlBaMo9B4p9MYRSba3+xtTd2m0ZIvty1JhVfUDOH+wQ35nDmemqThJh32DoWas761iiWhSfGnMIxmm/4oifP74jIk9KzrwDmlcZWAgKwsNVfpyb3DypQWWRwZdn/ntdVnFMjorISd+nIDauCV9lD6iZXgd+mH9eZaVjUa2FDyCs3S7bOjDELA6f3SmWzbhtRKCkOSQ=";
+		world.spawnNPC(UUID.randomUUID(), "Storage", fs, ss, new Location(world, -19.5, 99.0D, 8.5D, -63.0F, 0.0F));
+		world.spawnNPC(UUID.randomUUID(), "Battle Pass", fs, ss, new Location(world, -17.5, 99.0D, 5.5D, -49.0F, 0.0F));*/
 	}
 	
 	public MathUtils getMathUtils() {
@@ -217,5 +222,47 @@ public class Main extends JavaPlugin {
 	
 	public HologramManager getHologramManager() {
 		return this.hologramManager;
+	}
+	
+	public Cuboid spawnCuboid() {
+		return this.spawnCuboid;
+	}
+	
+	public void applySpawnProtection(Player player, boolean remove) {
+		for (Location loc : spawnCuboid.getEdgeLocations()) {
+			if (loc.getY() < 99) {
+				continue;
+			}
+			Block block = loc.getBlock();
+			
+			if (block.getType() != Material.AIR) {
+				continue;
+			}
+			if (!remove) {
+				player.sendBlockChange(loc, Material.STAINED_GLASS.getId(), (byte)14);
+				continue;
+			}
+			player.sendBlockChange(loc, 0, (byte)0);
+		}
+		if (mapTask == null && !remove) {
+			mapTask = new MapTask(this).startTask();
+			return;
+		}
+		if (mapTask != null) {
+			PlayerManager pm = PlayerManager.get(player.getUniqueId());
+			if (!remove) {
+				if (!mapTask.playersInMap.contains(pm)) {
+					mapTask.playersInMap.add(pm);
+				}
+				return;
+			}
+			if (mapTask.playersInMap.contains(pm)) {
+				mapTask.playersInMap.remove(pm);
+			}
+			if (mapTask.playersInMap.isEmpty()) {
+				this.mapTask.clearTask();
+				this.mapTask = null;
+			}
+		}
 	}
 }

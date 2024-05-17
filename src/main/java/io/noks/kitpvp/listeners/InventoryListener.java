@@ -120,9 +120,10 @@ public class InventoryListener implements Listener {
 					return;
 				}
 				player.closeInventory();
-				int random = (new Random()).nextInt(abilities.size());
+				final int random = (new Random()).nextInt(abilities.size());
 				pm.getAbility().setSelected(this.plugin.getAbilitiesManager().getAbilityFromName(abilities.get(random)));
-				player.sendMessage(ChatColor.GRAY + "You've chosen " + pm.getAbility().get().getRarity().getColor() + pm.getAbility().get().getName() + ChatColor.GRAY + " ability.");
+				final Abilities ab = pm.getAbility().ability();
+				player.sendMessage(ChatColor.GRAY + "You've chosen " + ab.getRarity().getColor() + ab.getName() + ChatColor.GRAY + " ability.");
 				abilities.clear();
 				return;
 			}
@@ -190,20 +191,20 @@ public class InventoryListener implements Listener {
 		final String title = ChatColor.stripColor(inventory.getTitle()).toLowerCase();
 		if (title.equals("refill chest") && !inventory.contains(Material.MUSHROOM_SOUP)) {
 			final Player player = (Player) event.getPlayer();
-			Location enderLocation = null;
+			Location location = null;
 			Block block = null;
 			
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < 8; i++) {
 				block = player.getTargetBlock(null, i);
-				if (block.getType() == Material.ENDER_CHEST && block.getRelative(BlockFace.DOWN).getType() == Material.GLOWSTONE) {
-					enderLocation = block.getLocation();
+				if (block.getType() == Material.GLOWSTONE && block.getRelative(BlockFace.UP).getType() == Material.WOOL) {
+					location = block.getLocation();
 					break;
 				}
 			}
-	        if (enderLocation == null) {
+	        if (location == null) {
 	        	return;
 	        }
-			RefillInventoryManager.get(enderLocation).setCooldown(60L);
+			RefillInventoryManager.get(location).setCooldown(60L);
 		}
 	}
 }

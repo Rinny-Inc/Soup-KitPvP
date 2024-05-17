@@ -1,6 +1,5 @@
 package io.noks.kitpvp.managers;
 
-import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,6 +9,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -17,23 +18,21 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.avaje.ebean.validation.NotNull;
 
-import io.noks.Hologram;
 import io.noks.kitpvp.Main;
 
 public class RefillInventoryManager {
 	public static final Set<RefillInventoryManager> inventories = new HashSet<RefillInventoryManager>();
 	public static @Nullable BukkitTask cooldownTask;
-	private Inventory inventory;
-	private boolean filled;
+	private @Nullable Inventory inventory;
 	private long cooldown;
 	private @NotNull final Location location;
-	private @NotNull Hologram hologram;
+	private @NotNull Block wool;
 
 	public RefillInventoryManager(Location location) {
 		this.cooldown = 0l;
 		this.location = location;
+		this.wool = location.getBlock().getRelative(BlockFace.UP);
 		setFilled(true);
-		this.hologram = Bukkit.getServer().newHologram(location.clone().add(0.5, 1.5, 0.5), ChatColor.GREEN.toString() + ChatColor.BOLD + "Free Soup");
 		inventories.add(this);
 	}
 
@@ -55,7 +54,7 @@ public class RefillInventoryManager {
 	}
 
 	public boolean isFilled() {
-		return this.filled;
+		return this.inventory != null;
 	}
 
 	public void setFilled(boolean filled) {
@@ -68,19 +67,10 @@ public class RefillInventoryManager {
 				this.inventory.addItem(soup);
 			}
 		}
-		this.filled = filled;
 	}
 	
 	public Location getLocation() {
 		return this.location;
-	}
-	
-	public String getHologramMessage() {
-		return this.hologram.getMessage();
-	}
-	
-	public void updateHologramMessage(String msg) {
-		this.hologram.setMessage(msg);
 	}
 
 	public Long getCooldown() {
@@ -89,10 +79,11 @@ public class RefillInventoryManager {
 
 	public void setCooldown(Long cooldown) {
 		if (cooldown != 0L && cooldownTask == null) {
-			//this.startTask();
+			this.startTask();
 		}
 		this.cooldown = System.currentTimeMillis() + (cooldown * 1000L);
-		this.filled = false;
+		this.inventory = null;
+		this.wool.setTypeIdAndData(35, (byte)14, false);
 	}
 
 	public boolean hasCooldown() {
@@ -101,7 +92,6 @@ public class RefillInventoryManager {
 	
 	private void startTask() {
 		cooldownTask = new BukkitRunnable() {
-			private final DecimalFormat format = new DecimalFormat("#.#");
 			private final int inventoriesSize = inventories.size();
 			
 			@Override
@@ -110,20 +100,21 @@ public class RefillInventoryManager {
 				for (RefillInventoryManager invs : inventories) {
 					if (!invs.hasCooldown()) {
 						inventoryNotCooldown++;
-						if (!invs.getHologramMessage().contains("free")) {
-							invs.updateHologramMessage(ChatColor.GREEN.toString() + ChatColor.BOLD + "Free Soup");
+						if (wool.getData() != (byte) 5) {
+							wool.setTypeIdAndData(35, (byte)5, false);
 							invs.setFilled(true);
 						}
 						continue;
 					}
-					double cooldown = invs.getCooldown().longValue() / 1000.0D;
-					invs.updateHologramMessage(ChatColor.RED + format.format(cooldown) + "s");
+					if (wool.getData() != (byte) 14) {
+						wool.setTypeIdAndData(35, (byte)14, false);
+					}
 				}
 				if (inventoryNotCooldown == this.inventoriesSize) {
 					this.cancel();
 					cooldownTask = null;
 				}
 			}
-		}.runTaskTimerAsynchronously(Main.getInstance(), 0, 1);
+		}.runTaskTimerAsynchronously(Main.getInstance(), 0, 20);
 	}
 }

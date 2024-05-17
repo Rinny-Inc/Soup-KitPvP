@@ -11,6 +11,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 
 import io.noks.kitpvp.Main;
+import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.RefreshType;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Ability;
@@ -25,9 +26,20 @@ public class MapTask extends BukkitRunnable {
 	
 	@Override
 	public void run() {
+		if (this.playersInMap.isEmpty()) {
+			this.clearTask();
+			return;
+		}
 		for (PlayerManager players : this.playersInMap) {
-			if (players.getAbility().get().hasCooldown() && players.getAbility().hasActiveCooldown()) {
-				this.updateXpBar(players, players.getAbility());
+			Ability am = players.getAbility();
+			if (am.ability() != null && am.ability().hasCooldown()) {
+				Abilities ability = am.ability();
+				if (am.hasActiveCooldown()) {
+					this.updateXpBar(players, ability);
+				} else if (!am.hasReceivedEndCooldownMessage()) {
+					players.getPlayer().sendMessage(ChatColor.GRAY + "You may now use " + ChatColor.RED + (ability.specialItem() != null ? ability.specialItemName() : ability.getName()));
+					am.updateHasReceivedEndCooldownMessage();
+				}
 			}
 			if (players.getPlayer().getScoreboard().getObjective(DisplaySlot.SIDEBAR) != null) {
 				players.refreshScoreboardLine(RefreshType.COMBATTAG);
@@ -35,10 +47,9 @@ public class MapTask extends BukkitRunnable {
 		}
 	}
 
-	
-	private void updateXpBar(PlayerManager pm, Ability ability) {
+	private void updateXpBar(PlayerManager pm, Abilities ability) {
 		Long activeCooldown = pm.getAbility().getActiveCooldown();
-	    float xpPercentage = Math.min(99.9f, ((float) activeCooldown / (ability.get().getCooldown() * 1000)) * 100);
+	    float xpPercentage = Math.min(99.9f, ((float) activeCooldown / (ability.getCooldown() * 1000)) * 100);
 	    if (xpPercentage < 0.0) {
 	    	xpPercentage = 0.0f;
 	    }
@@ -48,12 +59,9 @@ public class MapTask extends BukkitRunnable {
 	    	player.setLevel(level);
 	    }
 	    player.setExp(xpPercentage / 100);
-	    if (player.getLevel() == 0 && player.getExp() < 0.005f) {
-	    	player.sendMessage(ChatColor.GRAY + "You may now use " + ChatColor.RED + ability.get().specialItemName());
-	    }
 	}
 	
-	private static <T> Predicate<T> not(Predicate<T> p) { 
+	private <T> Predicate<T> not(Predicate<T> p) { 
 		return p.negate();
 	}
 	

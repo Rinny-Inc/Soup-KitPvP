@@ -4,11 +4,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import com.zaxxer.hikari.HikariDataSource;
 
 import io.noks.kitpvp.enums.PerksEnum;
+import io.noks.kitpvp.enums.RefreshType;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Economy;
 import io.noks.kitpvp.managers.caches.Perks;
@@ -17,6 +22,7 @@ import io.noks.kitpvp.managers.caches.PlayerSettings.SlotType;
 import io.noks.kitpvp.managers.caches.Stats;
 
 public class DBUtils {
+	private Map<RefreshType, Map<UUID, Integer>> leaderboard = new HashMap<RefreshType, Map<UUID, Integer>>(RefreshType.values().length);
 	private boolean connected = false;
 
 	private final String address;
@@ -171,6 +177,41 @@ public class DBUtils {
 				}
 			}
 		}
+	}
+	
+	public Map<UUID, Integer> getTopEloLadderList(RefreshType type){
+		return this.leaderboard.get(type);
+	}
+	private Map<UUID, Integer> getTopEloLadder(RefreshType type) {
+		if (!isConnected()) {
+			return null;
+		}
+		final Map<UUID, Integer> map = new LinkedHashMap<UUID, Integer>(10);
+		final String selectLine = "SELECT uuid," + type.getName().toLowerCase() + " FROM elo ORDER BY " + type.getName().toLowerCase() + " DESC LIMIT 10";
+		Connection connection = null;
+		try {
+			connection = this.hikari.getConnection();
+			final PreparedStatement statement = connection.prepareStatement(selectLine);
+			final ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				final UUID uuid = UUID.fromString(result.getString("uuid"));
+				final int elo = result.getInt(type.getName().toLowerCase());
+				map.put(uuid, elo);
+			}
+			result.close();
+			statement.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (connection != null) {
+				try {
+					connection.close();
+				} catch (SQLException ex) {
+					ex.printStackTrace();
+				}
+			}
+		}
+		return map.isEmpty() ? Collections.emptyMap() : map;
 	}
 
 	public HikariDataSource getHikari() {

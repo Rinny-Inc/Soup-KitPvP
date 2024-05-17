@@ -20,6 +20,7 @@ import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -201,6 +202,21 @@ public class ServerListener implements Listener {
 			return;
 		}
 		event.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onSignChange(SignChangeEvent event) {
+		final String[] lines = event.getLines();
+		if (lines[0].equals("fs")) {
+			event.setLine(0, null);
+			event.setLine(1, ChatColor.DARK_AQUA + "[Free Soup]");
+			if (lines[2] != null) {
+				event.setLine(2, null);
+			}
+			if (lines[3] != null) {
+				event.setLine(3, null);
+			}
+		}
 	}
 	
 	/*@EventHandler
