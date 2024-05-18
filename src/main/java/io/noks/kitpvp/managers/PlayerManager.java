@@ -24,11 +24,10 @@ import io.noks.kitpvp.managers.caches.Perks;
 import io.noks.kitpvp.managers.caches.PlayerSettings;
 import io.noks.kitpvp.managers.caches.Stats;
 
-public class PlayerManager {
+public class PlayerManager extends Ability {
 	public static final Map<UUID, PlayerManager> players = Maps.newConcurrentMap();
 	private final @NotNull Player player;
 	private final @NotNull UUID playerUUID;
-	private final @NotNull Ability ability;
 	private final @NotNull Perks perks;
 	private boolean usedSponsor;
 	private boolean usedRecraft;
@@ -41,7 +40,6 @@ public class PlayerManager {
 	public PlayerManager(UUID playerUUID) {
 		this.playerUUID = playerUUID;
 		this.player = Bukkit.getPlayer(this.playerUUID);
-		this.ability = new Ability();
 		this.perks = new Perks();
 		this.usedSponsor = false;
 		this.usedRecraft = false;
@@ -54,9 +52,9 @@ public class PlayerManager {
 	}
 	
 	public PlayerManager(UUID playerUUID, Stats stats, PlayerSettings settings, Economy economy, Perks perks) {
+		super();
 		this.playerUUID = playerUUID;
 		this.player = Bukkit.getPlayer(this.playerUUID);
-		this.ability = new Ability();
 		this.perks = perks;
 		this.usedSponsor = false;
 		this.usedRecraft = false;
@@ -91,11 +89,7 @@ public class PlayerManager {
 	}
 	
 	public boolean isInSpawn() {
-		return !this.ability.hasAbility();
-	}
-
-	public Ability getAbility() {
-		return this.ability;
+		return !this.hasAbility();
 	}
 
 	public boolean hasUsedSponsor() {
@@ -168,7 +162,9 @@ public class PlayerManager {
 				stats.updateBestKillStreak();
 			}
 		}
-		if (this.ability.hasAbility()) this.ability.remove();
+		if (this.hasAbility()) {
+			this.removeAbility();
+		}
 		if (hasUsedSponsor()) setUsedSponsor(false);
 		if (hasUsedRecraft()) setUsedRecraft(false);
 		this.player.eject();

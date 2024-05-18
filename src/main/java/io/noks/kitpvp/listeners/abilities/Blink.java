@@ -17,7 +17,6 @@ import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
-import io.noks.kitpvp.managers.caches.Ability;
 
 public class Blink extends Abilities {
 	private Main plugin;
@@ -46,10 +45,10 @@ public class Blink extends Abilities {
 		}
 		final Player p = e.getPlayer();
 		final Action action = e.getAction();
-		final Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();
-		if (action == Action.RIGHT_CLICK_AIR && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.NETHER_STAR && ability.hasAbility(this)) {
-			if (ability.hasActiveCooldown()) {
-				final double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
+		final PlayerManager pm = PlayerManager.get(p.getUniqueId());
+		if (action == Action.RIGHT_CLICK_AIR && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.NETHER_STAR && pm.hasAbility(this)) {
+			if (pm.hasActiveCooldown()) {
+				final double cooldown = pm.getActiveCooldown().longValue() / 1000.0D;
 				p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 				return;
 			}
@@ -68,7 +67,7 @@ public class Blink extends Abilities {
 				}
 			}.runTaskLaterAsynchronously(this.plugin, 100L);
 			if (amountUsed == 3) {
-				ability.applyCooldown();
+				pm.applyCooldown();
 				amountUsed = 0;
 			}
 		}

@@ -39,7 +39,7 @@ public class BuildCommand implements CommandExecutor {
 				return false;
 			}
 			final PlayerManager tm = PlayerManager.get(target.getUniqueId());
-			if (tm.getAbility().hasAbility()) {
+			if (tm.hasAbility()) {
 				player.sendMessage(ChatColor.RED + "This player is in the map!");
 				return false;
 			}
@@ -51,7 +51,7 @@ public class BuildCommand implements CommandExecutor {
 			return true;
 		}
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-		if (pm.getAbility().hasAbility()) {
+		if (pm.hasAbility()) {
 			player.sendMessage(ChatColor.RED + "You are in the map!");
 			return false;
 		}

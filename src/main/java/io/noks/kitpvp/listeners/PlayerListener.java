@@ -39,7 +39,6 @@ import io.noks.kitpvp.Main;
 import io.noks.kitpvp.enums.RefreshType;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.RefillInventoryManager;
-import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.managers.caches.CombatTag;
 import io.noks.kitpvp.managers.caches.Economy;
 import io.noks.kitpvp.managers.caches.Economy.MoneyType;
@@ -109,8 +108,8 @@ public class PlayerListener implements Listener {
 				final Player killer = km.getPlayer();
 
 				if (killer != player) {
-					if (km.getAbility().hasAbility()) {
-						km.getAbility().ability().onKill(killer);
+					if (km.hasAbility()) {
+						km.ability().onKill(killer);
 					}
 					killer.sendMessage(ChatColor.GREEN + "You have killed " + player.getDisplayName());
 
@@ -156,8 +155,8 @@ public class PlayerListener implements Listener {
 
 				killed.sendMessage(ChatColor.RED + "You have been killed by " + killer.getDisplayName());
 				if (killer != killed) {
-					if (km.getAbility().hasAbility()) {
-						km.getAbility().ability().onKill(killer);
+					if (km.hasAbility()) {
+						km.ability().onKill(killer);
 					}
 					if (killer != null) {
 						killer.sendMessage(ChatColor.GREEN + "You have killed " + killed.getDisplayName());
@@ -249,7 +248,7 @@ public class PlayerListener implements Listener {
 			final Player player = event.getPlayer();
 			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 			if (!pm.isInSpawn()) {
-				pm.getAbility().ability().onInteract(event);
+				pm.ability().onInteract(event);
 				return;
 			}
 			final String itemName = ChatColor.stripColor(item.getItemMeta().getDisplayName().toLowerCase());
@@ -274,7 +273,7 @@ public class PlayerListener implements Listener {
 		if (player.getGameMode() == GameMode.CREATIVE && pm.isAllowBuild()) {
 			return;
 		}
-		if (!pm.getAbility().hasAbility()) {
+		if (!pm.hasAbility()) {
 			event.setCancelled(true);
 			return;
 		}
@@ -295,7 +294,7 @@ public class PlayerListener implements Listener {
 			}
 			return;
 		}*/
-		if (pm.getAbility().ability().specialItem().getType() != Material.MUSHROOM_SOUP && droppedItem.getType() == pm.getAbility().ability().specialItem().getType()) {
+		if (pm.ability().specialItem().getType() != Material.MUSHROOM_SOUP && droppedItem.getType() == pm.ability().specialItem().getType()) {
 			event.setCancelled(true);
 			return;
 		}
@@ -329,9 +328,9 @@ public class PlayerListener implements Listener {
 		if (event.getEntity() instanceof Player) {
 			final Player player = (Player) event.getEntity();
 			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-			if (!pm.getAbility().hasAbility()) {
+			if (!pm.hasAbility()) {
 				event.setCancelled(true);
-				if (event.getCause() == DamageCause.VOID && !pm.getAbility().hasAbility()) {
+				if (event.getCause() == DamageCause.VOID && !pm.hasAbility()) {
 					player.teleport(player.getWorld().getSpawnLocation());
 				}
 			}
@@ -348,7 +347,7 @@ public class PlayerListener implements Listener {
 			if (block.getType() == Material.GLOWSTONE && block.getRelative(BlockFace.UP).getType() == Material.WOOL) {
 				final Player player = event.getPlayer();
 				// GET THE SIGN LINES
-				if (PlayerManager.get(player.getUniqueId()).getAbility().hasAbility()) {
+				if (PlayerManager.get(player.getUniqueId()).hasAbility()) {
 					Location loc = block.getLocation();
 					final RefillInventoryManager im = RefillInventoryManager.get(loc);
 					if (im.hasCooldown()) {
@@ -388,9 +387,8 @@ public class PlayerListener implements Listener {
 		}
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 		if (pm.isInSpawn() && !this.plugin.spawnCuboid().isIn(player.getLocation())) {
-			final Ability ability = pm.getAbility();
-			ability.set(ability.getSelected());
-			this.plugin.getItemUtils().giveEquipment(player, ability.ability());
+			pm.set(pm.getSelected());
+			this.plugin.getItemUtils().giveEquipment(player, pm.ability());
 			this.plugin.applySpawnProtection(player, false);
 			return;
 		}

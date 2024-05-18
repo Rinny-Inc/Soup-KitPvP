@@ -53,7 +53,7 @@ public class Switcher extends Abilities implements Listener {
 		if (event.getEntity() instanceof org.bukkit.entity.Snowball && event.getEntity().getShooter() instanceof Player && event.getHitEntity() instanceof Player) {
 			final Player shooter = (Player) event.getEntity().getShooter();
 
-			if (PlayerManager.get(shooter.getUniqueId()).getAbility().hasAbility(this)) {
+			if (PlayerManager.get(shooter.getUniqueId()).hasAbility(this)) {
 				final Player hit = (Player) event.getHitEntity();
 
 				if (hit == shooter)return;

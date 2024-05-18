@@ -121,8 +121,8 @@ public class InventoryListener implements Listener {
 				}
 				player.closeInventory();
 				final int random = (new Random()).nextInt(abilities.size());
-				pm.getAbility().setSelected(this.plugin.getAbilitiesManager().getAbilityFromName(abilities.get(random)));
-				final Abilities ab = pm.getAbility().ability();
+				pm.setSelected(this.plugin.getAbilitiesManager().getAbilityFromName(abilities.get(random)));
+				final Abilities ab = pm.ability();
 				player.sendMessage(ChatColor.GRAY + "You've chosen " + ab.getRarity().getColor() + ab.getName() + ChatColor.GRAY + " ability.");
 				abilities.clear();
 				return;
@@ -131,8 +131,8 @@ public class InventoryListener implements Listener {
 				return;
 			}
 			player.closeInventory();
-			pm.getAbility().setSelected(this.plugin.getAbilitiesManager().getAbilityFromName(correctItemName));
-			player.sendMessage(ChatColor.GRAY + "You've chosen " + pm.getAbility().getSelected().getRarity().getColor() + pm.getAbility().getSelected().getName() + ChatColor.GRAY + " ability.");
+			pm.setSelected(this.plugin.getAbilitiesManager().getAbilityFromName(correctItemName));
+			player.sendMessage(ChatColor.GRAY + "You've chosen " + pm.getSelected().getRarity().getColor() + pm.getSelected().getName() + ChatColor.GRAY + " ability.");
 			return;
 		}
 		if (title.contains("settings")) {

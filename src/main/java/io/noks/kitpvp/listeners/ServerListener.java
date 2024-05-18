@@ -73,7 +73,7 @@ public class ServerListener implements Listener {
 			return;
 		}
 		event.setCancelled(true);
-		if (!pm.getAbility().hasAbility()) {
+		if (!pm.hasAbility()) {
 			return;
 		}
 		if (block.getType() == Material.BROWN_MUSHROOM || block.getType() == Material.RED_MUSHROOM || block.getType() == Material.LOG) {

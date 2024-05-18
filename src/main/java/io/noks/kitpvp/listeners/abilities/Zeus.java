@@ -46,17 +46,17 @@ public class Zeus extends Abilities implements Listener {
 		final Player p = e.getPlayer();
 		final Action action = e.getAction();
 		final PlayerManager pm = PlayerManager.get(p.getUniqueId());
-		if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.WOOD_AXE && pm.getAbility().hasAbility(this)) {
+		if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.WOOD_AXE && pm.hasAbility(this)) {
 			e.setCancelled(true);
-			if (!pm.getAbility().hasActiveCooldown()) {
-				pm.getAbility().applyCooldown();
+			if (!pm.hasActiveCooldown()) {
+				pm.applyCooldown();
 				p.getWorld().strikeLightning(p.getLocation().add(3.0D, 0.0D, 0.0D));
 				p.getWorld().strikeLightning(p.getLocation().add(-3.0D, 0.0D, 0.0D));
 				p.getWorld().strikeLightning(p.getLocation().add(0.0D, 0.0D, 3.0D));
 				p.getWorld().strikeLightning(p.getLocation().add(0.0D, 0.0D, -3.0D));
 				return;
 			}
-			final double cooldown = pm.getAbility().getActiveCooldown().longValue() / 1000.0D;
+			final double cooldown = pm.getActiveCooldown().longValue() / 1000.0D;
 			p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 		}
 	}
@@ -65,7 +65,7 @@ public class Zeus extends Abilities implements Listener {
 	public void onZeusDamage(EntityDamageEvent e) {
 		if (e.getEntity() instanceof Player) {
 			final Player p = (Player) e.getEntity();
-			if (PlayerManager.get(p.getUniqueId()).getAbility().hasAbility(this) && e.getCause() == DamageCause.LIGHTNING) {
+			if (PlayerManager.get(p.getUniqueId()).hasAbility(this) && e.getCause() == DamageCause.LIGHTNING) {
 				e.setCancelled(true);
 			}
 		}

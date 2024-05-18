@@ -55,10 +55,10 @@ public class Phantom extends Abilities implements Listener {
 		}
 		final Player p = e.getPlayer();
 		final Action action = e.getAction();
-		if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.FEATHER && PlayerManager.get(p.getUniqueId()).getAbility().hasAbility(this)) {
+		if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.FEATHER && PlayerManager.get(p.getUniqueId()).hasAbility(this)) {
 			final PlayerManager pm = PlayerManager.get(p.getUniqueId());
-			if (!pm.getAbility().hasActiveCooldown()) {
-				pm.getAbility().applyCooldown();
+			if (!pm.hasActiveCooldown()) {
+				pm.applyCooldown();
 				for (Entity n : p.getNearbyEntities(20.0D, 20.0D, 20.0D)) {
 					if (n instanceof Player) {
 						Player nearby = (Player) n;
@@ -85,7 +85,7 @@ public class Phantom extends Abilities implements Listener {
 				}.runTaskLater(this.plugin, 120L);
 				return;
 			}
-			final double cooldown = pm.getAbility().getActiveCooldown().longValue() / 1000.0D;
+			final double cooldown = pm.getActiveCooldown().longValue() / 1000.0D;
 			p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 		}
 	}

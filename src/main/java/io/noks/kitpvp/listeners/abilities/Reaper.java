@@ -38,7 +38,7 @@ public class Reaper extends Abilities implements Listener {
 
 	@EventHandler
 	public void onDamage(EntityDamageByEntityEvent event) {
-		if (event.getDamager() instanceof org.bukkit.entity.Player && event.getEntity() instanceof org.bukkit.entity.Player && PlayerManager.get(event.getDamager().getUniqueId()).getAbility().hasAbility(this)) {
+		if (event.getDamager() instanceof org.bukkit.entity.Player && event.getEntity() instanceof org.bukkit.entity.Player && PlayerManager.get(event.getDamager().getUniqueId()).hasAbility(this)) {
 			if (((Player)event.getDamager()).getItemInHand().getType() != Material.WOOD_HOE) {
 				return;
 			}

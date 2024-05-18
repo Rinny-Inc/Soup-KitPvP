@@ -30,7 +30,6 @@ import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
-import io.noks.kitpvp.managers.caches.Ability;
 
 public class Gladiator extends Abilities implements Listener {
 	private @Nullable UUID opps, gladiator;
@@ -57,10 +56,10 @@ public class Gladiator extends Abilities implements Listener {
 	public void onGladiator(PlayerInteractEntityEvent e) {
 		if (e.getRightClicked() instanceof Player) {
 			final Player p = e.getPlayer();
-			final Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();
-			if (p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.IRON_FENCE && ability.hasAbility(this)) {
-				if (ability.hasActiveCooldown()) {
-					final double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
+			final PlayerManager pm = PlayerManager.get(p.getUniqueId());
+			if (p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.IRON_FENCE && pm.hasAbility(this)) {
+				if (pm.hasActiveCooldown()) {
+					final double cooldown = pm.getActiveCooldown().longValue() / 1000.0D;
 					p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 					return;
 				}
@@ -68,9 +67,9 @@ public class Gladiator extends Abilities implements Listener {
 				if (r.getUniqueId() == this.opps) {
 					return;
 				}
-				final Ability clickedAbility = PlayerManager.get(r.getUniqueId()).getAbility();
-				if (clickedAbility.ability() instanceof AntiGladiator) {
-					ability.applyCooldown();
+				final PlayerManager rm = PlayerManager.get(r.getUniqueId());
+				if (rm.ability() instanceof AntiGladiator) {
+					pm.applyCooldown();
 					return;
 				}
 				setupGladiatorsDuel(p, r);

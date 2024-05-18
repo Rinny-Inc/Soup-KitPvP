@@ -43,7 +43,7 @@ public class Specialist extends Abilities implements Listener {
 		}
 		final Player player = event.getPlayer();
 
-		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && PlayerManager.get(player.getUniqueId()).getAbility().hasAbility(this) && event.getItem() != null && event.getItem().getType() == Material.ENCHANTED_BOOK) {
+		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && PlayerManager.get(player.getUniqueId()).hasAbility(this) && event.getItem() != null && event.getItem().getType() == Material.ENCHANTED_BOOK) {
 			event.setCancelled(true);
 			player.getPlayer().openEnchanting(player.getPlayer().getLocation(), true);
 		}
@@ -51,7 +51,7 @@ public class Specialist extends Abilities implements Listener {
 
 	@EventHandler
 	public void onEnchant(EnchantItemEvent event) {
-		if (PlayerManager.get(event.getEnchanter().getUniqueId()).getAbility().hasAbility(this) && event.getEnchanter().getItemInHand().getType() == Material.ENCHANTED_BOOK) {
+		if (PlayerManager.get(event.getEnchanter().getUniqueId()).hasAbility(this) && event.getEnchanter().getItemInHand().getType() == Material.ENCHANTED_BOOK) {
 			event.getEnchantsToAdd().clear();
 			event.getEnchantsToAdd().put(Enchantment.DAMAGE_ALL, Integer.valueOf((event.getEnchanter().getLevel() == 1) ? 1 : ((event.getEnchanter().getLevel() == 2) ? 2 : 3)));
 		}
@@ -62,7 +62,7 @@ public class Specialist extends Abilities implements Listener {
 		if (event.getEntity().getKiller() instanceof Player) {
 			final Player killer = event.getEntity().getKiller();
 
-			if (PlayerManager.get(killer.getUniqueId()).getAbility().hasAbility(this)) {
+			if (PlayerManager.get(killer.getUniqueId()).hasAbility(this)) {
 				if (killer.getInventory().firstEmpty() == -1 && !killer.getInventory().contains(Material.EXP_BOTTLE)) {
 					killer.getWorld().dropItem(killer.getLocation(), new ItemStack(Material.EXP_BOTTLE, 1));
 				} else {

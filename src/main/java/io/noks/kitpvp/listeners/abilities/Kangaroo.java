@@ -16,7 +16,6 @@ import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
-import io.noks.kitpvp.managers.caches.Ability;
 
 public class Kangaroo extends Abilities implements Listener {
 	private Main plugin;
@@ -52,11 +51,11 @@ public class Kangaroo extends Abilities implements Listener {
 			return;
 		}
 		final Player player = event.getPlayer();
-		if (player.getItemInHand().getType() != null && player.getItemInHand().getType() == Material.FIREWORK && PlayerManager.get(player.getUniqueId()).getAbility().hasAbility(this)) {
-			final Ability ability = PlayerManager.get(player.getUniqueId()).getAbility();
+		if (player.getItemInHand().getType() != null && player.getItemInHand().getType() == Material.FIREWORK && PlayerManager.get(player.getUniqueId()).hasAbility(this)) {
+			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 			event.setCancelled(true);
-			if (ability.hasActiveCooldown()) {
-				final double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
+			if (pm.hasActiveCooldown()) {
+				final double cooldown = pm.getActiveCooldown().longValue() / 1000.0D;
 				player.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 				return;
 			}
@@ -66,7 +65,7 @@ public class Kangaroo extends Abilities implements Listener {
 			final Vector kangaVel = player.getEyeLocation().getDirection();
 			player.setVelocity(kangaVel.multiply(multiplier).setY(vertical));
 			player.setFallDistance(0.0F);
-			ability.applyCooldown();
+			pm.applyCooldown();
 		}
 	}
 }

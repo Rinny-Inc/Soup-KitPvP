@@ -31,7 +31,7 @@ public class Stomper extends Abilities implements Listener {
 	public void onStomper(EntityDamageEvent event) {
 		if (event.getEntity() instanceof Player) {
 			final Player stomper = (Player) event.getEntity();
-			if (event.getCause() == DamageCause.FALL && !stomper.hasMetadata("Sponged") && PlayerManager.get(stomper.getUniqueId()).getAbility().hasAbility(this)) {
+			if (event.getCause() == DamageCause.FALL && !stomper.hasMetadata("Sponged") && PlayerManager.get(stomper.getUniqueId()).hasAbility(this)) {
 				final List<Entity> stomped = stomper.getNearbyEntities(5.0D, 3.5D, 5.0D);
 				if (stomped.isEmpty()) {
 					return;
@@ -43,7 +43,7 @@ public class Stomper extends Abilities implements Listener {
 					if (!(nearbyPlayers instanceof Player)) continue;
 					final Player nearby = (Player) nearbyPlayers;
 					if (!stomper.canSee(nearby) || !nearby.canSee(stomper))continue;
-					if (PlayerManager.get(nearby.getUniqueId()).getAbility().ability() instanceof AntiStomper) {
+					if (PlayerManager.get(nearby.getUniqueId()).ability() instanceof AntiStomper) {
 						continue;
 					}
 					if (nearby.isSneaking()) {

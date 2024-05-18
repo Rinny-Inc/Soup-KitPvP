@@ -28,7 +28,7 @@ public class Viper extends Abilities implements Listener {
 
 	@EventHandler
 	public void Damage(EntityDamageByEntityEvent event) {
-		if (event.getDamager() instanceof org.bukkit.entity.Player && event.getEntity() instanceof org.bukkit.entity.Player && PlayerManager.get(event.getDamager().getUniqueId()).getAbility().hasAbility(this)) {
+		if (event.getDamager() instanceof org.bukkit.entity.Player && event.getEntity() instanceof org.bukkit.entity.Player && PlayerManager.get(event.getDamager().getUniqueId()).hasAbility(this)) {
 			final int rand = new Random().nextInt(100);
 			if (rand > 20) {
 				return;

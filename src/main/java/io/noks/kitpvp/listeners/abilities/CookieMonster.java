@@ -43,7 +43,7 @@ public class CookieMonster extends Abilities implements Listener {
 		if (!event.hasItem()) {
 			return;
 		}
-		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && PlayerManager.get(event.getPlayer().getUniqueId()).getAbility().hasAbility(this)) {
+		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && PlayerManager.get(event.getPlayer().getUniqueId()).hasAbility(this)) {
 			final Player p = event.getPlayer();
 			if (p.getItemInHand().getType() == Material.COOKIE && p.getFoodLevel() == 20 && (!p.hasPotionEffect(PotionEffectType.SPEED) || p.getHealth() * 2.0D < p.getMaxHealth())) {
 				p.setFoodLevel(19);
@@ -53,7 +53,7 @@ public class CookieMonster extends Abilities implements Listener {
 
 	@EventHandler
 	public void onConsumeCookie(PlayerItemConsumeEvent event) {
-		if (PlayerManager.get(event.getPlayer().getUniqueId()).getAbility().hasAbility(this) && event.getItem().getType() == Material.COOKIE) {
+		if (PlayerManager.get(event.getPlayer().getUniqueId()).hasAbility(this) && event.getItem().getType() == Material.COOKIE) {
 			final Player eater = event.getPlayer();
 
 			eater.setHealth(Math.min(eater.getHealth() * 2.0D, eater.getMaxHealth()));

@@ -67,13 +67,13 @@ public class Monk extends Abilities implements Listener {
 		final ItemStack item = event.getPlayer().getItemInHand();
 		final Player player = event.getPlayer();
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-		if (pm.getAbility().hasAbility(this) && event.getRightClicked() instanceof Player && item.getType() == Material.BLAZE_ROD) {
-			if (pm.getAbility().hasActiveCooldown()) {
-				double cooldown = pm.getAbility().getActiveCooldown().longValue() / 1000.0D;
+		if (pm.hasAbility(this) && event.getRightClicked() instanceof Player && item.getType() == Material.BLAZE_ROD) {
+			if (pm.hasActiveCooldown()) {
+				double cooldown = pm.getActiveCooldown().longValue() / 1000.0D;
 				player.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 				return;
 			}
-			pm.getAbility().applyCooldown();
+			pm.applyCooldown();
 			final Player rightClicked = (Player) event.getRightClicked();
 			final PlayerInventory inv = rightClicked.getInventory();
 			final int slot = (new Random()).nextInt(inv.getSize());

@@ -22,7 +22,6 @@ import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
-import io.noks.kitpvp.managers.caches.Ability;
 
 public class Spider extends Abilities implements Listener {
 
@@ -50,10 +49,10 @@ public class Spider extends Abilities implements Listener {
 		}
 		final Player p = e.getPlayer();
 		final Action action = e.getAction();
-		final Ability ability = PlayerManager.get(p.getUniqueId()).getAbility();
-		if (action == Action.RIGHT_CLICK_AIR && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.WEB && ability.hasAbility(this)) {
-			if (ability.hasActiveCooldown()) {
-				final double cooldown = ability.getActiveCooldown().longValue() / 1000.0D;
+		final PlayerManager pm = PlayerManager.get(p.getUniqueId());
+		if (action == Action.RIGHT_CLICK_AIR && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.WEB && pm.hasAbility(this)) {
+			if (pm.hasActiveCooldown()) {
+				final double cooldown = pm.getActiveCooldown().longValue() / 1000.0D;
 				p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 				return;
 			}
@@ -61,7 +60,7 @@ public class Spider extends Abilities implements Listener {
 			web.setShooter(p);
 			web.setMetadata("web", new FixedMetadataValue(this.main, Boolean.valueOf(true)));
 			web.setVelocity(p.getLocation().getDirection().multiply(2.5D));
-			ability.applyCooldown();
+			pm.applyCooldown();
 		}
 	}
 	
@@ -69,9 +68,9 @@ public class Spider extends Abilities implements Listener {
 	public void onProjectileHit(ProjectileHitEvent event) {
 		if (event.getEntity() instanceof Snowball && event.getEntity().getShooter() instanceof Player) {
 			final Player player = (Player) event.getEntity().getShooter();
-			final Ability pa = PlayerManager.get(player.getUniqueId()).getAbility();
+			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 			
-			if (!pa.hasAbility(this)) {
+			if (!pm.hasAbility(this)) {
 				return;
 			}
 			final Snowball ball = (Snowball) event.getEntity();

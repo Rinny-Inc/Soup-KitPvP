@@ -27,7 +27,7 @@ public class SponsorCommand implements CommandExecutor {
 		final Player player = (Player) sender;
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 
-		if (!pm.getAbility().hasAbility()) {
+		if (!pm.hasAbility()) {
 			player.sendMessage(ChatColor.RED + "You can't do this command here.");
 			return false;
 		}

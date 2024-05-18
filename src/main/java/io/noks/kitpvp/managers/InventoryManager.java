@@ -15,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
-import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.managers.caches.PlayerSettings;
 import net.minecraft.util.com.google.common.collect.Lists;
 
@@ -129,9 +128,9 @@ public class InventoryManager {
 		}
 		inventory.setItem(2, Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.NOTE_BLOCK), ChatColor.YELLOW + "Ability Rotation", new String[] {null, ChatColor.GRAY + "Get free abilities!", "", ChatColor.RED + " Coming soon"}));
 		inventory.setItem(4, Main.getInstance().getItemUtils().getItemMaterial(Material.BEACON, 0, ChatColor.DARK_GRAY + "(" + ChatColor.DARK_AQUA + "SoupWorld" + ChatColor.DARK_GRAY + ")"));
-		final Ability ability = PlayerManager.get(player.getUniqueId()).getAbility();
-		if (ability.getSelected() != null) {
-			final Abilities lastAbility = ability.getSelected();
+		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
+		if (pm.getSelected() != null) {
+			final Abilities lastAbility = pm.getSelected();
 			inventory.setItem(6, Main.getInstance().getItemUtils().getItemStack(lastAbility.getIcon(), ChatColor.YELLOW + "Last used ability: " + lastAbility.getRarity().getColor() + lastAbility.getName(), lastAbility.getLore()));
 		}
 		inventory.setItem(8, Main.getInstance().getItemUtils().getItemMaterial(Material.WATCH, 0, ChatColor.YELLOW + "Random Abilities"));

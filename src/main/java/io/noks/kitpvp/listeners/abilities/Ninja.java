@@ -90,7 +90,7 @@ public class Ninja extends Abilities implements Listener {
 				return;
 			}
 			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-			if (!pm.getAbility().hasAbility(this)) {
+			if (!pm.hasAbility(this)) {
 				return;
 			}
 			final Player target = Bukkit.getPlayer(this.target.get(0));
@@ -105,12 +105,12 @@ public class Ninja extends Abilities implements Listener {
 				this.target = null;
 				return;
 			}
-			if (pm.getAbility().hasActiveCooldown()) {
-				double cooldown = pm.getAbility().getActiveCooldown().longValue() / 1000.0D;
+			if (pm.hasActiveCooldown()) {
+				double cooldown = pm.getActiveCooldown().longValue() / 1000.0D;
 				player.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 				return;
 			}
-			pm.getAbility().applyCooldown();
+			pm.applyCooldown();
 			float nang = target.getLocation().getYaw() + 90.0F;
 			if (nang < 0.0F) {
 				nang += 360.0F;
@@ -139,7 +139,7 @@ public class Ninja extends Abilities implements Listener {
 			final Player damager = (Player) event.getDamager();
 			final PlayerManager dm = PlayerManager.get(damager.getUniqueId());
 
-			if (dm.getAbility().hasAbility(this)) {
+			if (dm.hasAbility(this)) {
 				Player damaged = (Player) event.getEntity();
 				if (this.target == null) {
 					this.target = new TtlArrayList<>(TimeUnit.SECONDS, 30, 1);
@@ -160,7 +160,7 @@ public class Ninja extends Abilities implements Listener {
 			return;
 		}
 		final PlayerManager dm = PlayerManager.get(event.getPlayer().getUniqueId());
-		if (dm.getAbility().hasAbility(this)) {
+		if (dm.hasAbility(this)) {
 			this.target = null;
 		}
 	}
@@ -173,7 +173,7 @@ public class Ninja extends Abilities implements Listener {
 				return;
 			}
 			final PlayerManager dm = PlayerManager.get(event.getEntity().getUniqueId());
-			if (dm.getAbility().hasAbility(this)) {
+			if (dm.hasAbility(this)) {
 				this.target = null;
 			}
 		}

@@ -107,7 +107,7 @@ public class FallenGolemTask implements Listener {
 			final IronGolem golem = (IronGolem) event.getEntity();
 
 			if (golem.getCustomName().toLowerCase().contains("fallen")) {
-				if (!PlayerManager.get(player.getUniqueId()).getAbility().hasAbility()) {
+				if (!PlayerManager.get(player.getUniqueId()).hasAbility()) {
 					event.setCancelled(true);
 					return;
 				}

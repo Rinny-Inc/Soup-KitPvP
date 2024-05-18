@@ -7,7 +7,7 @@ import com.avaje.ebean.validation.NotNull;
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.listeners.abilities.PvP;
 
-public class Ability {
+public abstract class Ability {
 	private @Nullable Abilities ability;
 	private @NotNull Abilities selectedAbility;
 	private Long abilityCooldown;
@@ -17,7 +17,7 @@ public class Ability {
 		this.ability = null;
 		this.selectedAbility = new PvP();
 		this.abilityCooldown = 0L;
-		this.receivedEndCooldownMessage = false;
+		this.receivedEndCooldownMessage = true;
 	}
 
 	public Abilities ability() {
@@ -44,7 +44,7 @@ public class Ability {
 		return (this.ability == ability);
 	}
 
-	public void remove() {
+	public void removeAbility() {
 		removeCooldown();
 		if (this.selectedAbility != this.ability) {
 			this.selectedAbility = this.ability;

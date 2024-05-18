@@ -42,7 +42,7 @@ public class Archer extends Abilities implements Listener {
 			final Arrow arrow = (Arrow) event.getEntity();
 			final Player shooter = (Player) arrow.getShooter();
 			
-			if (PlayerManager.get(shooter.getUniqueId()).getAbility().hasAbility(this)) {
+			if (PlayerManager.get(shooter.getUniqueId()).hasAbility(this)) {
 				final Player hitted = (Player) event.getHitEntity();
 				if (hitted == shooter) return;
 				final double damage = shooter.getLocation().distance(hitted.getLocation()) * 1.3D;

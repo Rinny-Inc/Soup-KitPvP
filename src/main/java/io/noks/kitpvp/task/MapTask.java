@@ -14,7 +14,6 @@ import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.RefreshType;
 import io.noks.kitpvp.managers.PlayerManager;
-import io.noks.kitpvp.managers.caches.Ability;
 
 public class MapTask extends BukkitRunnable {
 	private int taskId = -1;
@@ -31,14 +30,13 @@ public class MapTask extends BukkitRunnable {
 			return;
 		}
 		for (PlayerManager players : this.playersInMap) {
-			Ability am = players.getAbility();
-			if (am.ability() != null && am.ability().hasCooldown()) {
-				Abilities ability = am.ability();
-				if (am.hasActiveCooldown()) {
+			if (players.ability() != null && players.ability().hasCooldown()) {
+				Abilities ability = players.ability();
+				if (players.hasActiveCooldown()) {
 					this.updateXpBar(players, ability);
-				} else if (!am.hasReceivedEndCooldownMessage()) {
+				} else if (!players.hasReceivedEndCooldownMessage()) {
 					players.getPlayer().sendMessage(ChatColor.GRAY + "You may now use " + ChatColor.RED + (ability.specialItem() != null ? ability.specialItemName() : ability.getName()));
-					am.updateHasReceivedEndCooldownMessage();
+					players.updateHasReceivedEndCooldownMessage();
 				}
 			}
 			if (players.getPlayer().getScoreboard().getObjective(DisplaySlot.SIDEBAR) != null) {
@@ -48,7 +46,7 @@ public class MapTask extends BukkitRunnable {
 	}
 
 	private void updateXpBar(PlayerManager pm, Abilities ability) {
-		Long activeCooldown = pm.getAbility().getActiveCooldown();
+		Long activeCooldown = pm.getActiveCooldown();
 	    float xpPercentage = Math.min(99.9f, ((float) activeCooldown / (ability.getCooldown() * 1000)) * 100);
 	    if (xpPercentage < 0.0) {
 	    	xpPercentage = 0.0f;

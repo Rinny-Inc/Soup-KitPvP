@@ -29,7 +29,7 @@ public class Turtle extends Abilities implements Listener {
 		if (event.getDamager() instanceof Player) {
 			final Player damager = (Player) event.getDamager();
 
-			if (PlayerManager.get(damager.getUniqueId()).getAbility().hasAbility(this) && damager.getPlayer().isSneaking()) {
+			if (PlayerManager.get(damager.getUniqueId()).hasAbility(this) && damager.getPlayer().isSneaking()) {
 				event.setCancelled(true);
 			}
 		}
@@ -40,7 +40,7 @@ public class Turtle extends Abilities implements Listener {
 		if (event.getEntity() instanceof Player) {
 			final Player player = (Player) event.getEntity();
 
-			if (PlayerManager.get(player.getUniqueId()).getAbility().hasAbility(this)) {
+			if (PlayerManager.get(player.getUniqueId()).hasAbility(this)) {
 				if (player.getPlayer().isSneaking() && !player.getPlayer().isBlocking()) {
 					event.setDamage(2.0D);
 				}

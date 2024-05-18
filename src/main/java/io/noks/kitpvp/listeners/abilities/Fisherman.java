@@ -63,7 +63,7 @@ public class Fisherman extends Abilities implements Listener {
 		}
 		if (event.getCaught() instanceof Player) {
 			final Player player = event.getPlayer();
-			if (PlayerManager.get(player.getUniqueId()).getAbility().hasAbility(this)) {
+			if (PlayerManager.get(player.getUniqueId()).hasAbility(this)) {
 				final Player target = (Player) event.getCaught();
 				if (target == player) return;
 				if (PlayerManager.get(target.getUniqueId()).isInSpawn()) {
