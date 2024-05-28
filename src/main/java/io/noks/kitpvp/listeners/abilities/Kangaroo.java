@@ -54,8 +54,8 @@ public class Kangaroo extends Abilities implements Listener {
 		if (player.getItemInHand().getType() != null && player.getItemInHand().getType() == Material.FIREWORK && PlayerManager.get(player.getUniqueId()).hasAbility(this)) {
 			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 			event.setCancelled(true);
-			if (pm.hasActiveCooldown()) {
-				final double cooldown = pm.getActiveCooldown().longValue() / 1000.0D;
+			if (pm.hasActiveAbilityCooldown()) {
+				final double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
 				player.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 				return;
 			}
@@ -65,7 +65,7 @@ public class Kangaroo extends Abilities implements Listener {
 			final Vector kangaVel = player.getEyeLocation().getDirection();
 			player.setVelocity(kangaVel.multiply(multiplier).setY(vertical));
 			player.setFallDistance(0.0F);
-			pm.applyCooldown();
+			pm.applyAbilityCooldown();
 		}
 	}
 }

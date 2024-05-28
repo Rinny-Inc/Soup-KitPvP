@@ -58,8 +58,8 @@ public class Gladiator extends Abilities implements Listener {
 			final Player p = e.getPlayer();
 			final PlayerManager pm = PlayerManager.get(p.getUniqueId());
 			if (p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.IRON_FENCE && pm.hasAbility(this)) {
-				if (pm.hasActiveCooldown()) {
-					final double cooldown = pm.getActiveCooldown().longValue() / 1000.0D;
+				if (pm.hasActiveAbilityCooldown()) {
+					final double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
 					p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 					return;
 				}
@@ -69,7 +69,7 @@ public class Gladiator extends Abilities implements Listener {
 				}
 				final PlayerManager rm = PlayerManager.get(r.getUniqueId());
 				if (rm.ability() instanceof AntiGladiator) {
-					pm.applyCooldown();
+					pm.applyAbilityCooldown();
 					return;
 				}
 				setupGladiatorsDuel(p, r);

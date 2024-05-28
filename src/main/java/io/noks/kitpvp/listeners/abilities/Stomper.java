@@ -22,7 +22,7 @@ public class Stomper extends Abilities implements Listener {
 	private Main plugin;
 
 	public Stomper(Main main) {
-		super("Stomper", new ItemStack(Material.ANVIL), Rarity.UNIQUE, 0L, new String[] { ChatColor.AQUA + "Transfer fall damages to your opponents", ChatColor.AQUA + "while jumping on them" });
+		super("Stomper", new ItemStack(Material.ANVIL), Rarity.UNIQUE, 0L, new String[] { ChatColor.AQUA + "Transfer fall damages to your opponents", ChatColor.AQUA + "when jumping on them" });
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}
@@ -38,7 +38,6 @@ public class Stomper extends Abilities implements Listener {
 				}
 				double damage = event.getDamage();
 				stomper.getWorld().playSound(stomper.getLocation(), Sound.ANVIL_LAND, 0.8F, 1.1F);
-				event.setDamage(Math.min(damage, 4.0D)); // TODO: base the damage by how many players have been touched
 				for (Entity nearbyPlayers : stomped) {
 					if (!(nearbyPlayers instanceof Player)) continue;
 					final Player nearby = (Player) nearbyPlayers;
@@ -46,11 +45,15 @@ public class Stomper extends Abilities implements Listener {
 					if (PlayerManager.get(nearby.getUniqueId()).ability() instanceof AntiStomper) {
 						continue;
 					}
-					if (nearby.isSneaking()) {
-						damage = 2.0D;
+					if (damage >= 20.0D && nearby.getHealth() >= 20) {
+						damage = 18.0D;
+					}
+					if (damage >= 4.0D && nearby.isSneaking()) {
+						damage = 4.0D;
 					}
 					nearby.damage(damage, stomper);
 				}
+				event.setDamage(Math.min(damage, 4.0D)); // TODO: base the damage by how many players have been touched
 			}
 		}
 	}

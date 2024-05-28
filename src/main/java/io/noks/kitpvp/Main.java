@@ -17,18 +17,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Villager.Profession;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Scoreboard;
 
 import com.avaje.ebean.validation.NotNull;
 
 import io.noks.kitpvp.commands.AbilityListCommand;
-import io.noks.kitpvp.commands.BalanceCommand;
+import io.noks.kitpvp.commands.EconomyCommand;
 import io.noks.kitpvp.commands.BootCommand;
 import io.noks.kitpvp.commands.BuildCommand;
 import io.noks.kitpvp.commands.FeastCommand;
 import io.noks.kitpvp.commands.PingCommand;
+import io.noks.kitpvp.commands.RepairCommand;
 import io.noks.kitpvp.commands.ReportCommand;
 import io.noks.kitpvp.commands.ShoutCommand;
 import io.noks.kitpvp.commands.SkullCommand;
@@ -88,7 +86,6 @@ public class Main extends JavaPlugin {
 		this.itemUtils = new ItemUtils();
 		this.inventoryManager = new InventoryManager();
 		this.abilitiesManager = new AbilitiesManager(this);
-		this.registerScoreboard();
 		this.registerListeners();
 		this.registerCommands();
 		this.eventsTask = new EventsTask(this); // TODO: need to execute it (see in class)
@@ -131,7 +128,7 @@ public class Main extends JavaPlugin {
 		}
 	}
 	
-	private void registerScoreboard() {
+	/*private void registerScoreboard() {
 		final Scoreboard board = this.getServer().getScoreboardManager().getMainScoreboard();
 		if (board.getObjective("life") == null) {
 			final Objective life = board.registerNewObjective("life", "health");
@@ -139,12 +136,12 @@ public class Main extends JavaPlugin {
 			final char heart = '\u2764';
 			life.setDisplayName(ChatColor.RED.toString() + heart);
 		}
-		/*if (board.getObjective("bounty") == null) {
+		if (board.getObjective("bounty") == null) {
 			final Objective life = board.registerNewObjective("bounty", "health");
 			life.setDisplaySlot(DisplaySlot.BELOW_NAME);
 			life.setDisplayName(ChatColor.YELLOW + "Bounty:");
-		}*/
-	}
+		}
+	}*/
 	
 	private void registerListeners() {
 		new PlayerListener(this);
@@ -162,10 +159,11 @@ public class Main extends JavaPlugin {
 		getCommand("sponsor").setExecutor(new SponsorCommand());
 		new StatisticCommand(this);
 		new BuildCommand(this);
-		getCommand("balance").setExecutor(new BalanceCommand());
+		new EconomyCommand(this);
 		new BootCommand(this);
 		new FeastCommand(this);
 		new SpawnCommand(this);
+		getCommand("repair").setExecutor(new RepairCommand());
 	}
 	
 	private void spawnNPC(World world) {

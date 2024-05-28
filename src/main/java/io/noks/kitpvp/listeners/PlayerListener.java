@@ -31,22 +31,21 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.enums.RefreshType;
+import io.noks.kitpvp.interfaces.SignRotation;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.RefillInventoryManager;
 import io.noks.kitpvp.managers.caches.CombatTag;
 import io.noks.kitpvp.managers.caches.Economy;
-import io.noks.kitpvp.managers.caches.Economy.MoneyType;
 import io.noks.kitpvp.managers.caches.Stats;
 import io.noks.utils.EntityNPC;
 import net.md_5.bungee.api.chat.TextComponent;
 
-public class PlayerListener implements Listener {
+public class PlayerListener implements Listener, SignRotation {
 	private final Main plugin;
 	
 	public PlayerListener(Main main) {
@@ -120,7 +119,7 @@ public class PlayerListener implements Listener {
 					km.refreshScoreboardLine(RefreshType.KILLSTREAK);
 
 					final Economy killerEconomy = km.getEconomy();
-					killerEconomy.add(((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 20 : 10), MoneyType.BRONZE);
+					killerEconomy.add(((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 20 : 10));
 					km.refreshScoreboardLine(RefreshType.CREDITS);
 				}
 			}
@@ -169,12 +168,12 @@ public class PlayerListener implements Listener {
 					km.refreshScoreboardLine(RefreshType.KILLSTREAK);
 
 					final Economy killerEconomy = km.getEconomy();
-					killerEconomy.add(((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 20 : 10), MoneyType.BRONZE);
+					killerEconomy.add(((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 20 : 10));
 					km.refreshScoreboardLine(RefreshType.CREDITS);
 				}
 			}
 			event.getDrops().clear();
-			int random = new Random().nextInt(10) + 10;
+			int random = new Random().nextInt(10) + 15;
 			for (int i = 0; i < random; i++) {
 				event.getDrops().add(new ItemStack(Material.MUSHROOM_SOUP, 1));
 			}
@@ -300,8 +299,6 @@ public class PlayerListener implements Listener {
 		}
 	}
 	
-	// TODO: remake with critical damage and enchantment
-	// TODO: FIX DOUBLE HIT????
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onEntityDamageEntity(EntityDamageByEntityEvent event) {
 		if (event.getEntity() instanceof EntityNPC) {
@@ -362,23 +359,6 @@ public class PlayerListener implements Listener {
 		}
 	}
 	
-	private Block getBlockBehindSign(Block signBlock, Sign sign) {
-        MaterialData signData = sign.getData();
-
-        switch (signData.getData()) {
-            case 2:
-                return signBlock.getRelative(0, 0, 1);
-            case 3:
-                return signBlock.getRelative(0, 0, -1);
-            case 4:
-                return signBlock.getRelative(1, 0, 0);
-            case 5:
-                return signBlock.getRelative(-1, 0, 0);
-            default:
-                return null;
-        }
-    }
-	
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onMove(PlayerMoveEvent event) {
 		final Player player = event.getPlayer();
@@ -387,7 +367,7 @@ public class PlayerListener implements Listener {
 		}
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 		if (pm.isInSpawn() && !this.plugin.spawnCuboid().isIn(player.getLocation())) {
-			pm.set(pm.getSelected());
+			pm.setAbility(pm.getSelectedAbility());
 			this.plugin.getItemUtils().giveEquipment(player, pm.ability());
 			this.plugin.applySpawnProtection(player, false);
 			return;

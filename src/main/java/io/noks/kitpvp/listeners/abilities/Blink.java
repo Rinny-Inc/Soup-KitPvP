@@ -47,8 +47,8 @@ public class Blink extends Abilities {
 		final Action action = e.getAction();
 		final PlayerManager pm = PlayerManager.get(p.getUniqueId());
 		if (action == Action.RIGHT_CLICK_AIR && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.NETHER_STAR && pm.hasAbility(this)) {
-			if (pm.hasActiveCooldown()) {
-				final double cooldown = pm.getActiveCooldown().longValue() / 1000.0D;
+			if (pm.hasActiveAbilityCooldown()) {
+				final double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
 				p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 				return;
 			}
@@ -67,7 +67,7 @@ public class Blink extends Abilities {
 				}
 			}.runTaskLaterAsynchronously(this.plugin, 100L);
 			if (amountUsed == 3) {
-				pm.applyCooldown();
+				pm.applyAbilityCooldown();
 				amountUsed = 0;
 			}
 		}

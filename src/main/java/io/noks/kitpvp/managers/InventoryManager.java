@@ -12,6 +12,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.avaje.ebean.validation.NotNull;
+
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
@@ -19,15 +21,24 @@ import io.noks.kitpvp.managers.caches.PlayerSettings;
 import net.minecraft.util.com.google.common.collect.Lists;
 
 public class InventoryManager {
+	private final @NotNull Inventory shopInventory;
+	
+	public InventoryManager() {
+		this.shopInventory = Bukkit.createInventory(null, 54, ChatColor.DARK_AQUA + "Shop");
+		this.initShopInventory();
+	}
 
+	@NotNull
 	public Inventory loadKitsInventory(Player player) {
 		return loadKitsInventory(player, null, 1);
 	}
 
+	@NotNull
 	public Inventory loadKitsInventory(Player player, @Nullable Rarity rarity) {
 		return loadKitsInventory(player, rarity, 1);
 	}
 
+	@NotNull
 	public Inventory loadKitsInventory(Player player, @Nullable Rarity rarity, int page) {
 		Inventory[] inventories = { Bukkit.createInventory(player, 54, ChatColor.DARK_AQUA + "Ability Selector"), Bukkit.createInventory(player, 54) };
 		for (Inventory inventory : inventories) {
@@ -35,14 +46,15 @@ public class InventoryManager {
 		}
 		sortPlayersKitsByRarity(player, inventories, rarity);
 		if (inventories[0].firstEmpty() == -1 && inventories[1] != null) {
-			inventories[0].setItem(inventories[0].getSize() - 1, new ItemStack(Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.ARROW, page + 1), ChatColor.YELLOW + "Next page", null)));
-			inventories[1].setItem(inventories[1].getSize() - 9, new ItemStack(Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.ARROW, page - 1), ChatColor.YELLOW + "Previous page", null)));
+			inventories[0].setItem(9, new ItemStack(Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.ARROW, page + 1), ChatColor.YELLOW + "Next page", null)));
+			inventories[1].setItem(17, new ItemStack(Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.ARROW, page - 1), ChatColor.YELLOW + "Previous page", null)));
 		}
 		if (rarity != null)
 			inventories[0].setItem(inventories[0].getSize() - 9, new ItemStack(Main.getInstance().getItemUtils().getItemMaterial(Material.PAPER, 0, ChatColor.YELLOW + "Your whole abilities")));
 		return inventories[page - 1];
 	}
 
+	@NotNull
 	public Inventory loadSettingsInventory(Player player) {
 		Inventory inv = Bukkit.createInventory(player, 27, ChatColor.DARK_AQUA + "Your Settings");
 		inv.clear();
@@ -50,13 +62,14 @@ public class InventoryManager {
 			inv.setItem(i, Main.getInstance().getItemUtils().getItemMaterial(Material.STAINED_GLASS_PANE, 15, " "));
 		}
 		inv.setItem(0, Main.getInstance().getItemUtils().getItemMaterial(Material.ARROW, ChatColor.YELLOW + "Previous page"));
-		PlayerSettings settings = PlayerManager.get(player.getUniqueId()).getSettings();
+		final PlayerSettings settings = PlayerManager.get(player.getUniqueId()).getSettings();
 		inv.setItem(10, Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.COMMAND), ChatColor.GRAY + "Scoreboard", new String[] { (settings.hasScoreboardEnabled() ? ChatColor.GREEN + "Enabled" : ChatColor.RED + "Disabled") }));
 		inv.setItem(12, Main.getInstance().getItemUtils().getItemMaterial(Material.STONE_SWORD, ChatColor.GRAY + "Sword Slot", settings.getSlot(PlayerSettings.SlotType.SWORD) + 1));
 		inv.setItem(14, Main.getInstance().getItemUtils().getItemMaterial(Material.POTATO_ITEM, ChatColor.GRAY + "Item Slot", settings.getSlot(PlayerSettings.SlotType.ITEM) + 1));
 		return inv;
 	}
 
+	@NotNull
 	public Inventory loadSlotsInventory(Player player, String slots) {
 		Inventory inv = Bukkit.createInventory(player, 9, ChatColor.DARK_AQUA + slots + " Slot");
 		inv.clear();
@@ -69,7 +82,22 @@ public class InventoryManager {
 		inv.setItem(settings.getSlot(PlayerSettings.SlotType.ITEM), Main.getInstance().getItemUtils().getItemMaterial(Material.POTATO_ITEM, ChatColor.YELLOW + "Item"));
 		return inv;
 	}
+	
+	public Inventory loadPerksInventory(PlayerManager pm) {
+		// TODO
+		return null;
+	}
+	
+	private void initShopInventory() {
+		// TODO
+	}
+	
+	@NotNull
+	public Inventory openShopInventory() {
+		return this.shopInventory;
+	}
 
+	@NotNull
 	private ChatColor formatIntToColor(int colorInt) {
 		switch (colorInt) {
 		case 0:
@@ -120,21 +148,18 @@ public class InventoryManager {
 
 	private void fill(Inventory inventory, Player player) {
 		inventory.clear();
-		for (int i = 0; i < 9; i++) {
-			inventory.setItem(i, Main.getInstance().getItemUtils().getItemMaterial(Material.STAINED_GLASS_PANE, 15, " "));
-		}
-		for (int i = inventory.getSize() - 9; i < inventory.getSize(); i++) {
+		for (int i = 0; i < 18; i++) {
 			inventory.setItem(i, Main.getInstance().getItemUtils().getItemMaterial(Material.STAINED_GLASS_PANE, 15, " "));
 		}
 		inventory.setItem(2, Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.NOTE_BLOCK), ChatColor.YELLOW + "Ability Rotation", new String[] {null, ChatColor.GRAY + "Get free abilities!", "", ChatColor.RED + " Coming soon"}));
 		inventory.setItem(4, Main.getInstance().getItemUtils().getItemMaterial(Material.BEACON, 0, ChatColor.DARK_GRAY + "(" + ChatColor.DARK_AQUA + "SoupWorld" + ChatColor.DARK_GRAY + ")"));
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-		if (pm.getSelected() != null) {
-			final Abilities lastAbility = pm.getSelected();
+		if (pm.getSelectedAbility() != null) {
+			final Abilities lastAbility = pm.getSelectedAbility();
 			inventory.setItem(6, Main.getInstance().getItemUtils().getItemStack(lastAbility.getIcon(), ChatColor.YELLOW + "Last used ability: " + lastAbility.getRarity().getColor() + lastAbility.getName(), lastAbility.getLore()));
 		}
 		inventory.setItem(8, Main.getInstance().getItemUtils().getItemMaterial(Material.WATCH, 0, ChatColor.YELLOW + "Random Abilities"));
-		int rarityStartSlot = inventory.getSize() - 8;
+		int rarityStartSlot = 10;
 		for (Rarity rarity : Rarity.values()) {
 			if (rarity != Rarity.USELESS) {
 				boolean hasPermission = (player.hasPermission(rarity.getPermission()) || player.hasPermission("kit.*"));

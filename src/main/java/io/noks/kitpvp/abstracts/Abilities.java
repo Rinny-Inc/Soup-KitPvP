@@ -1,11 +1,16 @@
 package io.noks.kitpvp.abstracts;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import io.noks.kitpvp.enums.Rarity;
 
@@ -67,6 +72,10 @@ public abstract class Abilities {
 	
 	public String[] getLore() {
 		return this.lore;
+	}
+	
+	public List<PotionEffect> potionEffect() {
+		return Collections.singletonList(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0));
 	}
 	
 	public void onKill(Player killer) {}

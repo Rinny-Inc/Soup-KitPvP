@@ -23,6 +23,7 @@ import io.noks.kitpvp.listeners.abilities.Kangaroo;
 import io.noks.kitpvp.listeners.abilities.Magma;
 import io.noks.kitpvp.listeners.abilities.Monk;
 import io.noks.kitpvp.listeners.abilities.Ninja;
+import io.noks.kitpvp.listeners.abilities.Pacifist;
 import io.noks.kitpvp.listeners.abilities.Phantom;
 import io.noks.kitpvp.listeners.abilities.PvP;
 import io.noks.kitpvp.listeners.abilities.Reaper;
@@ -67,6 +68,7 @@ public class AbilitiesManager {
 		abilities.add(new Batman(main));
 		abilities.add(new Spider(main));
 		abilities.add(new Chemist());
+		abilities.add(new Pacifist(main));
 	}
 	
 	public Abilities getAbilityFromName(String name) {

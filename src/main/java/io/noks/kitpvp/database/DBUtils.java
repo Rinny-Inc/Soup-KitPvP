@@ -22,7 +22,7 @@ import io.noks.kitpvp.managers.caches.PlayerSettings.SlotType;
 import io.noks.kitpvp.managers.caches.Stats;
 
 public class DBUtils {
-	private Map<RefreshType, Map<UUID, Integer>> leaderboard = new HashMap<RefreshType, Map<UUID, Integer>>(RefreshType.values().length);
+	private Map<RefreshType, Map<UUID, Integer>> leaderboard = new HashMap<RefreshType, Map<UUID, Integer>>(RefreshType.values().length - 2);
 	private boolean connected = false;
 
 	private final String address;
@@ -42,6 +42,16 @@ public class DBUtils {
 		this.username = user;
 		this.password = password;
 		this.connectDatabase();
+		for (RefreshType type : RefreshType.values()) {
+			if (!type.canBeScanned()) {
+				continue;
+			}
+			updateLeaderboard(type);
+		}
+	}
+	
+	public void updateLeaderboard(RefreshType type) {
+		this.leaderboard.put(type, scanLeaderboard(type));
 	}
 	
 	private void connectDatabase() {
@@ -179,24 +189,24 @@ public class DBUtils {
 		}
 	}
 	
-	public Map<UUID, Integer> getTopEloLadderList(RefreshType type){
+	public Map<UUID, Integer> getLeaderboard(RefreshType type){
 		return this.leaderboard.get(type);
 	}
-	private Map<UUID, Integer> getTopEloLadder(RefreshType type) {
+	private Map<UUID, Integer> scanLeaderboard(RefreshType type) {
 		if (!isConnected()) {
 			return null;
 		}
 		final Map<UUID, Integer> map = new LinkedHashMap<UUID, Integer>(10);
-		final String selectLine = "SELECT uuid," + type.getName().toLowerCase() + " FROM elo ORDER BY " + type.getName().toLowerCase() + " DESC LIMIT 10";
+		final String selectLine = "SELECT uuid," + type.getName().toLowerCase() + " FROM stats ORDER BY " + type.getName().toLowerCase() + " DESC LIMIT 10";
 		Connection connection = null;
 		try {
 			connection = this.hikari.getConnection();
 			final PreparedStatement statement = connection.prepareStatement(selectLine);
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
-				final UUID uuid = UUID.fromString(result.getString("uuid"));
-				final int elo = result.getInt(type.getName().toLowerCase());
-				map.put(uuid, elo);
+				UUID uuid = UUID.fromString(result.getString("uuid"));
+				int stat = result.getInt(type.getName().toLowerCase());
+				map.put(uuid, stat);
 			}
 			result.close();
 			statement.close();

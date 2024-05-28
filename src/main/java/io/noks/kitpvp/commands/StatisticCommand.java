@@ -35,13 +35,13 @@ public class StatisticCommand implements CommandExecutor {
 			}
 			final Stats stats = PlayerManager.get(target.getUniqueId()).getStats();
 			sender.sendMessage(ChatColor.GOLD + target.getName() + ChatColor.GRAY + "'s Statistics:");
-			sender.sendMessage(stats.toStrings());
+			sender.sendMessage(stats.toString());
 			return true;
 		}
 		final Player player = (Player) sender;
 		final Stats stats = PlayerManager.get(player.getUniqueId()).getStats();
 		sender.sendMessage(ChatColor.GOLD + player.getName() + ChatColor.GRAY + "'s Statistics:");
-		sender.sendMessage(stats.toStrings());
+		sender.sendMessage(stats.toString());
 		return true;
 	}
 }

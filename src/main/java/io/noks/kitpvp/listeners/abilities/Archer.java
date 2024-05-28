@@ -38,7 +38,7 @@ public class Archer extends Abilities implements Listener {
 	
 	@EventHandler
 	public void onProjectileHit(ProjectileHitEvent event) {
-		if (event.getEntity() instanceof Arrow) {
+		if (event.getEntity() instanceof Arrow && event.getHitEntity() != null) {
 			final Arrow arrow = (Arrow) event.getEntity();
 			final Player shooter = (Player) arrow.getShooter();
 			

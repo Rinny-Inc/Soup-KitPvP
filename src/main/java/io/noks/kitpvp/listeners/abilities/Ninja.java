@@ -1,6 +1,8 @@
 package io.noks.kitpvp.listeners.abilities;
 
 import java.text.DecimalFormat;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -24,6 +26,8 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.avaje.ebean.validation.NotNull;
 
@@ -82,6 +86,11 @@ public class Ninja extends Abilities implements Listener {
 		return sword;
 	}
 	
+	@Override
+	public List<PotionEffect> potionEffect() {
+		return Collections.singletonList(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
+	}
+	
 	@EventHandler
 	public void onToggleSneak(PlayerToggleSneakEvent event) {
 		final Player player = event.getPlayer();
@@ -105,12 +114,12 @@ public class Ninja extends Abilities implements Listener {
 				this.target = null;
 				return;
 			}
-			if (pm.hasActiveCooldown()) {
-				double cooldown = pm.getActiveCooldown().longValue() / 1000.0D;
+			if (pm.hasActiveAbilityCooldown()) {
+				double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
 				player.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 				return;
 			}
-			pm.applyCooldown();
+			pm.applyAbilityCooldown();
 			float nang = target.getLocation().getYaw() + 90.0F;
 			if (nang < 0.0F) {
 				nang += 360.0F;
@@ -147,7 +156,7 @@ public class Ninja extends Abilities implements Listener {
 				if (!this.target.isEmpty() && this.target.get(0) == damaged.getUniqueId()) {
 					return;
 				}
-				this.target.removeFirst();
+				this.target.clear();
 				this.target.add(damaged.getUniqueId());
 			}
 		}

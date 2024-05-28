@@ -82,20 +82,20 @@ public class ItemUtils {
 
 	public ItemStack[] getSpawnItems(String name) {
 		return new ItemStack[] {getItemStack(new ItemStack(Material.ENCHANTED_BOOK), ChatColor.DARK_AQUA + "Ability Selector", new String[] {ChatColor.GRAY + "Choose your ability to fight other players"}),
-								getItemStack(new ItemStack(Material.CHEST), ChatColor.DARK_AQUA + "Shop", new String[] {ChatColor.RED + "Coming Soon"}), 
+								getItemStack(new ItemStack(Material.CHEST), ChatColor.DARK_AQUA + "Perk Selector", new String[] {ChatColor.RED + "Coming Soon"}), 
 								null,
 								null, 
 								getPlayerHead(name, ChatColor.DARK_AQUA + "Stats"),
 								null,
 								null,
 								getItemStack(new ItemStack(Material.WATCH), ChatColor.DARK_AQUA + "Settings", new String[] {ChatColor.RED + "Edit your settings"}),
-								getItemStack(new ItemStack(Material.NETHER_STAR), ChatColor.RED + "??", new String[] {ChatColor.RED + "Coming Soon"})};
+								getItemStack(new ItemStack(Material.NETHER_STAR), ChatColor.DARK_AQUA + "Shop", new String[] {ChatColor.RED + "Coming Soon"})};
 	}
 	
 	public void giveEquipment(Player player, Abilities ability) {
 		player.setGameMode(GameMode.SURVIVAL);
 		final PlayerInventory inv = player.getInventory();
-		inv.clear();
+		inv.clear(); // TODO: dont clear just remove SpawnItems players will be able to buy things for the game
 		inv.setArmorContents(null);
 		/*inv.setItem(14, new ItemStack(Material.BOWL, 32));
 		inv.setItem(13, new ItemStack(Material.RED_MUSHROOM, 32));
@@ -116,10 +116,6 @@ public class ItemUtils {
 			inv.addItem(new ItemStack(Material.MUSHROOM_SOUP));
 		}
 		player.updateInventory();
-		if (ability instanceof Ninja) {
-			player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
-			return;
-		}
-		player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0));
+		player.addPotionEffects(ability.potionEffect());
 	}
 }

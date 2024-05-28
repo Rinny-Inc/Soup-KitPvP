@@ -35,13 +35,13 @@ public class Hulk extends Abilities implements Listener {
 			final Player r = (Player) e.getRightClicked();
 			final PlayerManager pm = PlayerManager.get(p.getUniqueId());
 			if (p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.AIR && pm.hasAbility(this) && !p.isInsideVehicle() && p.getPassenger() == null && r.getPassenger() == null) {
-				if (!pm.hasActiveCooldown()) {
+				if (!pm.hasActiveAbilityCooldown()) {
 					p.setPassenger(r);
 					r.sendMessage(ChatColor.GREEN + p.getName() + " just picked you up! Press SHIFT to dismount!");
-					pm.applyCooldown();
+					pm.applyAbilityCooldown();
 					return;
 				}
-				final double cooldown = pm.getActiveCooldown().longValue() / 1000.0D;
+				final double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
 				p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 			}
 		}

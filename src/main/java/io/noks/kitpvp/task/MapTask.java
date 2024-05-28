@@ -32,11 +32,11 @@ public class MapTask extends BukkitRunnable {
 		for (PlayerManager players : this.playersInMap) {
 			if (players.ability() != null && players.ability().hasCooldown()) {
 				Abilities ability = players.ability();
-				if (players.hasActiveCooldown()) {
+				if (players.hasActiveAbilityCooldown()) {
 					this.updateXpBar(players, ability);
-				} else if (!players.hasReceivedEndCooldownMessage()) {
+				} else if (!players.hasReceivedEndAbilityCooldownMessage()) {
 					players.getPlayer().sendMessage(ChatColor.GRAY + "You may now use " + ChatColor.RED + (ability.specialItem() != null ? ability.specialItemName() : ability.getName()));
-					players.updateHasReceivedEndCooldownMessage();
+					players.updateHasReceivedEndAbilityCooldownMessage();
 				}
 			}
 			if (players.getPlayer().getScoreboard().getObjective(DisplaySlot.SIDEBAR) != null) {
@@ -46,7 +46,7 @@ public class MapTask extends BukkitRunnable {
 	}
 
 	private void updateXpBar(PlayerManager pm, Abilities ability) {
-		Long activeCooldown = pm.getActiveCooldown();
+		Long activeCooldown = pm.getActiveAbilityCooldown();
 	    float xpPercentage = Math.min(99.9f, ((float) activeCooldown / (ability.getCooldown() * 1000)) * 100);
 	    if (xpPercentage < 0.0) {
 	    	xpPercentage = 0.0f;

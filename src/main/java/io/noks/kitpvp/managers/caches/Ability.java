@@ -24,15 +24,15 @@ public abstract class Ability {
 		return this.ability;
 	}
 
-	public Abilities getSelected() {
+	public Abilities getSelectedAbility() {
 		return this.selectedAbility;
 	}
 
-	public void set(Abilities ability) {
+	public void setAbility(Abilities ability) {
 		this.ability = ability;
 	}
 	
-	public void setSelected(Abilities ability) {
+	public void setSelectedAbility(Abilities ability) {
 		this.selectedAbility = ability;
 	}
 
@@ -45,19 +45,19 @@ public abstract class Ability {
 	}
 
 	public void removeAbility() {
-		removeCooldown();
+		this.clearAbilityCooldown();
 		if (this.selectedAbility != this.ability) {
 			this.selectedAbility = this.ability;
 		}
 		this.ability = null;
 	}
 
-	public Long getActiveCooldown() {
+	public Long getActiveAbilityCooldown() {
 		if (this.abilityCooldown != 0L) return Long.valueOf(Math.max(0L, this.abilityCooldown - System.currentTimeMillis()));
 		return Long.valueOf(0L);
 	}
 
-	public void applyCooldown() {
+	public void applyAbilityCooldown() {
 		if (!this.ability.hasCooldown()) return;
 		this.abilityCooldown = Long.valueOf(System.currentTimeMillis() + this.ability.getCooldown().longValue() * 1000L);
 		if (this.receivedEndCooldownMessage) {
@@ -65,21 +65,21 @@ public abstract class Ability {
 		}
 	}
 
-	public boolean hasActiveCooldown() {
+	public boolean hasActiveAbilityCooldown() {
 		if (this.abilityCooldown == 0L) return false;
 		return this.abilityCooldown > System.currentTimeMillis();
 	}
 
-	public void removeCooldown() {
+	private void clearAbilityCooldown() {
 		if (this.abilityCooldown == 0L) return;
 		this.abilityCooldown = 0L;
 	}
 	
-	public boolean hasReceivedEndCooldownMessage() {
+	public boolean hasReceivedEndAbilityCooldownMessage() {
 		return this.receivedEndCooldownMessage;
 	}
 	
-	public void updateHasReceivedEndCooldownMessage() {
+	public void updateHasReceivedEndAbilityCooldownMessage() {
 		this.receivedEndCooldownMessage = !this.receivedEndCooldownMessage;
 	}
 }

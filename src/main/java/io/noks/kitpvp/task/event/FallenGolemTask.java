@@ -17,7 +17,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.enums.EventsType;
 import io.noks.kitpvp.managers.PlayerManager;
-import io.noks.kitpvp.managers.caches.Economy.MoneyType;
 
 public class FallenGolemTask implements Listener {
 	private static FallenGolemTask instance = new FallenGolemTask();
@@ -93,7 +92,7 @@ public class FallenGolemTask implements Listener {
 				this.countdown = 8400;
 				final Player killer = golem.getKiller();
 				Bukkit.broadcastMessage(this.prefix + ChatColor.RED + "The fallen golem has been killed by " + killer.getName());
-				PlayerManager.get(killer.getUniqueId()).getEconomy().add(85, MoneyType.BRONZE);
+				PlayerManager.get(killer.getUniqueId()).getEconomy().add(85);
 				// TODO: DROP STUFF
 				doFallenGolem();
 			}

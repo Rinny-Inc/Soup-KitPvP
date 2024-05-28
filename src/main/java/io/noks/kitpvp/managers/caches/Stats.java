@@ -87,12 +87,13 @@ public class Stats {
 		return this.bounty;
 	}
 
-	public String[] toStrings() {
-		return new String[] { ChatColor.GRAY + "Kills -> " + ChatColor.GREEN + this.kills,
-				ChatColor.GRAY + "Deaths -> " + ChatColor.RED + this.deaths,
-				ChatColor.GRAY + "Killstreak -> " + ChatColor.GOLD + this.killStreak,
-				ChatColor.GRAY + "Highest Killstreak -> " + ChatColor.GOLD + this.bestKillStreak,
-				ChatColor.GRAY + "K/D Ratio -> " + ChatColor.GOLD + getRatio(),
-				ChatColor.GRAY + "Bounty -> " + ChatColor.RED + this.bounty};
+	@Override
+	public String toString() {
+		return ChatColor.GRAY + "Kills -> " + ChatColor.GREEN + this.kills + "\n" +
+			   ChatColor.GRAY + "Deaths -> " + ChatColor.RED +  this.deaths + "\n" +
+			   ChatColor.GRAY + "Killstreak -> " + ChatColor.GOLD +  this.killStreak + "\n" +
+			   ChatColor.GRAY + "Highest Killstreak -> " + ChatColor.GOLD +  this.bestKillStreak + "\n" +
+			   ChatColor.GRAY + "K/D Ratio -> " + ChatColor.GOLD +  this.getRatio() + "\n" +
+			   ChatColor.GRAY + "Bounty -> " + ChatColor.RED + this.bounty;
 	}
 }

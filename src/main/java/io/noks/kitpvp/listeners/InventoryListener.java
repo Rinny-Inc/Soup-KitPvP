@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -26,12 +27,13 @@ import com.google.common.collect.Lists;
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
+import io.noks.kitpvp.interfaces.SignRotation;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.RefillInventoryManager;
 import io.noks.kitpvp.managers.caches.PlayerSettings;
 import io.noks.kitpvp.managers.caches.PlayerSettings.SlotType;
 
-public class InventoryListener implements Listener {
+public class InventoryListener implements Listener, SignRotation {
 	private Main plugin;
 
 	public InventoryListener(Main main) {
@@ -121,7 +123,7 @@ public class InventoryListener implements Listener {
 				}
 				player.closeInventory();
 				final int random = (new Random()).nextInt(abilities.size());
-				pm.setSelected(this.plugin.getAbilitiesManager().getAbilityFromName(abilities.get(random)));
+				pm.setSelectedAbility(this.plugin.getAbilitiesManager().getAbilityFromName(abilities.get(random)));
 				final Abilities ab = pm.ability();
 				player.sendMessage(ChatColor.GRAY + "You've chosen " + ab.getRarity().getColor() + ab.getName() + ChatColor.GRAY + " ability.");
 				abilities.clear();
@@ -131,8 +133,8 @@ public class InventoryListener implements Listener {
 				return;
 			}
 			player.closeInventory();
-			pm.setSelected(this.plugin.getAbilitiesManager().getAbilityFromName(correctItemName));
-			player.sendMessage(ChatColor.GRAY + "You've chosen " + pm.getSelected().getRarity().getColor() + pm.getSelected().getName() + ChatColor.GRAY + " ability.");
+			pm.setSelectedAbility(this.plugin.getAbilitiesManager().getAbilityFromName(correctItemName));
+			player.sendMessage(ChatColor.GRAY + "You've chosen " + pm.getSelectedAbility().getRarity().getColor() + pm.getSelectedAbility().getName() + ChatColor.GRAY + " ability.");
 			return;
 		}
 		if (title.contains("settings")) {
@@ -196,9 +198,13 @@ public class InventoryListener implements Listener {
 			
 			for (int i = 0; i < 8; i++) {
 				block = player.getTargetBlock(null, i);
-				if (block.getType() == Material.GLOWSTONE && block.getRelative(BlockFace.UP).getType() == Material.WOOL) {
-					location = block.getLocation();
-					break;
+				if (block.getType() == Material.WALL_SIGN) {
+					Sign sign = (Sign) block.getState();
+					Block blockBehind = this.getBlockBehindSign(block, sign);
+					if (blockBehind.getType() == Material.GLOWSTONE && blockBehind.getRelative(BlockFace.UP).getType() == Material.WOOL) {
+						location = blockBehind.getLocation();
+						break;
+					}
 				}
 			}
 	        if (location == null) {

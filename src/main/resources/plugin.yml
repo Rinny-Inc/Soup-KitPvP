@@ -16,5 +16,8 @@ commands:
   boot:
     aliases: [ddos]
   balance:
+    aliases: [money]
+  pay:
   feast:
   spawn:
+  repair:
