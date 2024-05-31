@@ -1,12 +1,8 @@
 package io.noks.kitpvp.listeners;
 
-import java.text.DecimalFormat;
-import java.util.Map;
 import java.util.Random;
 
-import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -26,30 +22,26 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.event.server.ServerDateChangeEvent;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.google.common.collect.Maps;
 
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.managers.PlayerManager;
 
 public class ServerListener implements Listener {
 	private Main plugin;
-	private final Map<Location, Long> blockCooldown;
 
 	public ServerListener(Main main) {
-		this.blockCooldown = Maps.newConcurrentMap();
-
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}
 
 	@EventHandler
 	public void onServerPing(ServerListPingEvent event) {
-		final String line1 = ChatColor.translateAlternateColorCodes('&', this.plugin.getConfigManager().motdFirstLine) + "\n";
+		final String line1 = ChatColor.translateAlternateColorCodes('&', this.plugin.getConfigManager().motdFirstLine) + (this.plugin.getServer().hasWhitelist() ? ChatColor.RED + "      Whitelisted" : ChatColor.GREEN + "           Open") +"\n";
 		final String line2 = ChatColor.translateAlternateColorCodes('&', this.plugin.getConfigManager().motdSecondLine);
 		event.setMotd(line1 + line2 /*+ (Bukkit.hasWhitelist() ? (ChatColor.RED + " Whitelisted") : "")*/);
 	}
@@ -73,19 +65,6 @@ public class ServerListener implements Listener {
 			return;
 		}
 		event.setCancelled(true);
-		if (!pm.hasAbility()) {
-			return;
-		}
-		if (block.getType() == Material.BROWN_MUSHROOM || block.getType() == Material.RED_MUSHROOM || block.getType() == Material.LOG) {
-			final Location location = event.getBlock().getLocation();
-			if (isBlockCooldownActive(location)) {
-				double time = getBlockCooldown(location).longValue() / 1000.0D;
-				player.sendMessage(ChatColor.RED + "This " + WordUtils.capitalizeFully(block.getType().toString().replaceAll("_", " ")) + " respawn in " + (new DecimalFormat("#.#")).format(time) + " seconds.");
-				return;
-			}
-			setBlockCooldown(location, ((new Random()).nextInt(5) + 25));
-			block.getWorld().dropItem(location, this.plugin.getItemUtils().getItemMaterial((block.getType() == Material.LOG) ? Material.BOWL : block.getType(), (new Random()).nextInt(3) + 1));
-		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -172,22 +151,6 @@ public class ServerListener implements Listener {
 			}
 		}
 	}
-
-	private Long getBlockCooldown(Location location) {
-		if (this.blockCooldown.containsKey(location))
-			return Long.valueOf(Math.max(0L, ((Long) this.blockCooldown.get(location)).longValue() - System.currentTimeMillis()));
-		return Long.valueOf(0L);
-	}
-
-	private void setBlockCooldown(Location location, long cooldown) {
-		this.blockCooldown.put(location, Long.valueOf(System.currentTimeMillis() + cooldown * 1000L));
-	}
-
-	private boolean isBlockCooldownActive(Location location) {
-		if (!this.blockCooldown.containsKey(location))
-			return false;
-		return (((Long) this.blockCooldown.get(location)).longValue() > System.currentTimeMillis());
-	}
 	
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onBlockIgnite(BlockIgniteEvent event) {
@@ -216,6 +179,17 @@ public class ServerListener implements Listener {
 			if (lines[3] != null) {
 				event.setLine(3, null);
 			}
+		}
+	}
+	
+	@EventHandler
+	public void onDateChange(ServerDateChangeEvent event) {
+		if (event.getDate().getDay() == 2) {
+			this.plugin.getServer().setWhitelist(true);
+			return;
+		}
+		if (event.getDate().getDay() == 6) {
+			this.plugin.getServer().setWhitelist(false);
 		}
 	}
 	

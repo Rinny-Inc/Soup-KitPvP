@@ -30,7 +30,6 @@ public class PlayerManager extends Ability {
 	private final @NotNull UUID playerUUID;
 	private final @NotNull Perks perks;
 	private boolean usedSponsor;
-	private boolean usedRecraft;
 	private boolean allowBuild;
 	private final @NotNull Stats stats;
 	private final @NotNull PlayerSettings settings;
@@ -42,7 +41,6 @@ public class PlayerManager extends Ability {
 		this.player = Bukkit.getPlayer(this.playerUUID);
 		this.perks = new Perks();
 		this.usedSponsor = false;
-		this.usedRecraft = false;
 		this.allowBuild = false;
 		this.stats = new Stats();
 		this.settings = new PlayerSettings();
@@ -57,7 +55,6 @@ public class PlayerManager extends Ability {
 		this.player = Bukkit.getPlayer(this.playerUUID);
 		this.perks = perks;
 		this.usedSponsor = false;
-		this.usedRecraft = false;
 		this.allowBuild = false;
 		this.stats = stats;
 		this.settings = settings;
@@ -98,14 +95,6 @@ public class PlayerManager extends Ability {
 
 	public void setUsedSponsor(boolean use) {
 		this.usedSponsor = use;
-	}
-
-	public boolean hasUsedRecraft() {
-		return this.usedRecraft;
-	}
-
-	public void setUsedRecraft(boolean use) {
-		this.usedRecraft = use;
 	}
 
 	public boolean isAllowBuild() {
@@ -151,12 +140,10 @@ public class PlayerManager extends Ability {
 	public void kill(boolean backToSpawn) {
 		if (!backToSpawn) {
 			if (hasCombatTag()) {
-				if (this.player.getLastDamage() > 0.0D) {
-					stats.addDeaths();
-				}
-				refreshScoreboardLine(RefreshType.DEATHS);
 				this.combatTag = null;
 			}
+			stats.addDeaths();
+			refreshScoreboardLine(RefreshType.DEATHS);
 			refreshScoreboardLine(RefreshType.KILLSTREAK);
 			if (stats.getKillStreak() > stats.getBestKillStreak()) {
 				stats.updateBestKillStreak();
@@ -166,7 +153,6 @@ public class PlayerManager extends Ability {
 			this.removeAbility();
 		}
 		if (hasUsedSponsor()) setUsedSponsor(false);
-		if (hasUsedRecraft()) setUsedRecraft(false);
 		this.player.eject();
 		this.player.setWalkSpeed(0.2F);
 		this.player.setMaximumNoDamageTicks(20);
@@ -238,18 +224,19 @@ public class PlayerManager extends Ability {
 	
 	public void refreshScoreboardLine(RefreshType type) {
 		final Scoreboard board = this.player.getScoreboard();
+		final Team team = board.getTeam(type.getName());
 		switch (type) {
 		case KILLS:
-			board.getTeam(type.getName()).setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getKills());
+			team.setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getKills());
 			break;
 		case KILLSTREAK:
-			board.getTeam(type.getName()).setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getKillStreak());
+			team.setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getKillStreak());
 			break;
 		case DEATHS:
-			board.getTeam(type.getName()).setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getDeaths());
+			team.setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getDeaths());
 			break;
 		case CREDITS:
-			board.getTeam(type.getName()).setSuffix(ChatColor.DARK_AQUA.toString() + this.economy.getMoney());
+			team.setSuffix(ChatColor.DARK_AQUA.toString() + this.economy.getMoney());
 			break;
 		/*case COMBATTAG:
 			final Objective sidebar = board.getObjective(DisplaySlot.SIDEBAR);

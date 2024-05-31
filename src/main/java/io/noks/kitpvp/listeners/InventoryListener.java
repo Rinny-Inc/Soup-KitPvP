@@ -14,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -50,7 +49,7 @@ public class InventoryListener implements Listener, SignRotation {
 		if (inventory.getType().equals(InventoryType.CREATIVE) || inventory.getType().equals(InventoryType.CRAFTING) || inventory.getType().equals(InventoryType.PLAYER)) {
 			final Player player = (Player) event.getWhoClicked();
 			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-			if (pm.isInSpawn() && player.getGameMode() != GameMode.CREATIVE || !pm.isInSpawn() && event.getInventory().getTitle().toLowerCase().contains("refill chest") && event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+			if (pm.isInSpawn() && player.getGameMode() != GameMode.CREATIVE) {
 				event.setCancelled(true);
 				player.updateInventory();
 			}

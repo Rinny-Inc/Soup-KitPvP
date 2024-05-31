@@ -3,6 +3,8 @@ package io.noks.kitpvp.listeners;
 import java.util.Random;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -100,7 +102,10 @@ public class PlayerListener implements Listener, SignRotation {
 	}
 	
 	private void leaveAction(Player player) {
-		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
+		final @Nullable PlayerManager pm = PlayerManager.get(player.getUniqueId());
+		if (pm == null) {
+			return;
+		}
 		if (pm.hasCombatTag()) {
 			final PlayerManager km = PlayerManager.get(pm.getCurrentCombatTag().getLastAttackerUUID()); 
 			if (km != null) {
