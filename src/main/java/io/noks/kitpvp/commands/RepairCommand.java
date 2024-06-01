@@ -23,11 +23,15 @@ public class RepairCommand implements CommandExecutor {
 		}
 		final Player player = (Player) sender;
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-		if (pm.getEconomy().getMoney() < 150) {
-			player.sendMessage(ChatColor.RED + "Missing " + (150 - pm.getEconomy().getMoney()) + "credits!");
+		if (pm.isInSpawn()) {
+			player.sendMessage(ChatColor.RED + "You need to be in the map to do this!");
 			return false;
 		}
-		pm.getEconomy().remove(150);
+		if (pm.getEconomy().getMoney() < 50) {
+			player.sendMessage(ChatColor.RED + "Missing " + (50 - pm.getEconomy().getMoney()) + "credits!");
+			return false;
+		}
+		pm.getEconomy().remove(50);
 		for (ItemStack armor : player.getInventory().getArmorContents()) {
 			armor.setDurability(armor.getType().getMaxDurability());
 		}

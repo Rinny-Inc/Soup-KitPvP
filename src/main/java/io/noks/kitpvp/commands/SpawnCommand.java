@@ -60,6 +60,7 @@ public class SpawnCommand implements CommandExecutor {
 						pm.kill(true);
 						player.teleport(player.getLocation().getWorld().getSpawnLocation());
 						player.getInventory().clear();
+						player.getInventory().setArmorContents(null);
 						player.getInventory().setContents(main.getItemUtils().getSpawnItems(player.getName()));
 						for (PotionEffect effect : player.getActivePotionEffects()) {
 							player.removePotionEffect(effect.getType());

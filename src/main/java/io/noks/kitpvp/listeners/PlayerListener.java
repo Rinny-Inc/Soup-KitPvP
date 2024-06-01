@@ -13,6 +13,7 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.Event.Result;
@@ -25,6 +26,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -236,6 +238,18 @@ public class PlayerListener implements Listener, SignRotation {
 	public void onConsumeSoup(PlayerItemConsumeEvent event) {
 		if (event.getItem().getType() == Material.MUSHROOM_SOUP) {
 			event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler(priority=EventPriority.LOWEST)
+	public void onNPCClick(PlayerInteractEntityEvent event) {
+		if (event.getRightClicked() instanceof Villager) {
+			Villager entity = (Villager) event.getRightClicked();
+			
+			if (entity.getCustomName().toLowerCase().contains("shop")) {
+				event.setCancelled(true);
+				event.getPlayer().openInventory(this.plugin.getInventoryManager().openShopInventory());
+			}
 		}
 	}
 

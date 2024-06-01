@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.bukkit.AxisAlignedBB;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -116,6 +117,10 @@ public class Cuboid {
 
     public boolean isIn(final Player player) {
         return isIn(player.getLocation());
+    }
+    
+    public boolean isIn(AxisAlignedBB boundingBox) {
+        return boundingBox.getMinX() >= this.xMin && boundingBox.getMaxX() <= this.xMax && boundingBox.getMinY() >= this.yMin && boundingBox.getMaxY() <= this.yMax && boundingBox.getMinZ() >= this.zMin && boundingBox.getMaxZ() <= this.zMax;
     }
 
     public boolean isInWithMarge(final Location loc, final double marge) {

@@ -21,13 +21,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.avaje.ebean.validation.NotNull;
 
 import io.noks.kitpvp.commands.AbilityListCommand;
-import io.noks.kitpvp.commands.EconomyCommand;
 import io.noks.kitpvp.commands.BootCommand;
 import io.noks.kitpvp.commands.BuildCommand;
+import io.noks.kitpvp.commands.EconomyCommand;
 import io.noks.kitpvp.commands.FeastCommand;
 import io.noks.kitpvp.commands.PingCommand;
 import io.noks.kitpvp.commands.RepairCommand;
 import io.noks.kitpvp.commands.ReportCommand;
+import io.noks.kitpvp.commands.ShopCommand;
 import io.noks.kitpvp.commands.ShoutCommand;
 import io.noks.kitpvp.commands.SkullCommand;
 import io.noks.kitpvp.commands.SpawnCommand;
@@ -164,6 +165,7 @@ public class Main extends JavaPlugin {
 		new FeastCommand(this);
 		new SpawnCommand(this);
 		getCommand("repair").setExecutor(new RepairCommand());
+		getCommand("shop").setExecutor(new ShopCommand());
 	}
 	
 	private void spawnNPC(World world) {

@@ -29,6 +29,7 @@ import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.interfaces.SignRotation;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.RefillInventoryManager;
+import io.noks.kitpvp.managers.caches.Economy;
 import io.noks.kitpvp.managers.caches.PlayerSettings;
 import io.noks.kitpvp.managers.caches.PlayerSettings.SlotType;
 
@@ -134,6 +135,31 @@ public class InventoryListener implements Listener, SignRotation {
 			player.closeInventory();
 			pm.setSelectedAbility(this.plugin.getAbilitiesManager().getAbilityFromName(correctItemName));
 			player.sendMessage(ChatColor.GRAY + "You've chosen " + pm.getSelectedAbility().getRarity().getColor() + pm.getSelectedAbility().getName() + ChatColor.GRAY + " ability.");
+			return;
+		}
+		// TODO: SHOP
+		if (title.equals("shop")) {
+			event.setCancelled(true);
+			Player player = (Player) event.getWhoClicked();
+			final int clickedSlot = event.getSlot();
+			switch (clickedSlot) {
+			case 0: {
+				player.closeInventory();
+				player.performCommand("repair");
+			}
+			case 1: {
+				Economy eco = PlayerManager.get(player.getUniqueId()).getEconomy();
+				if (eco.getMoney() < 150) {
+					break;
+				}
+				player.closeInventory();
+				eco.remove(150);
+				player.sendMessage(ChatColor.GREEN + "Successfully bought Golden Apples for 150 credits!");
+				player.getInventory().addItem(new ItemStack(Material.GOLDEN_APPLE, 3));
+			}
+			default:
+				break;
+			}
 			return;
 		}
 		if (title.contains("settings")) {

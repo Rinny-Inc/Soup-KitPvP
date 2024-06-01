@@ -88,18 +88,24 @@ public class ItemUtils {
 								getPlayerHead(name, ChatColor.DARK_AQUA + "Stats"),
 								null,
 								null,
-								getItemStack(new ItemStack(Material.WATCH), ChatColor.DARK_AQUA + "Settings", new String[] {ChatColor.RED + "Edit your settings"}),
+								getItemStack(new ItemStack(Material.WATCH), ChatColor.DARK_AQUA + "Settings", new String[] {ChatColor.GRAY + "Edit your settings"}),
 								getItemStack(new ItemStack(Material.NETHER_STAR), ChatColor.DARK_AQUA + "Shop", new String[] {ChatColor.RED + "Coming Soon"})};
 	}
 	
 	public void giveEquipment(Player player, Abilities ability) {
 		player.setGameMode(GameMode.SURVIVAL);
 		final PlayerInventory inv = player.getInventory();
-		inv.clear(); // TODO: dont clear just remove SpawnItems players will be able to buy things for the game
+		for (ItemStack items : inv.getContents()) {
+			if (items == null) {
+				continue;
+			}
+			for (ItemStack spawnItems : getSpawnItems(player.getName())) {
+				if (spawnItems != null && items.getItemMeta().getDisplayName().equals(spawnItems.getItemMeta().getDisplayName())) {
+					inv.remove(spawnItems.getType());
+				}
+			}
+		}
 		inv.setArmorContents(null);
-		/*inv.setItem(14, new ItemStack(Material.BOWL, 32));
-		inv.setItem(13, new ItemStack(Material.RED_MUSHROOM, 32));
-		inv.setItem(15, new ItemStack(Material.BROWN_MUSHROOM, 32));*/
 		inv.setArmorContents(ability.armors());
 		final PlayerSettings settings = PlayerManager.get(player.getUniqueId()).getSettings();
 		inv.setItem(settings.getSlot(SlotType.SWORD), ability.sword());

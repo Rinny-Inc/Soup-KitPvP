@@ -24,7 +24,7 @@ public class InventoryManager {
 	private final @NotNull Inventory shopInventory;
 	
 	public InventoryManager() {
-		this.shopInventory = Bukkit.createInventory(null, 54, ChatColor.DARK_AQUA + "Shop");
+		this.shopInventory = Bukkit.createInventory(null, 9, ChatColor.DARK_AQUA + "Shop");
 		this.initShopInventory();
 	}
 
@@ -89,7 +89,10 @@ public class InventoryManager {
 	}
 	
 	private void initShopInventory() {
-		// TODO
+		this.shopInventory.setItem(0, Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.IRON_CHESTPLATE), ChatColor.GREEN + "Repair All", new String[] { "", ChatColor.GRAY + "Repairs everything in your inventory.", "", ChatColor.WHITE + "Status: " + ChatColor.GREEN + "In Stock", ChatColor.WHITE + "Cost: " + ChatColor.GOLD + "50 Credits", "", ChatColor.YELLOW + "Click to purchase the Repair All!" }));
+		this.shopInventory.setItem(1, Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.GOLDEN_APPLE), ChatColor.GREEN + "Golden Apples", new String[] { "", ChatColor.GRAY + "3 premium golden apples.", "", ChatColor.WHITE + "Status: " + ChatColor.GREEN + "In Stock", ChatColor.WHITE + "Cost: " + ChatColor.GOLD + "150 Credits", "", ChatColor.YELLOW + "Click to purchase the Golden Apples!" }));
+		
+		this.shopInventory.setItem(8, Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.CHEST), ChatColor.DARK_AQUA + "Perk Shop", new String[] { ChatColor.GRAY + "Click here to go to the perk shop", "", ChatColor.RED + "Coming Soon :)"}));
 	}
 	
 	@NotNull

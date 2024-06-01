@@ -73,7 +73,7 @@ public class EconomyCommand implements CommandExecutor {
 			pe.remove(amount);
 			PlayerManager.get(target.getUniqueId()).getEconomy().add(amount);
 			player.sendMessage(ChatColor.GREEN + "You've sent " + target.getName() + " " + ChatColor.YELLOW + amount + " credits.");
-			player.sendMessage(ChatColor.GREEN + player.getName() + " sent you " + ChatColor.YELLOW + amount + " credits.");
+			target.sendMessage(ChatColor.GREEN + player.getName() + " sent you " + ChatColor.YELLOW + amount + " credits.");
 			return true;
 		}
 		return false;
