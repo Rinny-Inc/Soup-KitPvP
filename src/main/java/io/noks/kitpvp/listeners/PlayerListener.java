@@ -1,5 +1,6 @@
 package io.noks.kitpvp.listeners;
 
+import java.text.DecimalFormat;
 import java.util.Random;
 import java.util.UUID;
 
@@ -13,7 +14,6 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.Event.Result;
@@ -362,11 +362,14 @@ public class PlayerListener implements Listener, SignRotation {
 			final Block block = this.getBlockBehindSign(signBlock, sign);
 			if (block.getType() == Material.GLOWSTONE && block.getRelative(BlockFace.UP).getType() == Material.WOOL) {
 				final Player player = event.getPlayer();
-				// GET THE SIGN LINES
 				if (PlayerManager.get(player.getUniqueId()).hasAbility()) {
 					Location loc = block.getLocation();
 					final RefillInventoryManager im = RefillInventoryManager.get(loc);
 					if (im.hasCooldown()) {
+						DecimalFormat df = new DecimalFormat("#.#");
+						double cooldown = im.getCooldown() / 1000.0D;
+						double cooldownPercentage = 100.0 - ((cooldown / 60) * 100.0);
+						player.sendMessage(ChatColor.RED + "Refill in progress " + df.format(cooldownPercentage) + "% " + "(" + df.format(cooldown) + "s)");
 						return;
 					}
 					if (!im.isFilled()) {

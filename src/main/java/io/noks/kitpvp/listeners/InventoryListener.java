@@ -124,9 +124,10 @@ public class InventoryListener implements Listener, SignRotation {
 				player.closeInventory();
 				final int random = (new Random()).nextInt(abilities.size());
 				pm.setSelectedAbility(this.plugin.getAbilitiesManager().getAbilityFromName(abilities.get(random)));
-				final Abilities ab = pm.ability();
+				final Abilities ab = pm.getSelectedAbility();
 				player.sendMessage(ChatColor.GRAY + "You've chosen " + ab.getRarity().getColor() + ab.getName() + ChatColor.GRAY + " ability.");
 				abilities.clear();
+				abilities = null;
 				return;
 			}
 			if (!this.plugin.getAbilitiesManager().contains(correctItemName)) {
