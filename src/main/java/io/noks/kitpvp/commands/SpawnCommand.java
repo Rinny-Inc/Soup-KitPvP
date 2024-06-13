@@ -65,6 +65,7 @@ public class SpawnCommand implements CommandExecutor {
 						for (PotionEffect effect : player.getActivePotionEffects()) {
 							player.removePotionEffect(effect.getType());
 						}
+						player.setHealth(20.0D);
 						main.applySpawnProtection(player, true);
 						this.cancel();
 						return;

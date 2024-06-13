@@ -80,7 +80,7 @@ public class ItemUtils {
 		return i;
 	}
 
-	public ItemStack[] getSpawnItems(String name) {
+	public final ItemStack[] getSpawnItems(String name) {
 		return new ItemStack[] {getItemStack(new ItemStack(Material.ENCHANTED_BOOK), ChatColor.DARK_AQUA + "Ability Selector", new String[] {ChatColor.GRAY + "Choose your ability to fight other players"}),
 								getItemStack(new ItemStack(Material.CHEST), ChatColor.DARK_AQUA + "Perk Selector", new String[] {ChatColor.RED + "Coming Soon"}), 
 								null,

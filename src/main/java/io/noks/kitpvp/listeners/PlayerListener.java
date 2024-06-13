@@ -14,6 +14,7 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.NPC;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.Event.Result;
@@ -243,10 +244,10 @@ public class PlayerListener implements Listener, SignRotation {
 	
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onNPCClick(PlayerInteractEntityEvent event) {
-		if (event.getRightClicked() instanceof Villager) {
-			Villager entity = (Villager) event.getRightClicked();
+		if (event.getRightClicked() instanceof Player) {
+			Player npc = (Player) event.getRightClicked();
 			
-			if (entity.getCustomName().toLowerCase().contains("shop")) {
+			if (npc.getName().toLowerCase().contains("shop")) {
 				event.setCancelled(true);
 				event.getPlayer().openInventory(this.plugin.getInventoryManager().openShopInventory());
 			}
@@ -270,16 +271,20 @@ public class PlayerListener implements Listener, SignRotation {
 				return;
 			}
 			final String itemName = ChatColor.stripColor(item.getItemMeta().getDisplayName().toLowerCase());
-			if (item.getType() == Material.ENCHANTED_BOOK && itemName.equals("ability selector")) {
-				player.openInventory(this.plugin.getInventoryManager().loadKitsInventory(player));
-				return;
-			}
-			if (item.getType() == Material.WATCH && itemName.equals("settings")) {
-				player.openInventory(this.plugin.getInventoryManager().loadSettingsInventory(player));
-				return;
-			}
-			if (item.getType() == Material.SKULL_ITEM && itemName.equals("stats")) {
-				player.performCommand("stats");
+			switch (itemName) {
+				case "ability selector": {
+					player.openInventory(this.plugin.getInventoryManager().loadKitsInventory(player));
+					return;
+				}
+				case "settings": {
+					player.openInventory(this.plugin.getInventoryManager().loadSettingsInventory(player));
+					return;
+				}
+				case "stats": {
+					player.performCommand("stats");
+					return;
+				}
+				default: break;
 			}
 		}
 	}

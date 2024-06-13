@@ -72,130 +72,6 @@ public class InventoryListener implements Listener, SignRotation {
 			return;
 		}
 		final String title = ChatColor.stripColor(inventory.getTitle()).toLowerCase();
-		if (title.equals("ability selector")) {
-			event.setCancelled(true);
-			final Player player = (Player) event.getWhoClicked();
-			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-			final String itemName = item.getItemMeta().getDisplayName();
-			if (itemName.equals(" ") || itemName.length() < 3) {
-				return;
-			}
-			String correctItemName = itemName.substring(2, itemName.length());
-			if (Rarity.contains(correctItemName)) {
-				Rarity rarity = Rarity.getRarityByName(correctItemName);
-				if (!player.hasPermission(rarity.getPermission()) && !player.hasPermission("kit.*")) {
-					return;
-				}
-				inventory.setContents(this.plugin.getInventoryManager().loadKitsInventory(player, rarity).getContents());
-				return;
-			}
-			if (itemName.toLowerCase().equals(ChatColor.RED + "leave")) {
-				player.sendMessage(ChatColor.RED + "You just left your kits inventory.");
-				player.closeInventory();
-				return;
-			}
-			if (itemName.toLowerCase().equals(ChatColor.YELLOW + "your whole abilities")) {
-				inventory.setContents(this.plugin.getInventoryManager().loadKitsInventory(player).getContents());
-				return;
-			}
-			if (itemName.toLowerCase().equals(ChatColor.YELLOW + "next page")) {
-				inventory.setContents(this.plugin.getInventoryManager().loadKitsInventory(player, Rarity.getRarityByName(correctItemName), item.getAmount()).getContents());
-				return;
-			}
-			if (itemName.toLowerCase().equals(ChatColor.YELLOW + "previous page")) {
-				inventory.setContents(this.plugin.getInventoryManager().loadKitsInventory(player, Rarity.getRarityByName(correctItemName), item.getAmount()).getContents());
-				return;
-			}
-			if (itemName.toLowerCase().contains("last used ability:")) {
-				final String split = itemName.split(": ")[1];
-				correctItemName = split.substring(2, split.length());
-			}
-			if (itemName.toLowerCase().equals(ChatColor.YELLOW + "random abilities")) {
-				List<String> abilities = Lists.newArrayList();
-
-				for (Abilities abilitiess : this.plugin.getAbilitiesManager().getAbilities()) {
-					if (abilitiess.getRarity() != Rarity.USELESS && (player.hasPermission("kit." + abilitiess.getName().toLowerCase()) || player.hasPermission(abilitiess.getRarity().getPermission()) || player.hasPermission("kit.*"))) {
-						abilities.add(abilitiess.getName());
-					}
-				}
-				if (abilities.isEmpty()) {
-					return;
-				}
-				player.closeInventory();
-				final int random = (new Random()).nextInt(abilities.size());
-				pm.setSelectedAbility(this.plugin.getAbilitiesManager().getAbilityFromName(abilities.get(random)));
-				final Abilities ab = pm.getSelectedAbility();
-				player.sendMessage(ChatColor.GRAY + "You've chosen " + ab.getRarity().getColor() + ab.getName() + ChatColor.GRAY + " ability.");
-				abilities.clear();
-				abilities = null;
-				return;
-			}
-			if (!this.plugin.getAbilitiesManager().contains(correctItemName)) {
-				return;
-			}
-			player.closeInventory();
-			pm.setSelectedAbility(this.plugin.getAbilitiesManager().getAbilityFromName(correctItemName));
-			player.sendMessage(ChatColor.GRAY + "You've chosen " + pm.getSelectedAbility().getRarity().getColor() + pm.getSelectedAbility().getName() + ChatColor.GRAY + " ability.");
-			return;
-		}
-		// TODO: SHOP
-		if (title.equals("shop")) {
-			event.setCancelled(true);
-			Player player = (Player) event.getWhoClicked();
-			final int clickedSlot = event.getSlot();
-			switch (clickedSlot) {
-			case 0: {
-				player.closeInventory();
-				player.performCommand("repair");
-			}
-			case 1: {
-				Economy eco = PlayerManager.get(player.getUniqueId()).getEconomy();
-				if (eco.getMoney() < 150) {
-					break;
-				}
-				player.closeInventory();
-				eco.remove(150);
-				player.sendMessage(ChatColor.GREEN + "Successfully bought Golden Apples for 150 credits!");
-				player.getInventory().addItem(new ItemStack(Material.GOLDEN_APPLE, 3));
-			}
-			default:
-				break;
-			}
-			return;
-		}
-		if (title.contains("settings")) {
-			event.setCancelled(true);
-			String itemName = ChatColor.stripColor(item.getItemMeta().getDisplayName().toLowerCase());
-			if (itemName.equals(" ") || itemName.length() < 3) {
-				return;
-			}
-			Player player = (Player) event.getWhoClicked();
-			player.closeInventory();
-			if (itemName.equals("previous page")) {
-				player.openInventory(this.plugin.getInventoryManager().loadKitsInventory(player));
-				return;
-			}
-			if (itemName.equals("scoreboard")) {
-				final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-				pm.getSettings().updateScoreboardState();
-				if (pm.getSettings().hasScoreboardEnabled()) {
-					pm.applyScoreboard();
-				} else {
-					if (player.getScoreboard().getObjective(DisplaySlot.SIDEBAR) != null) {
-						player.getScoreboard().getObjective(DisplaySlot.SIDEBAR).unregister();
-					}
-				}
-				player.openInventory(this.plugin.getInventoryManager().loadSettingsInventory(player));
-				return;
-			}
-			if (itemName.contains("slot")) {
-				String name = itemName.split(" ")[0];
-				name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
-				player.openInventory(this.plugin.getInventoryManager().loadSlotsInventory(player, name));
-				return;
-			}
-			return;
-		}
 		if (title.contains("slot")) {
 			event.setCancelled(true);
 			Player player = (Player) event.getWhoClicked();
@@ -207,6 +83,128 @@ public class InventoryListener implements Listener, SignRotation {
 			settings.setSlot(SlotType.getSlotTypeFromName(titleSplitted), event.getSlot());
 			player.closeInventory();
 			player.openInventory(this.plugin.getInventoryManager().loadSettingsInventory(player));
+			return;
+		}
+		switch (title) {
+			case "ability selector" -> {
+				event.setCancelled(true);
+				final Player player = (Player) event.getWhoClicked();
+				final PlayerManager pm = PlayerManager.get(player.getUniqueId());
+				final String itemName = item.getItemMeta().getDisplayName();
+				if (itemName.equals(" ") || itemName.length() < 3) {
+					return;
+				}
+				String correctItemName = itemName.substring(2, itemName.length());
+				if (Rarity.contains(correctItemName)) {
+					Rarity rarity = Rarity.getRarityByName(correctItemName);
+					if (!player.hasPermission(rarity.getPermission()) && !player.hasPermission("kit.*")) {
+						return;
+					}
+					inventory.setContents(this.plugin.getInventoryManager().loadKitsInventory(player, rarity).getContents());
+					return;
+				}
+				if (itemName.toLowerCase().equals(ChatColor.RED + "leave")) {
+					player.sendMessage(ChatColor.RED + "You just left your kits inventory.");
+					player.closeInventory();
+					return;
+				}
+				if (itemName.toLowerCase().equals(ChatColor.YELLOW + "your whole abilities")) {
+					inventory.setContents(this.plugin.getInventoryManager().loadKitsInventory(player).getContents());
+					return;
+				}
+				if (itemName.toLowerCase().equals(ChatColor.YELLOW + "next page")) {
+					inventory.setContents(this.plugin.getInventoryManager().loadKitsInventory(player, Rarity.getRarityByName(correctItemName), item.getAmount()).getContents());
+					return;
+				}
+				if (itemName.toLowerCase().equals(ChatColor.YELLOW + "previous page")) {
+					inventory.setContents(this.plugin.getInventoryManager().loadKitsInventory(player, Rarity.getRarityByName(correctItemName), item.getAmount()).getContents());
+					return;
+				}
+				if (itemName.toLowerCase().contains("last used ability:")) {
+					final String split = itemName.split(": ")[1];
+					correctItemName = split.substring(2, split.length());
+				}
+				if (itemName.toLowerCase().equals(ChatColor.YELLOW + "random abilities")) {
+					List<String> abilities = Lists.newArrayList();
+
+					for (Abilities abilitiess : this.plugin.getAbilitiesManager().getAbilities()) {
+						if (abilitiess.getRarity() != Rarity.USELESS && (player.hasPermission("kit." + abilitiess.getName().toLowerCase()) || player.hasPermission(abilitiess.getRarity().getPermission()) || player.hasPermission("kit.*"))) {
+							abilities.add(abilitiess.getName());
+						}
+					}
+					if (abilities.isEmpty()) {
+						return;
+					}
+					player.closeInventory();
+					final int random = (new Random()).nextInt(abilities.size());
+					pm.setSelectedAbility(this.plugin.getAbilitiesManager().getAbilityFromName(abilities.get(random)));
+					final Abilities ab = pm.getSelectedAbility();
+					player.sendMessage(ChatColor.GRAY + "You've chosen " + ab.getRarity().getColor() + ab.getName() + ChatColor.GRAY + " ability.");
+					abilities.clear();
+					abilities = null;
+					return;
+				}
+				if (!this.plugin.getAbilitiesManager().contains(correctItemName)) {
+					return;
+				}
+				player.closeInventory();
+				pm.setSelectedAbility(this.plugin.getAbilitiesManager().getAbilityFromName(correctItemName));
+				player.sendMessage(ChatColor.GRAY + "You've chosen " + pm.getSelectedAbility().getRarity().getColor() + pm.getSelectedAbility().getName() + ChatColor.GRAY + " ability.");
+			}
+			case "shop" -> {
+				event.setCancelled(true);
+				Player player = (Player) event.getWhoClicked();
+				final int clickedSlot = event.getSlot();
+				switch (clickedSlot) {
+					case 0 -> {
+						player.closeInventory();
+						player.performCommand("repair");
+					}
+					case 1 -> {
+						Economy eco = PlayerManager.get(player.getUniqueId()).getEconomy();
+						if (eco.getMoney() < 150) {
+							player.sendMessage(ChatColor.RED + "Missing " + (150 - eco.getMoney()) + " credits!");
+							break;
+						}
+						player.closeInventory();
+						eco.remove(150);
+						player.sendMessage(ChatColor.GREEN + "Successfully bought Golden Apples for 150 credits!");
+						player.getInventory().addItem(new ItemStack(Material.GOLDEN_APPLE, 3));
+					}
+				}
+			}
+			case "your settings" -> {
+				event.setCancelled(true);
+				String itemName = ChatColor.stripColor(item.getItemMeta().getDisplayName().toLowerCase());
+				if (itemName.equals(" ") || itemName.length() < 3) {
+					return;
+				}
+				Player player = (Player) event.getWhoClicked();
+				player.closeInventory();
+				if (itemName.equals("previous page")) {
+					player.openInventory(this.plugin.getInventoryManager().loadKitsInventory(player));
+					return;
+				}
+				if (itemName.equals("scoreboard")) {
+					final PlayerManager pm = PlayerManager.get(player.getUniqueId());
+					pm.getSettings().updateScoreboardState();
+					if (pm.getSettings().hasScoreboardEnabled()) {
+						pm.applyScoreboard();
+					} else {
+						if (player.getScoreboard().getObjective(DisplaySlot.SIDEBAR) != null) {
+							player.getScoreboard().getObjective(DisplaySlot.SIDEBAR).unregister();
+						}
+					}
+					player.openInventory(this.plugin.getInventoryManager().loadSettingsInventory(player));
+					return;
+				}
+				if (itemName.contains("slot")) {
+					String name = itemName.split(" ")[0];
+					name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
+					player.openInventory(this.plugin.getInventoryManager().loadSlotsInventory(player, name));
+					return;
+				}
+			}
 		}
 	}
 

@@ -47,9 +47,9 @@ public class ReportCommand implements CommandExecutor {
 			return false;
 		}
 		if (this.cooldowns.containsKey(p.getUniqueId())) {
-			long secondsLeft = ((Long) this.cooldowns.get(p.getUniqueId())).longValue() / 1000L + this.cooldownTime - System.currentTimeMillis() / 1000L;
+			long secondsLeft = this.cooldowns.get(p.getUniqueId()) / 1000L + this.cooldownTime - System.currentTimeMillis() / 1000L;
 			if (secondsLeft > 0L) {
-				p.sendMessage(ChatColor.RED + "You cant report for another " + secondsLeft + " seconds!");
+				p.sendMessage(ChatColor.RED + "Wait another " + secondsLeft + " seconds before reporting someone again!");
 				return false;
 			}
 		}
@@ -111,7 +111,7 @@ public class ReportCommand implements CommandExecutor {
 				staff.spigot().sendMessage(l1);
 			}
 		}
-		this.cooldowns.put(p.getUniqueId(), Long.valueOf(System.currentTimeMillis()));
+		this.cooldowns.put(p.getUniqueId(), System.currentTimeMillis());
 		p.sendMessage(ChatColor.GREEN + "You have reported " + target.getName() + " for " + reason.toString() + ".");
 		return true;
 	}

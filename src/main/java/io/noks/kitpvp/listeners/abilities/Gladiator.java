@@ -148,7 +148,7 @@ public class Gladiator extends Abilities implements Listener {
 			if (fightings.getUniqueId() == opps || fightings.getUniqueId() == gladiator) {
 				continue;
 			}
-			fightings.hidePlayer(player);
+			fightings.hidePlayer(player, false);
 		}
 	}
 
@@ -176,8 +176,8 @@ public class Gladiator extends Abilities implements Listener {
 		this.gladiatorLastLocation = gladiator.getLocation();
 		this.oppsLastLocation = target.getLocation();
 		for (Player allPlayers : this.plugin.getServer().getOnlinePlayers()) {
-			gladiator.hidePlayer(allPlayers);
-			target.hidePlayer(allPlayers);
+			gladiator.hidePlayer(allPlayers, false);
+			target.hidePlayer(allPlayers, false);
 		}
 		
 		this.createCage(gladiator, target);

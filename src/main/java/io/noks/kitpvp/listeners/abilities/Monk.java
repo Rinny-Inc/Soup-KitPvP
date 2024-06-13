@@ -25,7 +25,7 @@ public class Monk extends Abilities implements Listener {
 	private Main plugin;
 
 	public Monk(Main main) {
-		super("Monk", new ItemStack(Material.BLAZE_ROD), Rarity.UNCOMMON, 15L, new String[] { ChatColor.AQUA + "Switch your opponent sword", ChatColor.AQUA + "with another item in his", ChatColor.AQUA + "inventory" });
+		super("Monk", new ItemStack(Material.BLAZE_ROD), Rarity.UNCOMMON, 20L, new String[] { ChatColor.AQUA + "Switch your opponent sword", ChatColor.AQUA + "with another item in his", ChatColor.AQUA + "inventory" });
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}

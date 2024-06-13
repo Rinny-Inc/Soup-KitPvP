@@ -33,7 +33,14 @@ public class RepairCommand implements CommandExecutor {
 		}
 		pm.getEconomy().remove(50);
 		for (ItemStack armor : player.getInventory().getArmorContents()) {
-			armor.setDurability(armor.getType().getMaxDurability());
+			if (armor.getType().getMaxDurability() > 0) {
+				armor.setDurability((short) 0);
+			}
+		}
+		for (ItemStack content : player.getInventory().getContents()) {
+			if (content.getType().getMaxDurability() > 0) {
+				content.setDurability((short) 0);
+			}
 		}
 		player.sendMessage(ChatColor.GREEN + "Successfuly repaired amor! " + ChatColor.GOLD + "(Cost: 150 credits)");
 		return false;
