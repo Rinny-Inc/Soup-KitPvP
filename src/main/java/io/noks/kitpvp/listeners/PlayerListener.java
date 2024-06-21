@@ -2,7 +2,6 @@ package io.noks.kitpvp.listeners;
 
 import java.text.DecimalFormat;
 import java.util.Random;
-import java.util.UUID;
 
 import javax.annotation.Nullable;
 
@@ -14,9 +13,7 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
-import org.bukkit.entity.NPC;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -42,12 +39,13 @@ import org.bukkit.util.Vector;
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.enums.RefreshType;
 import io.noks.kitpvp.interfaces.SignRotation;
+import io.noks.kitpvp.listeners.abilities.Gladiator;
+import io.noks.kitpvp.listeners.abilities.Ninja;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.RefillInventoryManager;
 import io.noks.kitpvp.managers.caches.CombatTag;
 import io.noks.kitpvp.managers.caches.Economy;
 import io.noks.kitpvp.managers.caches.Stats;
-import io.noks.utils.EntityNPC;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class PlayerListener implements Listener, SignRotation {
@@ -61,7 +59,7 @@ public class PlayerListener implements Listener, SignRotation {
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
 		if (this.plugin.getConfigManager().sendJoinAndQuitMessageToOP && this.plugin.getServer().getOnlinePlayers().size() > 1) {
-		    this.plugin.getServer().getOnlinePlayers().stream().filter(opPlayers -> opPlayers.isOp()).forEach(opPlayers -> opPlayers.sendMessage(event.getJoinMessage()));
+		    this.plugin.getServer().getOnlinePlayers().stream().filter(Player::isOp).forEach(opPlayers -> opPlayers.sendMessage(event.getJoinMessage()));
 		}
 		event.setJoinMessage(null);
 		final Player player = event.getPlayer();
@@ -74,11 +72,7 @@ public class PlayerListener implements Listener, SignRotation {
 		player.setSaturation(10000.0F);
 		player.setLevel(0);
 		player.setExp(0.0F);
-		if (!player.getActivePotionEffects().isEmpty()) {
-			for (PotionEffect activeEffects : player.getActivePotionEffects()) {
-				player.removePotionEffect(activeEffects.getType());
-			}
-		}
+		player.getActivePotionEffects().stream().map(PotionEffect::getType).forEach(player::removePotionEffect);
 		player.teleport(player.getWorld().getSpawnLocation());
 		player.setAllowFlight(false);
 		player.setFlying(false);
@@ -89,16 +83,16 @@ public class PlayerListener implements Listener, SignRotation {
 		player.updateInventory();
 	}
 
-	@EventHandler(priority=EventPriority.HIGHEST)
+	@EventHandler(priority=EventPriority.LOWEST)
 	public void onQuit(PlayerQuitEvent event) {
 		if (this.plugin.getConfigManager().sendJoinAndQuitMessageToOP && this.plugin.getServer().getOnlinePlayers().size() > 1) {
-		    this.plugin.getServer().getOnlinePlayers().stream().filter(opPlayers -> opPlayers.isOp()).forEach(opPlayers -> opPlayers.sendMessage(event.getQuitMessage()));
+		    this.plugin.getServer().getOnlinePlayers().stream().filter(Player::isOp).forEach(opPlayers -> opPlayers.sendMessage(event.getQuitMessage()));
 		}
 		event.setQuitMessage(null);
 		this.leaveAction(event.getPlayer());
 	}
 	
-	@EventHandler(priority=EventPriority.HIGHEST)
+	@EventHandler(priority=EventPriority.LOWEST)
 	public void onGettingKicked(PlayerKickEvent event) {
 		event.setLeaveMessage(null);
 		this.leaveAction(event.getPlayer());
@@ -109,6 +103,10 @@ public class PlayerListener implements Listener, SignRotation {
 		if (pm == null) {
 			return;
 		}
+		if (pm.hasAbility()) {
+			pm.ability().leaveAction(player);
+		}
+		boolean abilityLeaveActionDone = false;
 		if (pm.hasCombatTag()) {
 			final PlayerManager km = PlayerManager.get(pm.getCurrentCombatTag().getLastAttackerUUID()); 
 			if (km != null) {
@@ -116,23 +114,34 @@ public class PlayerListener implements Listener, SignRotation {
 
 				if (killer != player) {
 					if (km.hasAbility()) {
+						km.ability().leaveAction(player);
 						km.ability().onKill(killer);
+						abilityLeaveActionDone = true;
 					}
 					killer.sendMessage(ChatColor.GREEN + "You have killed " + player.getDisplayName());
 
 					final Stats killerStats = km.getStats();
 					killerStats.addKills();
-					km.refreshScoreboardLine(RefreshType.KILLS);
 					killerStats.addKillStreak();
-					km.refreshScoreboardLine(RefreshType.KILLSTREAK);
 
 					final Economy killerEconomy = km.getEconomy();
 					killerEconomy.add(((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 20 : 10));
-					km.refreshScoreboardLine(RefreshType.CREDITS);
+					km.refreshScoreboardLine(RefreshType.KILLS, RefreshType.KILLSTREAK, RefreshType.CREDITS);
 				}
 			}
 		}
+		if (!abilityLeaveActionDone && player.getLastInteractedByUUID() != null) {
+			PlayerManager lastInteractedBy = PlayerManager.get(player.getLastInteractedByUUID());
+			
+			if (lastInteractedBy != null && lastInteractedBy.hasAbility() && (lastInteractedBy.ability() instanceof Gladiator || lastInteractedBy.ability() instanceof Ninja)) {
+				lastInteractedBy.ability().leaveAction(player);
+			}
+		}
 		pm.kill(false);
+		if (this.plugin.isTournamentActive()) {
+			this.plugin.getActiveTournament().killAttendee(pm.getPlayerUUID());
+			// TODO
+		}
 		if (this.plugin.mapTask != null) {
 			if (this.plugin.mapTask.playersInMap.contains(pm)) {
 				this.plugin.mapTask.playersInMap.remove(pm);
@@ -145,7 +154,7 @@ public class PlayerListener implements Listener, SignRotation {
 		this.plugin.getDataBase().savePlayer(pm);
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onDeath(PlayerDeathEvent event) {
 		event.setDroppedExp(0);
 		event.setDeathMessage(null);
@@ -153,9 +162,13 @@ public class PlayerListener implements Listener, SignRotation {
 			final Player killed = event.getEntity();
 			final PlayerManager pm = PlayerManager.get(killed.getUniqueId());
 
+			if (pm.hasAbility()) {
+				pm.ability().onDeath(event);
+			}
 			if (killed.getItemOnCursor() != null) {
 				killed.setItemOnCursor(null);
 			}
+			boolean abilityDeathActionDone = false;
 			if (pm.hasCombatTag()) {
 				final PlayerManager km = PlayerManager.get(pm.getCurrentCombatTag().getLastAttackerUUID());
 				final Player killer = km.getPlayer();
@@ -164,6 +177,8 @@ public class PlayerListener implements Listener, SignRotation {
 				if (killer != killed) {
 					if (km.hasAbility()) {
 						km.ability().onKill(killer);
+						km.ability().onDeath(event);
+						abilityDeathActionDone = true;
 					}
 					if (killer != null) {
 						killer.sendMessage(ChatColor.GREEN + "You have killed " + killed.getDisplayName());
@@ -171,22 +186,31 @@ public class PlayerListener implements Listener, SignRotation {
 
 					final Stats killerStats = km.getStats();
 					killerStats.addKills();
-					km.refreshScoreboardLine(RefreshType.KILLS);
 					killerStats.addKillStreak();
-					km.refreshScoreboardLine(RefreshType.KILLSTREAK);
 
 					final Economy killerEconomy = km.getEconomy();
 					killerEconomy.add(((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 20 : 10));
-					km.refreshScoreboardLine(RefreshType.CREDITS);
+					km.refreshScoreboardLine(RefreshType.KILLS, RefreshType.KILLSTREAK, RefreshType.CREDITS);
+				}
+			}
+			if (!abilityDeathActionDone && killed.getLastInteractedByUUID() != null) {
+				PlayerManager lastInteractedBy = PlayerManager.get(killed.getLastInteractedByUUID());
+				
+				if (lastInteractedBy != null && lastInteractedBy.hasAbility() && (lastInteractedBy.ability() instanceof Gladiator || lastInteractedBy.ability() instanceof Ninja)) {
+					lastInteractedBy.ability().onDeath(event);
 				}
 			}
 			event.getDrops().clear();
-			int random = new Random().nextInt(10) + 15;
+			final int random = new Random().nextInt(10) + 15;
 			for (int i = 0; i < random; i++) {
 				event.getDrops().add(new ItemStack(Material.MUSHROOM_SOUP, 1));
 			}
 			this.plugin.applySpawnProtection(killed, false);
 			pm.kill(false);
+			if (this.plugin.isTournamentActive()) {
+				this.plugin.getActiveTournament().killAttendee(pm.getPlayerUUID());
+				// TODO
+			}
 			if (this.plugin.mapTask == null) {
 				return;
 			}
@@ -197,7 +221,7 @@ public class PlayerListener implements Listener, SignRotation {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onRespawn(PlayerRespawnEvent event) {
 		final Player player = event.getPlayer();
 		event.setRespawnLocation(player.getWorld().getSpawnLocation());
@@ -243,14 +267,20 @@ public class PlayerListener implements Listener, SignRotation {
 	}
 	
 	@EventHandler(priority=EventPriority.LOWEST)
-	public void onNPCClick(PlayerInteractEntityEvent event) {
+	public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof Player) {
-			Player npc = (Player) event.getRightClicked();
+			PlayerManager pm = PlayerManager.get(event.getPlayer().getUniqueId());
 			
-			if (npc.getName().toLowerCase().contains("shop")) {
-				event.setCancelled(true);
-				event.getPlayer().openInventory(this.plugin.getInventoryManager().openShopInventory());
+			if (!pm.hasAbility()) {
+				Player npc = (Player) event.getRightClicked();
+				
+				if (npc.getName().toLowerCase().contains("shop")) {
+					event.setCancelled(true);
+					event.getPlayer().openInventory(this.plugin.getInventoryManager().openShopInventory());
+				}
+				return;
 			}
+			pm.ability().onPlayerInteractEntity(event);
 		}
 	}
 
@@ -266,25 +296,17 @@ public class PlayerListener implements Listener, SignRotation {
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			final Player player = event.getPlayer();
 			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-			if (!pm.isInSpawn()) {
+			if (pm.hasAbility()) {
 				pm.ability().onInteract(event);
 				return;
 			}
 			final String itemName = ChatColor.stripColor(item.getItemMeta().getDisplayName().toLowerCase());
 			switch (itemName) {
-				case "ability selector": {
-					player.openInventory(this.plugin.getInventoryManager().loadKitsInventory(player));
-					return;
-				}
-				case "settings": {
-					player.openInventory(this.plugin.getInventoryManager().loadSettingsInventory(player));
-					return;
-				}
-				case "stats": {
-					player.performCommand("stats");
-					return;
-				}
-				default: break;
+				case "ability selector" -> player.openInventory(this.plugin.getInventoryManager().loadKitsInventory(player));
+				case "settings" -> player.openInventory(this.plugin.getInventoryManager().loadSettingsInventory(player));
+				case "stats" -> player.performCommand("stats");
+				case "perk selector" -> player.sendMessage(ChatColor.RED + "Coming soon :)");
+				case "shop" -> player.openInventory(this.plugin.getInventoryManager().openShopInventory());
 			}
 		}
 	}
@@ -323,29 +345,27 @@ public class PlayerListener implements Listener, SignRotation {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onEntityDamageEntity(EntityDamageByEntityEvent event) {
-		if (event.getEntity() instanceof EntityNPC) {
-			event.setCancelled(true);
-			return;
-		}
 		if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
-			if (event.getEntity() == event.getDamager()) {
+			if (event.getEntity().getUniqueId() == event.getDamager().getUniqueId()) {
 				return;
 			}
-			final UUID damaged = event.getEntity().getUniqueId();
-			final UUID damager = event.getDamager().getUniqueId();
-			PlayerManager.get(damaged).updateCombatTag(new CombatTag(damager));
-			PlayerManager.get(damager).updateCombatTag(new CombatTag(damaged));
+			final PlayerManager damagedM = PlayerManager.get(event.getEntity().getUniqueId());
+			if (!damagedM.hasAbility()) {
+				return;
+			}
+			final PlayerManager damagerM = PlayerManager.get(event.getDamager().getUniqueId());
+			if (damagerM.hasAbility()) {
+				damagedM.ability().onEntityDamageByEntity(event);
+			}
+			damagedM.updateCombatTag(new CombatTag(damagerM.getPlayerUUID()));
+			damagerM.updateCombatTag(new CombatTag(damagedM.getPlayerUUID()));
 		}
 	}
 
 	@EventHandler
 	public void onDamage(EntityDamageEvent event) {
-		if (event.getEntity() instanceof Villager) {
-			event.setCancelled(true);
-			return;
-		}
 		if (event.getEntity() instanceof Player) {
 			final Player player = (Player) event.getEntity();
 			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
@@ -392,14 +412,17 @@ public class PlayerListener implements Listener, SignRotation {
 		if (player.getGameMode() == GameMode.CREATIVE || player.isDead()) {
 			return;
 		}
+		if (this.plugin.isTournamentActive() && this.plugin.getActiveTournament().containsAttendee(player.getUniqueId())) {
+			return;
+		}
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-		if (pm.isInSpawn() && !this.plugin.spawnCuboid().isIn(player.getLocation())) {
-			pm.setAbility(pm.getSelectedAbility());
+		if (!pm.hasAbility() && !this.plugin.spawnCuboid().isIn(event.getFrom())) {
+			pm.setAbility((pm.getSelectedAbility().needCloning() ? pm.getSelectedAbility().clone() : pm.getSelectedAbility()));
 			this.plugin.getItemUtils().giveEquipment(player, pm.ability());
 			this.plugin.applySpawnProtection(player, false);
 			return;
 		}
-		if (!pm.isInSpawn()) {
+		if (pm.hasAbility()) {
 			final Block sponge = event.getTo().getBlock().getRelative(BlockFace.DOWN);
 			if (sponge.getType() == Material.SPONGE) {
 				final Block signBlock = sponge.getLocation().getBlock().getRelative(BlockFace.DOWN);
@@ -414,6 +437,10 @@ public class PlayerListener implements Listener, SignRotation {
 					player.setVelocity(new Vector(0, multiplier, 0));
 					player.playSound(player.getLocation(), Sound.CHICKEN_EGG_POP, 1.0f, 1.0f);
 				} catch (NumberFormatException e) {}
+				return;
+			}
+			if (this.plugin.spawnCuboid().isIn(event.getTo())) {
+				event.setTo(event.getFrom());
 			}
 		}
 	}

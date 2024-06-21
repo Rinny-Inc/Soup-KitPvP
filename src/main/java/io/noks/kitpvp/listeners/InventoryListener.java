@@ -50,14 +50,14 @@ public class InventoryListener implements Listener, SignRotation {
 		if (inventory.getType().equals(InventoryType.CREATIVE) || inventory.getType().equals(InventoryType.CRAFTING) || inventory.getType().equals(InventoryType.PLAYER)) {
 			final Player player = (Player) event.getWhoClicked();
 			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-			if (pm.isInSpawn() && player.getGameMode() != GameMode.CREATIVE) {
+			if (!pm.hasAbility() && player.getGameMode() != GameMode.CREATIVE) {
 				event.setCancelled(true);
 				player.updateInventory();
 			}
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onInventoryClick(InventoryClickEvent event) {
 		final Inventory inventory = event.getClickedInventory();
 		if (inventory == null) {
@@ -101,11 +101,6 @@ public class InventoryListener implements Listener, SignRotation {
 						return;
 					}
 					inventory.setContents(this.plugin.getInventoryManager().loadKitsInventory(player, rarity).getContents());
-					return;
-				}
-				if (itemName.toLowerCase().equals(ChatColor.RED + "leave")) {
-					player.sendMessage(ChatColor.RED + "You just left your kits inventory.");
-					player.closeInventory();
 					return;
 				}
 				if (itemName.toLowerCase().equals(ChatColor.YELLOW + "your whole abilities")) {

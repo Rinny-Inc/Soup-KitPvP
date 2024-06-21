@@ -1,7 +1,6 @@
 package io.noks.kitpvp.holograms;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -11,7 +10,7 @@ import io.noks.Hologram;
 import io.noks.kitpvp.abstracts.Holograms;
 
 public class LeaderboardHologram implements Holograms {
-	private Set<Hologram> content;
+	private List<Hologram> content;
 	
 	public LeaderboardHologram() {
 		spawn();
@@ -37,21 +36,18 @@ public class LeaderboardHologram implements Holograms {
 		return ChatColor.RED + "Coming Soon :)";
 	}
 	
-	public Set<Hologram> content() {
+	public List<Hologram> content() {
 		return this.content;
 	}
 
 	@Override
 	public void spawn() {
-		final Set<Hologram> content = new HashSet<>();
-		Bukkit.getServer().newHologram(location(), header());
-		Location lastLocation = location().clone();
+		Hologram parent = Bukkit.getServer().newHologram(location(), header());
 		for (int i = 0; i < 10; i++) {
 			String name = ChatColor.YELLOW.toString() + (i + 1) + ". " + ChatColor.AQUA + "NAME " + ChatColor.GRAY + "- " + ChatColor.YELLOW + "STATS";
-			Hologram holo = Bukkit.getServer().newHologram(lastLocation = lastLocation.subtract(0, 0.25, 0), name);
-			content.add(holo);
+			parent.addLineBelow(name);
 		}
-		Bukkit.getServer().newHologram(lastLocation.subtract(0, 0.25, 0), footer());
-		this.content = content;
+		parent.addLineBelow(footer());
+		this.content = parent.getChild();
 	}
 }

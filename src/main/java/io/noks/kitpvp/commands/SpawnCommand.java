@@ -38,7 +38,7 @@ public class SpawnCommand implements CommandExecutor {
 			player.sendMessage(spawnMessage);
 			return true;
 		}
-		if (!pm.isInSpawn() && pm.hasCombatTag()) {
+		if (pm.hasAbility() && pm.hasCombatTag()) {
 			return false;
 		}
 		new BukkitRunnable() {
@@ -62,9 +62,7 @@ public class SpawnCommand implements CommandExecutor {
 						player.getInventory().clear();
 						player.getInventory().setArmorContents(null);
 						player.getInventory().setContents(main.getItemUtils().getSpawnItems(player.getName()));
-						for (PotionEffect effect : player.getActivePotionEffects()) {
-							player.removePotionEffect(effect.getType());
-						}
+						player.getActivePotionEffects().stream().map(PotionEffect::getType).forEach(player::removePotionEffect);
 						player.setHealth(20.0D);
 						main.applySpawnProtection(player, true);
 						this.cancel();

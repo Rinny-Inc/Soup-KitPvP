@@ -17,11 +17,8 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -29,22 +26,15 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.avaje.ebean.validation.NotNull;
-
 import io.noks.collections.TtlArrayList;
-import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
 
-public class Ninja extends Abilities implements Listener {
-	private final @NotNull Main plugin;
+public class Ninja extends Abilities {
 	private @Nullable TtlArrayList<UUID> target;
-
-	public Ninja(Main main) {
+	public Ninja() {
 		super("Ninja", new ItemStack(Material.WOOL, 1, (short) 15), Rarity.LEGENDARY, 20L, new String[] { ChatColor.AQUA + "Teleport yourself behind your opponent" });
-		this.plugin = main;
-		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}
 	
 	@Override
@@ -91,7 +81,12 @@ public class Ninja extends Abilities implements Listener {
 		return Collections.singletonList(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
 	}
 	
-	@EventHandler
+	@Override
+	public boolean needCloning() {
+		return true;
+	}
+	
+	@Override
 	public void onToggleSneak(PlayerToggleSneakEvent event) {
 		final Player player = event.getPlayer();
 		if (target != null && !target.isEmpty()) {
@@ -106,11 +101,7 @@ public class Ninja extends Abilities implements Listener {
 			if (target == null) {
 				return;
 			}
-			if (!player.canSee(target) || !target.canSee(player)) {
-				this.target = null;
-				return;
-			}
-			if (PlayerManager.get(target.getUniqueId()).isInSpawn()) {
+			if (!player.canSee(target) || !target.canSee(player) || !PlayerManager.get(target.getUniqueId()).hasAbility()) {
 				this.target = null;
 				return;
 			}
@@ -142,8 +133,8 @@ public class Ninja extends Abilities implements Listener {
 		}
 	}
 
-	@EventHandler
-	public void onPlayerAttack(EntityDamageByEntityEvent event) {
+	@Override
+	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
 		if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
 			final Player damager = (Player) event.getDamager();
 			final PlayerManager dm = PlayerManager.get(damager.getUniqueId());
@@ -162,25 +153,17 @@ public class Ninja extends Abilities implements Listener {
 		}
 	}
 
-	@EventHandler
-	public void onQuit(PlayerQuitEvent event) {
-		if (this.target != null && !this.target.isEmpty() && this.target.get(0) == event.getPlayer().getUniqueId()) {
-			this.target.clear();
-			return;
-		}
-		final PlayerManager dm = PlayerManager.get(event.getPlayer().getUniqueId());
+	@Override
+	public void leaveAction(Player player) {
+		final PlayerManager dm = PlayerManager.get(player.getUniqueId());
 		if (dm.hasAbility(this)) {
 			this.target = null;
 		}
 	}
 
-	@EventHandler
+	@Override
 	public void onDeath(PlayerDeathEvent event) {
 		if (event.getEntity() instanceof Player) {
-			if (this.target != null && !this.target.isEmpty() && this.target.get(0) == event.getEntity().getUniqueId()) {
-				this.target.clear();
-				return;
-			}
 			final PlayerManager dm = PlayerManager.get(event.getEntity().getUniqueId());
 			if (dm.hasAbility(this)) {
 				this.target = null;

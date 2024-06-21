@@ -11,16 +11,10 @@ import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.avaje.ebean.validation.NotNull;
@@ -31,15 +25,16 @@ import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
 
-public class Gladiator extends Abilities implements Listener {
+// TODO: NEED TO CHECK IF BLOCK ARE IN THE CREATING ZONE OF THE CAGE, MOVE IT UP
+
+public class Gladiator extends Abilities {
 	private @Nullable UUID opps, gladiator;
 	private @Nullable Location gladiatorLastLocation, oppsLastLocation;
 	private @Nullable Map<Location, Material> cage;
-	private final @NotNull Main plugin;
+	private static @NotNull Main plugin;
 	public Gladiator(Main main) {
-		super("Gladiator", new ItemStack(Material.IRON_FENCE), Rarity.LEGENDARY, 20L, new String[] { ChatColor.AQUA + "Duel your opponent" });
-		this.plugin = main;
-		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
+		super("Gladiator", new ItemStack(Material.IRON_FENCE), Rarity.BETA/*Rarity.LEGENDARY*/, 20L, new String[] { ChatColor.AQUA + "Duel your opponent" });
+		plugin = main;
 	}
 	
 	@Override
@@ -51,9 +46,14 @@ public class Gladiator extends Abilities implements Listener {
 	public String specialItemName() {
 		return "Gladiator Fence";
 	}
+	
+	@Override
+	public boolean needCloning() {
+		return true;
+	}
 
-	@EventHandler
-	public void onGladiator(PlayerInteractEntityEvent e) {
+	@Override
+	public void onPlayerInteractEntity(PlayerInteractEntityEvent e) {
 		if (e.getRightClicked() instanceof Player) {
 			final Player p = e.getPlayer();
 			final PlayerManager pm = PlayerManager.get(p.getUniqueId());
@@ -77,17 +77,20 @@ public class Gladiator extends Abilities implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@Override
 	public void onDeath(PlayerDeathEvent e) {
 		if (opps == null) {
+			return;
+		}
+		if (opps != e.getEntity().getUniqueId() || gladiator != e.getEntity().getUniqueId()) {
 			return;
 		}
 		if (e.getEntity() instanceof Player) {
 			final List<ItemStack> loot = Lists.newArrayList(e.getDrops());
 			e.getDrops().clear();
-			final Player deadPlayer = this.plugin.getServer().getPlayer((e.getEntity().getUniqueId() == opps ? opps : gladiator));
-			final Player winner = this.plugin.getServer().getPlayer((deadPlayer.getUniqueId() == opps ? gladiator : opps));
-			for (Player allPlayers : this.plugin.getServer().getOnlinePlayers()) {
+			final Player deadPlayer = plugin.getServer().getPlayer((e.getEntity().getUniqueId() == opps ? opps : gladiator));
+			final Player winner = plugin.getServer().getPlayer((deadPlayer.getUniqueId() == opps ? gladiator : opps));
+			for (Player allPlayers : plugin.getServer().getOnlinePlayers()) {
 				deadPlayer.showPlayer(allPlayers);
 				winner.showPlayer(allPlayers);
 			}
@@ -106,20 +109,16 @@ public class Gladiator extends Abilities implements Listener {
 		}
 	}
 
-	@EventHandler
-	public void onGladiatorsQuit(PlayerQuitEvent e) {
-		this.leaveAction(e.getPlayer());
-	}
-	@EventHandler
-	public void onGladiatorsKick(PlayerKickEvent e) {
-		this.leaveAction(e.getPlayer());
-	}
-	private void leaveAction(Player p) {
+	@Override
+	public void leaveAction(Player p) {
 		if (opps != null) {
+			if (opps != p.getUniqueId() || gladiator != p.getUniqueId()) {
+				return;
+			}
 			final List<ItemStack> loot = Lists.newArrayList(p.getInventory().getContents());
-			final Player deadPlayer = this.plugin.getServer().getPlayer((p.getUniqueId() == opps ? opps : gladiator));
-			final Player winner = this.plugin.getServer().getPlayer((deadPlayer.getUniqueId() == opps ? gladiator : opps));
-			for (Player allPlayers : this.plugin.getServer().getOnlinePlayers()) {
+			final Player deadPlayer = plugin.getServer().getPlayer((p.getUniqueId() == opps ? opps : gladiator));
+			final Player winner = plugin.getServer().getPlayer((deadPlayer.getUniqueId() == opps ? gladiator : opps));
+			for (Player allPlayers : plugin.getServer().getOnlinePlayers()) {
 				deadPlayer.showPlayer(allPlayers);
 				winner.showPlayer(allPlayers);
 			}
@@ -135,33 +134,6 @@ public class Gladiator extends Abilities implements Listener {
 				deadPlayer.getWorld().dropItemNaturally(loc, loots, deadPlayer);
 			}
 			this.clearMemory();
-		}
-	}
-
-	@EventHandler
-	public void onJoinForGladiators(PlayerJoinEvent event) {
-		if (opps == null) {
-			return;
-		}
-		final Player player = event.getPlayer();
-		for (Player fightings : this.plugin.getServer().getOnlinePlayers()) {
-			if (fightings.getUniqueId() == opps || fightings.getUniqueId() == gladiator) {
-				continue;
-			}
-			fightings.hidePlayer(player, false);
-		}
-	}
-
-	@EventHandler
-	public void onDropReceive(PlayerPickupItemEvent event) {
-		final Player receiver = event.getPlayer();
-		if (receiver.getUniqueId() == opps || receiver.getUniqueId() == gladiator) {
-			return;
-		}
-		if (event.getItem().getOwner() instanceof Player) {
-			final Player dropper = (Player) event.getItem().getOwner();
-			if (!receiver.canSee(dropper))
-				event.setCancelled(true);
 		}
 	}
 
@@ -175,7 +147,7 @@ public class Gladiator extends Abilities implements Listener {
 		this.opps = target.getUniqueId();
 		this.gladiatorLastLocation = gladiator.getLocation();
 		this.oppsLastLocation = target.getLocation();
-		for (Player allPlayers : this.plugin.getServer().getOnlinePlayers()) {
+		for (Player allPlayers : plugin.getServer().getOnlinePlayers()) {
 			gladiator.hidePlayer(allPlayers, false);
 			target.hidePlayer(allPlayers, false);
 		}
@@ -201,18 +173,36 @@ public class Gladiator extends Abilities implements Listener {
 			this.cage = new HashMap<Location, Material>();
 		}
 		final Location loc = gladiator.getLocation().clone().add(0, 100, 0);
-		int centerX = loc.getBlockX();
+		final int centerX = loc.getBlockX();
         int centerY = loc.getBlockX();
         int centerZ = loc.getBlockX();
-		int halfSize = 7; // Half of the cube size - 1
+		int halfSize = 7;
+	    boolean blockFound = false;
+
+	    for (int x = centerX - halfSize; x <= centerX + halfSize; x++) {
+	        for (int y = centerY - halfSize; y <= centerY + halfSize; y++) {
+	            for (int z = centerZ - halfSize; z <= centerZ + halfSize; z++) {
+	                if (!loc.getWorld().getBlockAt(x, y, z).getType().equals(Material.AIR)) {
+	                    blockFound = true;
+	                    break;
+	                }
+	            }
+	            if (blockFound) break;
+	        }
+	        if (blockFound) break;
+	    }
+
+	    if (blockFound) {
+	        centerY += 50;
+	    }
         
 		for (int x = centerX - halfSize; x <= centerX + halfSize; x++) {
             for (int y = centerY - halfSize; y <= centerY + halfSize; y++) {
                 for (int z = centerZ - halfSize; z <= centerZ + halfSize; z++) {
-                    // Place glass blocks only on the outer layer and inside the bottom layer
                     if ((x == centerX - halfSize || x == centerX + halfSize || y == centerY - halfSize || y == centerY + halfSize || z == centerZ - halfSize || z == centerZ + halfSize) || (y == centerY - halfSize && (x != centerX || z != centerZ))) {
-                        this.cage.put(loc.getWorld().getBlockAt(x, y, z).getLocation(), loc.getWorld().getBlockAt(x, y, z).getType());
-                    	loc.getWorld().getBlockAt(x, y, z).setType(Material.GLASS);
+                        Block block = loc.getWorld().getBlockAt(x, y, z);
+                    	this.cage.put(block.getLocation(), block.getType());
+                    	block.setType(Material.GLASS);
                     }
                 }
             }

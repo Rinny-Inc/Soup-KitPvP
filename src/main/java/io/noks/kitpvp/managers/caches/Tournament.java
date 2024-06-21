@@ -10,6 +10,7 @@ import io.noks.kitpvp.enums.TournamentState;
 
 public class Tournament {
 	private List<UUID> attendees;
+	private List<UUID> spectators;
 	private @Nullable UUID hostUUID;
 	private TournamentState state;
 
@@ -31,8 +32,16 @@ public class Tournament {
 		this.attendees.remove(uuid);
 	}
 	
+	public void killAttendee(UUID uuid) {
+		removeAttendee(uuid);
+	}
+	
 	public List<UUID> getAttendees() {
 		return this.attendees;
+	}
+	
+	public boolean containsAttendee(UUID uuid) {
+		return this.attendees.contains(uuid);
 	}
 	
 	public boolean hasHost() {

@@ -13,14 +13,12 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
-import org.bukkit.entity.Villager.Profession;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.avaje.ebean.validation.NotNull;
 
+import io.noks.Hologram;
 import io.noks.kitpvp.commands.AbilityListCommand;
 import io.noks.kitpvp.commands.BootCommand;
 import io.noks.kitpvp.commands.BuildCommand;
@@ -36,6 +34,8 @@ import io.noks.kitpvp.commands.SpawnCommand;
 import io.noks.kitpvp.commands.SponsorCommand;
 import io.noks.kitpvp.commands.StatisticCommand;
 import io.noks.kitpvp.database.DBUtils;
+import io.noks.kitpvp.interfaces.TournamentManager;
+import io.noks.kitpvp.listeners.AbilityListener;
 import io.noks.kitpvp.listeners.InventoryListener;
 import io.noks.kitpvp.listeners.PlayerListener;
 import io.noks.kitpvp.listeners.ServerListener;
@@ -45,8 +45,8 @@ import io.noks.kitpvp.managers.HologramManager;
 import io.noks.kitpvp.managers.InventoryManager;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.RefillInventoryManager;
-import io.noks.kitpvp.managers.TournamentManager;
 import io.noks.kitpvp.managers.caches.Feast;
+import io.noks.kitpvp.managers.caches.Tournament;
 import io.noks.kitpvp.task.MapTask;
 import io.noks.kitpvp.task.event.EventsTask;
 import io.noks.kitpvp.task.event.FallenGolemTask;
@@ -55,20 +55,20 @@ import io.noks.kitpvp.utils.ItemUtils;
 import io.noks.kitpvp.utils.MathUtils;
 import io.noks.kitpvp.utils.Messages;
 
-public class Main extends JavaPlugin {
+public class Main extends JavaPlugin implements TournamentManager {
 	private @NotNull ConfigManager configManager;
 	private @NotNull DBUtils database;
 	private @NotNull MathUtils mathUtils;
 	private @NotNull AbilitiesManager abilitiesManager;
 	private @NotNull ItemUtils itemUtils;
 	private @NotNull InventoryManager inventoryManager;
-	private @NotNull TournamentManager tournamentManager;
 	private @NotNull Messages messages;
 	private @NotNull EventsTask eventsTask;
 	public @Nullable Feast feast = null;
 	public @NotNull HologramManager hologramManager;
 	private @NotNull Cuboid spawnCuboid;
 	public @Nullable MapTask mapTask = null;
+	private @Nullable Tournament tournament;
 	
 	private static Main instance;
 	public static Main getInstance() {
@@ -92,8 +92,8 @@ public class Main extends JavaPlugin {
 		this.registerCommands();
 		this.eventsTask = new EventsTask(this); // TODO: need to execute it (see in class)
 		this.hologramManager = new HologramManager();
-		this.getServer().newHologram(new Location(world, 5.5, 102, -5.5), ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "Active Event");
-		this.getServer().newHologram(new Location(world, 5.5, 101.7, -5.5), ChatColor.RED + "Coming Soon :)");
+		final Hologram parent = this.getServer().newHologram(new Location(world, 5.5, 102, -5.5), ChatColor.DARK_AQUA.toString() + ChatColor.BOLD + "Active Event");
+		parent.addLineBelow(ChatColor.RED + "Coming Soon :)");
 		this.spawnNPC(world);
 	}
 
@@ -149,6 +149,7 @@ public class Main extends JavaPlugin {
 		new PlayerListener(this);
 		new ServerListener(this);
 		new InventoryListener(this);
+		new AbilityListener(this);
 		getServer().getPluginManager().registerEvents(new FallenGolemTask(), this);
 	}
 
@@ -195,10 +196,6 @@ public class Main extends JavaPlugin {
 	
 	public InventoryManager getInventoryManager() {
 		return this.inventoryManager;
-	}
-	
-	public TournamentManager getTournamentManager() {
-		return this.tournamentManager;
 	}
 	
 	public Messages getMessages() {
@@ -257,5 +254,20 @@ public class Main extends JavaPlugin {
 				this.mapTask = null;
 			}
 		}
+	}
+	
+	@Override
+	public boolean isTournamentActive() {
+		return this.tournament != null;
+	}
+	
+	@Override
+	public Tournament getActiveTournament() {
+		return this.tournament;
+	}
+	
+	@Override
+	public void setActiveTournament(Tournament tournament) {
+		this.tournament = tournament;
 	}
 }

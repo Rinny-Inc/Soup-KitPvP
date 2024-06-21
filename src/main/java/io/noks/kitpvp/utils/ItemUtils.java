@@ -13,13 +13,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+
+import com.avaje.ebean.validation.NotNull;
 
 import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.listeners.abilities.Archer;
 import io.noks.kitpvp.listeners.abilities.Chemist;
-import io.noks.kitpvp.listeners.abilities.Ninja;
+import io.noks.kitpvp.listeners.abilities.Jesus;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.PlayerSettings;
 import io.noks.kitpvp.managers.caches.PlayerSettings.SlotType;
@@ -80,6 +80,7 @@ public class ItemUtils {
 		return i;
 	}
 
+	@NotNull
 	public final ItemStack[] getSpawnItems(String name) {
 		return new ItemStack[] {getItemStack(new ItemStack(Material.ENCHANTED_BOOK), ChatColor.DARK_AQUA + "Ability Selector", new String[] {ChatColor.GRAY + "Choose your ability to fight other players"}),
 								getItemStack(new ItemStack(Material.CHEST), ChatColor.DARK_AQUA + "Perk Selector", new String[] {ChatColor.RED + "Coming Soon"}), 
@@ -111,6 +112,9 @@ public class ItemUtils {
 		inv.setItem(settings.getSlot(SlotType.SWORD), ability.sword());
 		if (ability.specialItem().getType() != Material.MUSHROOM_SOUP) {
 			inv.setItem(settings.getSlot(SlotType.ITEM), getItemStack(ability.specialItem(), ChatColor.RED + ability.specialItemName(), null));
+		}
+		if (ability instanceof Jesus) {
+			
 		}
 		if (ability instanceof Archer) {
 			inv.setItem(9, new ItemStack(Material.ARROW, 18));

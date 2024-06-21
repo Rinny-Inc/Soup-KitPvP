@@ -25,6 +25,7 @@ import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.server.ServerDateChangeEvent;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -46,13 +47,13 @@ public class ServerListener implements Listener {
 		event.setMotd(line1 + line2 /*+ (Bukkit.hasWhitelist() ? (ChatColor.RED + " Whitelisted") : "")*/);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onRain(WeatherChangeEvent event) {
 		if (event.toWeatherState())
 			event.setCancelled(true);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockBreak(BlockBreakEvent event) {
 		final Player player = event.getPlayer();
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
@@ -67,7 +68,7 @@ public class ServerListener implements Listener {
 		event.setCancelled(true);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockPlace(BlockPlaceEvent event) {
 		final Player player = event.getPlayer();
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
@@ -82,19 +83,19 @@ public class ServerListener implements Listener {
 		event.setCancelled(true);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onEntityExplode(EntityExplodeEvent event) {
 		event.blockList().clear();
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPrepareCraft(PrepareItemCraftEvent event) {
 		if (event.getInventory().getResult().getType() != Material.MUSHROOM_SOUP) {
 			event.getInventory().setResult(null);
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onFoodChange(FoodLevelChangeEvent event) {
 		if (event.getEntity() instanceof Player) {
 			event.setCancelled(true);
@@ -103,7 +104,7 @@ public class ServerListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onCreatureSpawn(CreatureSpawnEvent event) {
 		if (event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.CUSTOM) {
 			event.setCancelled(true);
@@ -152,14 +153,14 @@ public class ServerListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority=EventPriority.LOWEST)
+	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onBlockIgnite(BlockIgniteEvent event) {
 		if (event.getCause() == IgniteCause.FLINT_AND_STEEL) {
 			return;
 		}
 		event.setCancelled(true);
 	}
-	@EventHandler(priority=EventPriority.LOWEST)
+	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onBlockSpread(BlockSpreadEvent event) {
 		if (event.getSource().getType() != Material.VINE) {
 			return;
@@ -167,7 +168,7 @@ public class ServerListener implements Listener {
 		event.setCancelled(true);
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onSignChange(SignChangeEvent event) {
 		final String[] lines = event.getLines();
 		if (lines[0].equals("fs")) {
@@ -182,7 +183,7 @@ public class ServerListener implements Listener {
 		}
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onDateChange(ServerDateChangeEvent event) {
 		if (event.getDate().getDay() == 2) {
 			this.plugin.getServer().setWhitelist(true);

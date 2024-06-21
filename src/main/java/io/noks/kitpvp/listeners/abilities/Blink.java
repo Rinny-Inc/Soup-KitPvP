@@ -19,13 +19,10 @@ import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
 
 public class Blink extends Abilities {
-	private Main plugin;
 	private int amountUsed;
-
-	public Blink(Main main) {
+	public Blink() {
 		super("Blink", new ItemStack(Material.NETHER_STAR), Rarity.UNCOMMON, 15L, new String[] { ChatColor.AQUA + "Use your star to get", ChatColor.AQUA + "away from dangerous situations" });
 		this.amountUsed = 0;
-		this.plugin = main;
 	}
 	
 	@Override
@@ -36,6 +33,11 @@ public class Blink extends Abilities {
 	@Override
 	public String specialItemName() {
 		return "Blink Star";
+	}
+	
+	@Override
+	public boolean needCloning() {
+		return true;
 	}
 
 	@Override
@@ -65,7 +67,7 @@ public class Blink extends Abilities {
 				public void run() {
 					block.setType(Material.AIR);
 				}
-			}.runTaskLaterAsynchronously(this.plugin, 100L);
+			}.runTaskLaterAsynchronously(Main.getInstance(), 100L);
 			if (amountUsed == 3) {
 				pm.applyAbilityCooldown();
 				amountUsed = 0;

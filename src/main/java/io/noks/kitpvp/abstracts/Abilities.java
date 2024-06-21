@@ -6,7 +6,11 @@ import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
@@ -14,7 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import io.noks.kitpvp.enums.Rarity;
 
-public abstract class Abilities {
+public abstract class Abilities implements Cloneable {
 	private final String name;
 	private final ItemStack icon;
 	private final Rarity rarity;
@@ -78,7 +82,29 @@ public abstract class Abilities {
 		return Collections.singletonList(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0));
 	}
 	
+	public boolean needCloning() {
+		return false;
+	}
+	
+	/*public void giveEquipment(Player player) {
+		
+	}*/
+	
 	public void onKill(Player killer) {}
 	
-	public void onInteract(PlayerInteractEvent e) {}
+	public void onInteract(PlayerInteractEvent event) {}
+	public void onToggleSneak(PlayerToggleSneakEvent event) {}
+	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {}
+	public void leaveAction(Player player) {}
+	public void onDeath(PlayerDeathEvent event) {}
+	public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {}
+	
+	@Override
+    public Abilities clone() {
+        try {
+            return (Abilities) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new Error(e);
+        }
+    }
 }

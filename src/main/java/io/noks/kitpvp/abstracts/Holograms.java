@@ -1,6 +1,10 @@
 package io.noks.kitpvp.abstracts;
 
+import java.util.List;
+
 import org.bukkit.Location;
+
+import io.noks.Hologram;
 
 public interface Holograms {
 	public String title();
@@ -9,6 +13,8 @@ public interface Holograms {
 	
 	public String header();
 	public String footer();
+	
+	public List<Hologram> content();
 	
 	public void spawn();
 }

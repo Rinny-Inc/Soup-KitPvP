@@ -152,7 +152,7 @@ public class DBUtils {
 
 	public void savePlayer(PlayerManager pm) {
 		if (!isConnected()) {
-			pm.remove();
+			pm.drop();
 			return;
 		}
 		Connection connection = null;
@@ -181,7 +181,7 @@ public class DBUtils {
 			if (connection != null) {
 				try {
 					connection.close();
-					pm.remove();
+					pm.drop();
 				} catch (SQLException ex) {
 					ex.printStackTrace();
 				}

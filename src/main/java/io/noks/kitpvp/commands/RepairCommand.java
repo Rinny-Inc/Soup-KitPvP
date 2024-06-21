@@ -23,7 +23,7 @@ public class RepairCommand implements CommandExecutor {
 		}
 		final Player player = (Player) sender;
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-		if (pm.isInSpawn()) {
+		if (!pm.hasAbility()) {
 			player.sendMessage(ChatColor.RED + "You need to be in the map to do this!");
 			return false;
 		}
@@ -33,11 +33,13 @@ public class RepairCommand implements CommandExecutor {
 		}
 		pm.getEconomy().remove(50);
 		for (ItemStack armor : player.getInventory().getArmorContents()) {
+			if (armor == null) continue;
 			if (armor.getType().getMaxDurability() > 0) {
 				armor.setDurability((short) 0);
 			}
 		}
 		for (ItemStack content : player.getInventory().getContents()) {
+			if (content == null) continue;
 			if (content.getType().getMaxDurability() > 0) {
 				content.setDurability((short) 0);
 			}

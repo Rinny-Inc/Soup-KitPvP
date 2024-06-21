@@ -57,7 +57,7 @@ public class Switcher extends Abilities implements Listener {
 				final Player hit = (Player) event.getHitEntity();
 
 				if (hit == shooter)return;
-				if (PlayerManager.get(hit.getUniqueId()).isInSpawn()) {
+				if (!PlayerManager.get(hit.getUniqueId()).hasAbility()) {
 					return;
 				}
 				final Location hittedLoc = hit.getLocation();

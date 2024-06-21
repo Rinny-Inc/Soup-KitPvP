@@ -2,7 +2,6 @@ package io.noks.kitpvp.task;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.bukkit.ChatColor;
@@ -59,13 +58,9 @@ public class MapTask extends BukkitRunnable {
 	    player.setExp(xpPercentage / 100);
 	}
 	
-	private <T> Predicate<T> not(Predicate<T> p) { 
-		return p.negate();
-	}
-	
 	public MapTask startTask() {
 		if (this.taskId == -1) {
-			this.playersInMap = new HashSet<PlayerManager>(PlayerManager.players.values().stream().filter(not(PlayerManager::isInSpawn)).collect(Collectors.toSet()));
+			this.playersInMap = new HashSet<PlayerManager>(PlayerManager.players.values().stream().filter(PlayerManager::hasAbility).collect(Collectors.toSet()));
 			this.taskId = this.runTaskTimerAsynchronously(this.main, 0, 1).getTaskId();
 		}
 		return this;

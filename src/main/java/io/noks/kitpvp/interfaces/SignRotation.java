@@ -8,17 +8,12 @@ public interface SignRotation {
 	default Block getBlockBehindSign(Block signBlock, Sign sign) {
         MaterialData signData = sign.getData();
 
-        switch (signData.getData()) {
-            case 2:
-                return signBlock.getRelative(0, 0, 1);
-            case 3:
-                return signBlock.getRelative(0, 0, -1);
-            case 4:
-                return signBlock.getRelative(1, 0, 0);
-            case 5:
-                return signBlock.getRelative(-1, 0, 0);
-            default:
-                return null;
-        }
+        return switch (signData.getData()) {
+            case 2 -> signBlock.getRelative(0, 0, 1);
+            case 3 -> signBlock.getRelative(0, 0, -1);
+            case 4 -> signBlock.getRelative(1, 0, 0);
+            case 5 -> signBlock.getRelative(-1, 0, 0);
+            default -> throw new IllegalArgumentException("Unexpected value: " + signData.getData());
+        };
     }
 }

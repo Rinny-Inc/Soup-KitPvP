@@ -50,7 +50,6 @@ public class PlayerManager extends Ability {
 	}
 	
 	public PlayerManager(UUID playerUUID, Stats stats, PlayerSettings settings, Economy economy, Perks perks) {
-		super();
 		this.playerUUID = playerUUID;
 		this.player = Bukkit.getPlayer(this.playerUUID);
 		this.perks = perks;
@@ -73,7 +72,7 @@ public class PlayerManager extends Ability {
 		return null;
 	}
 
-	public void remove() {
+	public void drop() {
 		players.remove(this.playerUUID);
 	}
 
@@ -83,10 +82,6 @@ public class PlayerManager extends Ability {
 
 	public UUID getPlayerUUID() {
 		return this.playerUUID;
-	}
-	
-	public boolean isInSpawn() {
-		return !this.hasAbility();
 	}
 
 	public boolean hasUsedSponsor() {
@@ -222,44 +217,46 @@ public class PlayerManager extends Ability {
 		this.player.setScoreboard(scoreboard);
 	}
 	
-	public void refreshScoreboardLine(RefreshType type) {
+	public void refreshScoreboardLine(RefreshType... rtype) {
 		final Scoreboard board = this.player.getScoreboard();
-		final Team team = board.getTeam(type.getName());
-		switch (type) {
-		case KILLS:
-			team.setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getKills());
-			break;
-		case KILLSTREAK:
-			team.setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getKillStreak());
-			break;
-		case DEATHS:
-			team.setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getDeaths());
-			break;
-		case CREDITS:
-			team.setSuffix(ChatColor.DARK_AQUA.toString() + this.economy.getMoney());
-			break;
-		/*case COMBATTAG:
-			final Objective sidebar = board.getObjective(DisplaySlot.SIDEBAR);
-			if (board.getTeam(type.getName()) == null) {
-				break;
-			}
-			if (sidebar.getScore(ChatColor.RED + "Combat Tag: ") != null && this.combatTag == null) {
-				board.getScores(ChatColor.RED + "Combat Tag: ").clear();
-				sidebar.getScore(ChatColor.RESET.toString() + ChatColor.GRAY + ChatColor.STRIKETHROUGH + "-----").setScore(10);
-				this.combatTag = null;
-				break;
-			}
-			if (board.getTeam(type.getName()) != null) {
-				board.getTeam(type.getName()).setSuffix(ChatColor.RESET + ": " + this.format(this.combatTag.getRemainingTime()));
-				if (sidebar.getScore(ChatColor.RED + "Combat Tag: ") == null) {
-					sidebar.getScore(ChatColor.RED + "Combat Tag: ").setScore(10);
-					sidebar.getScore(ChatColor.RESET.toString() + ChatColor.GRAY + ChatColor.STRIKETHROUGH + "-----").setScore(9);
+		for (RefreshType type : rtype) {
+			final Team team = board.getTeam(type.getName());
+			switch (type) {
+			case KILLS:
+				team.setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getKills());
+				continue;
+			case KILLSTREAK:
+				team.setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getKillStreak());
+				continue;
+			case DEATHS:
+				team.setSuffix(ChatColor.DARK_AQUA.toString() + this.stats.getDeaths());
+				continue;
+			case CREDITS:
+				team.setSuffix(ChatColor.DARK_AQUA.toString() + this.economy.getMoney());
+				continue;
+			/*case COMBATTAG:
+				final Objective sidebar = board.getObjective(DisplaySlot.SIDEBAR);
+				if (board.getTeam(type.getName()) == null) {
+					break;
 				}
-				break;
+				if (sidebar.getScore(ChatColor.RED + "Combat Tag: ") != null && this.combatTag == null) {
+					board.getScores(ChatColor.RED + "Combat Tag: ").clear();
+					sidebar.getScore(ChatColor.RESET.toString() + ChatColor.GRAY + ChatColor.STRIKETHROUGH + "-----").setScore(10);
+					this.combatTag = null;
+					break;
+				}
+				if (board.getTeam(type.getName()) != null) {
+					board.getTeam(type.getName()).setSuffix(ChatColor.RESET + ": " + this.format(this.combatTag.getRemainingTime()));
+					if (sidebar.getScore(ChatColor.RED + "Combat Tag: ") == null) {
+						sidebar.getScore(ChatColor.RED + "Combat Tag: ").setScore(10);
+						sidebar.getScore(ChatColor.RESET.toString() + ChatColor.GRAY + ChatColor.STRIKETHROUGH + "-----").setScore(9);
+					}
+					break;
+				}
+				break;*/
+			default:
+				continue;
 			}
-			break;*/
-		default:
-			break;
 		}
 	}
 	

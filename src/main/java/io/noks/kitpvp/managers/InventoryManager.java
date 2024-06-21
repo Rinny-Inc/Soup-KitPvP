@@ -161,7 +161,7 @@ public class InventoryManager {
 			final Abilities lastAbility = pm.getSelectedAbility();
 			inventory.setItem(6, Main.getInstance().getItemUtils().getItemStack(lastAbility.getIcon(), ChatColor.YELLOW + "Last used ability: " + lastAbility.getRarity().getColor() + lastAbility.getName(), lastAbility.getLore()));
 		}
-		inventory.setItem(8, Main.getInstance().getItemUtils().getItemMaterial(Material.WATCH, 0, ChatColor.YELLOW + "Random Abilities"));
+		inventory.setItem(7, Main.getInstance().getItemUtils().getItemMaterial(Material.WATCH, 0, ChatColor.YELLOW + "Random Abilities"));
 		int rarityStartSlot = 10;
 		for (Rarity rarity : Rarity.values()) {
 			if (rarity != Rarity.USELESS) {
