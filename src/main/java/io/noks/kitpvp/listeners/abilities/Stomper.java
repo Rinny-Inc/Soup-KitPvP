@@ -42,9 +42,6 @@ public class Stomper extends Abilities implements Listener {
 					if (!(nearbyPlayers instanceof Player)) continue;
 					final Player nearby = (Player) nearbyPlayers;
 					if (!stomper.canSee(nearby) || !nearby.canSee(stomper))continue;
-					if (PlayerManager.get(nearby.getUniqueId()).ability() instanceof AntiStomper) {
-						continue;
-					}
 					if (damage >= 20.0D && nearby.getHealth() >= 20) {
 						damage = 18.0D;
 					}

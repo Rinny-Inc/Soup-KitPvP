@@ -4,9 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,9 +30,9 @@ public class DBUtils {
 
 	private HikariDataSource hikari;
 
-	private final String SAVE = "UPDATE players SET kills=?, death=?, bestks=?, bounty=?, scoreboard=?, swordslot=?, itemslot=?, money=?, firstperk=?, secondperk=?, thirdperk=? WHERE uuid=?";
-	private final String INSERT = "INSERT INTO players VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE uuid=?";
-	private final String SELECT = "SELECT kills,death,bestks,bounty,scoreboard,swordslot,itemslot,money,firstperk,secondperk,thirdperk FROM players WHERE uuid=?";
+	private final String SAVE = "UPDATE stats SET kills=?, death=?, bestks=?, bounty=?, scoreboard=?, swordslot=?, itemslot=?, money=?, firstperk=?, secondperk=?, thirdperk=? WHERE uuid=?";
+	private final String INSERT = "INSERT INTO stats VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE uuid=?";
+	private final String SELECT = "SELECT kills,death,bestks,bounty,scoreboard,swordslot,itemslot,money,firstperk,secondperk,thirdperk FROM stats WHERE uuid=?";
 
 	public DBUtils(String address, String name, String user, String password) {
 		this.address = address;
@@ -57,7 +55,7 @@ public class DBUtils {
 	private void connectDatabase() {
 		try {
 			this.hikari = new HikariDataSource();
-			this.hikari.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
+			this.hikari.setDataSourceClassName("com.mysql.cj.jdbc.MysqlDataSource");
 			this.hikari.addDataSourceProperty("serverName", this.address);
 			this.hikari.addDataSourceProperty("port", "3306");
 			this.hikari.addDataSourceProperty("databaseName", this.name);
@@ -78,14 +76,16 @@ public class DBUtils {
 	
 	private void createTable() {
 		if (!isConnected()) {
+			System.out.println("NOT CONNECTED");
 			return;
 		}
 		Connection connection = null;
 		try {
 			connection = this.hikari.getConnection();
-			final PreparedStatement statement = (PreparedStatement) connection.createStatement();
-			statement.executeUpdate("CREATE TABLE IF NOT EXISTS players(uuid varchar(36), kills int(11), death int(11), bestks int(11), bounty int(11), scoreboard TINYINT(1), swordslot int(11), itemslot int(11), money int(11), firstperk text(16). seondperk text(20), thirdperk text(18), PRIMARY KEY(`uuid`), UNIQUE(`uuid`));");
+			final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS stats(uuid VARCHAR(36), kills INT, death INT, bestks INT, bounty INT, scoreboard TINYINT(1), swordslot INT, itemslot INT, money INT, firstperk VARCHAR(16), secondperk VARCHAR(20), thirdperk VARCHAR(18), PRIMARY KEY(`uuid`), UNIQUE(`uuid`));");
+			statement.executeUpdate();
 			statement.close();
+			System.out.println("CREATED TABLE");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -163,16 +163,15 @@ public class DBUtils {
 			statement.setInt(1, pm.getStats().getKills());
 			statement.setInt(2, pm.getStats().getDeaths());
 			statement.setInt(3, pm.getStats().getBestKillStreak());
-			statement.setInt(4, pm.getStats().getBestKillStreak());
-			statement.setInt(5, pm.getStats().getBounty());
-			statement.setBoolean(6, pm.getSettings().hasScoreboardEnabled());
-			statement.setInt(7, pm.getSettings().getSlot(SlotType.SWORD));
-			statement.setInt(8, pm.getSettings().getSlot(SlotType.ITEM));
-			statement.setInt(9, pm.getEconomy().getMoney());
-			statement.setString(10, pm.getActivePerks().first().getName());
-			statement.setString(11, pm.getActivePerks().second().getName());
-			statement.setString(12, pm.getActivePerks().third().getName());
-			statement.setString(13, pm.getPlayerUUID().toString());
+			statement.setInt(4, pm.getStats().getBounty());
+			statement.setBoolean(5, pm.getSettings().hasScoreboardEnabled());
+			statement.setInt(6, pm.getSettings().getSlot(SlotType.SWORD));
+			statement.setInt(7, pm.getSettings().getSlot(SlotType.ITEM));
+			statement.setInt(8, pm.getEconomy().getMoney());
+			statement.setString(9, "none"/*pm.getActivePerks().first().getName()*/); // TODO
+			statement.setString(10, "none"/*pm.getActivePerks().second().getName()*/); // TODO
+			statement.setString(11, "none"/*pm.getActivePerks().third().getName()*/); // TODO
+			statement.setString(12, pm.getPlayerUUID().toString());
 			statement.execute();
 			statement.close();
 		} catch (SQLException e) {
@@ -193,7 +192,8 @@ public class DBUtils {
 		return this.leaderboard.get(type);
 	}
 	private Map<UUID, Integer> scanLeaderboard(RefreshType type) {
-		if (!isConnected()) {
+		return null;
+		/*if (!isConnected()) {
 			return null;
 		}
 		final Map<UUID, Integer> map = new LinkedHashMap<UUID, Integer>(10);
@@ -221,7 +221,7 @@ public class DBUtils {
 				}
 			}
 		}
-		return map.isEmpty() ? Collections.emptyMap() : map;
+		return map.isEmpty() ? Collections.emptyMap() : map;*/
 	}
 
 	public HikariDataSource getHikari() {

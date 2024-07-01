@@ -6,8 +6,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
@@ -20,6 +22,7 @@ import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
 
 public class CookieMonster extends Abilities implements Listener {
+	// TODO: REWORK NEEDED
 	private Main plugin;
 
 	public CookieMonster(Main main) {
@@ -37,6 +40,14 @@ public class CookieMonster extends Abilities implements Listener {
 	public String specialItemName() {
 		return "Cookie";
 	}
+	
+	@EventHandler(priority = EventPriority.LOW)
+	public void onFoodLevelChange(FoodLevelChangeEvent event) {
+		if (event.getEntity().getItemInHand().getType() == Material.COOKIE) {
+			event.setCancelled(true);
+			event.setFoodLevel(19);
+		}
+	}
 
 	@EventHandler
 	public void onInteract(PlayerInteractEvent event) {
@@ -45,7 +56,8 @@ public class CookieMonster extends Abilities implements Listener {
 		}
 		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && PlayerManager.get(event.getPlayer().getUniqueId()).hasAbility(this)) {
 			final Player p = event.getPlayer();
-			if (p.getItemInHand().getType() == Material.COOKIE && p.getFoodLevel() == 20 && (!p.hasPotionEffect(PotionEffectType.SPEED) || p.getHealth() * 2.0D < p.getMaxHealth())) {
+			if (p.getItemInHand().getType() == Material.COOKIE && p.getFoodLevel() == 20) {
+				p.setSaturation(0);;
 				p.setFoodLevel(19);
 			}
 		}
@@ -60,6 +72,7 @@ public class CookieMonster extends Abilities implements Listener {
 			eater.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 140, (new Random()).nextInt(1) + 1));
 			eater.updateInventory();
 			eater.setFoodLevel(20);
+			eater.setSaturation(10000.0F);
 		}
 	}
 	

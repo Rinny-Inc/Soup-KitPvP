@@ -15,6 +15,9 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
 
 import com.avaje.ebean.validation.NotNull;
 
@@ -88,6 +91,7 @@ public class Main extends JavaPlugin implements TournamentManager {
 		this.itemUtils = new ItemUtils();
 		this.inventoryManager = new InventoryManager();
 		this.abilitiesManager = new AbilitiesManager(this);
+		this.registerScoreboard();
 		this.registerListeners();
 		this.registerCommands();
 		this.eventsTask = new EventsTask(this); // TODO: need to execute it (see in class)
@@ -130,7 +134,7 @@ public class Main extends JavaPlugin implements TournamentManager {
 		}
 	}
 	
-	/*private void registerScoreboard() {
+	private void registerScoreboard() {
 		final Scoreboard board = this.getServer().getScoreboardManager().getMainScoreboard();
 		if (board.getObjective("life") == null) {
 			final Objective life = board.registerNewObjective("life", "health");
@@ -138,12 +142,12 @@ public class Main extends JavaPlugin implements TournamentManager {
 			final char heart = '\u2764';
 			life.setDisplayName(ChatColor.RED.toString() + heart);
 		}
-		if (board.getObjective("bounty") == null) {
+		/*if (board.getObjective("bounty") == null) {
 			final Objective life = board.registerNewObjective("bounty", "health");
 			life.setDisplaySlot(DisplaySlot.BELOW_NAME);
 			life.setDisplayName(ChatColor.YELLOW + "Bounty:");
-		}
-	}*/
+		}*/
+	}
 	
 	private void registerListeners() {
 		new PlayerListener(this);

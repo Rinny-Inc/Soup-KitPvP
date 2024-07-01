@@ -31,6 +31,8 @@ import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
 
+// TODO: doesnt work
+
 public class Ninja extends Abilities {
 	private @Nullable TtlArrayList<UUID> target;
 	public Ninja() {
@@ -94,10 +96,7 @@ public class Ninja extends Abilities {
 				return;
 			}
 			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-			if (!pm.hasAbility(this)) {
-				return;
-			}
-			final Player target = Bukkit.getPlayer(this.target.get(0));
+			final Player target = Bukkit.getPlayer(this.target.getFirst());
 			if (target == null) {
 				return;
 			}
@@ -118,10 +117,7 @@ public class Ninja extends Abilities {
 			final double nX = Math.cos(Math.toRadians(nang));
 			final double nZ = Math.sin(Math.toRadians(nang));
 			Location behindTargetLocation = new Location(player.getWorld(), target.getLocation().getX() - nX, target.getLocation().getY(), target.getLocation().getZ() - nZ, target.getLocation().getYaw(), target.getLocation().getPitch());
-			if (behindTargetLocation.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR) {
-				behindTargetLocation = target.getLocation();
-			}
-			if (behindTargetLocation.getBlock().getType() != Material.AIR) {
+			if (behindTargetLocation.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR || behindTargetLocation.getBlock().getType() != Material.AIR) {
 				behindTargetLocation = target.getLocation();
 			}
 			player.teleport(behindTargetLocation);

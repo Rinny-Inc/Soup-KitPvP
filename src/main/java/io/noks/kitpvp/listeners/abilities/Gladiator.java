@@ -1,16 +1,17 @@
 package io.noks.kitpvp.listeners.abilities;
 
 import java.text.DecimalFormat;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
+import java.util.Vector;
 
 import javax.annotation.Nullable;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -25,12 +26,12 @@ import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
 
-// TODO: NEED TO CHECK IF BLOCK ARE IN THE CREATING ZONE OF THE CAGE, MOVE IT UP
+// TODO: arena doesnt despawn
 
 public class Gladiator extends Abilities {
 	private @Nullable UUID opps, gladiator;
 	private @Nullable Location gladiatorLastLocation, oppsLastLocation;
-	private @Nullable Map<Location, Material> cage;
+	private @Nullable Vector<Location> cage;
 	private static @NotNull Main plugin;
 	public Gladiator(Main main) {
 		super("Gladiator", new ItemStack(Material.IRON_FENCE), Rarity.BETA/*Rarity.LEGENDARY*/, 20L, new String[] { ChatColor.AQUA + "Duel your opponent" });
@@ -65,11 +66,6 @@ public class Gladiator extends Abilities {
 				}
 				final Player r = (Player) e.getRightClicked();
 				if (r.getUniqueId() == this.opps) {
-					return;
-				}
-				final PlayerManager rm = PlayerManager.get(r.getUniqueId());
-				if (rm.ability() instanceof AntiGladiator) {
-					pm.applyAbilityCooldown();
 					return;
 				}
 				setupGladiatorsDuel(p, r);
@@ -161,6 +157,7 @@ public class Gladiator extends Abilities {
 	}
 	
 	private void clearMemory() {
+		// Let GC do his job
 		this.gladiator = null;
 		this.opps = null;
 		this.gladiatorLastLocation = null;
@@ -170,19 +167,20 @@ public class Gladiator extends Abilities {
 	
 	private void createCage(Player gladiator, Player opps) {
 		if (this.cage == null) {
-			this.cage = new HashMap<Location, Material>();
+			this.cage = new Vector<Location>();
 		}
 		final Location loc = gladiator.getLocation().clone().add(0, 100, 0);
+		final World world = loc.getWorld();
 		final int centerX = loc.getBlockX();
-        int centerY = loc.getBlockX();
-        int centerZ = loc.getBlockX();
-		int halfSize = 7;
+        int centerY = loc.getBlockY();
+        int centerZ = loc.getBlockZ();
+		final int halfSize = 8;
 	    boolean blockFound = false;
 
 	    for (int x = centerX - halfSize; x <= centerX + halfSize; x++) {
 	        for (int y = centerY - halfSize; y <= centerY + halfSize; y++) {
 	            for (int z = centerZ - halfSize; z <= centerZ + halfSize; z++) {
-	                if (!loc.getWorld().getBlockAt(x, y, z).getType().equals(Material.AIR)) {
+	                if (!world.getBlockAt(x, y, z).getType().equals(Material.AIR)) {
 	                    blockFound = true;
 	                    break;
 	                }
@@ -200,24 +198,24 @@ public class Gladiator extends Abilities {
             for (int y = centerY - halfSize; y <= centerY + halfSize; y++) {
                 for (int z = centerZ - halfSize; z <= centerZ + halfSize; z++) {
                     if ((x == centerX - halfSize || x == centerX + halfSize || y == centerY - halfSize || y == centerY + halfSize || z == centerZ - halfSize || z == centerZ + halfSize) || (y == centerY - halfSize && (x != centerX || z != centerZ))) {
-                        Block block = loc.getWorld().getBlockAt(x, y, z);
-                    	this.cage.put(block.getLocation(), block.getType());
+                        Block block = world.getBlockAt(x, y, z);
+                    	this.cage.add(block.getLocation());
                     	block.setType(Material.GLASS);
                     }
                 }
             }
         }
-		
-		gladiator.teleport(new Location (loc.getWorld(), centerX - halfSize, centerY - halfSize, centerZ - halfSize));
-		opps.teleport(new Location(loc.getWorld(), centerX + halfSize, centerY + halfSize, centerZ + halfSize));
+		gladiator.teleport(new Location (world, centerX - halfSize, centerY - halfSize, centerZ - halfSize));
+		opps.teleport(new Location(world, centerX + halfSize, centerY + halfSize, centerZ + halfSize));
 	}
 	
 	private void clearCage() {
-		for (Map.Entry<Location, Material> entry : this.cage.entrySet()) {
-			Location loc = entry.getKey();
-			Material oldMaterial = entry.getValue();
-			loc.getWorld().getBlockAt(loc).setType(oldMaterial);
+		Iterator<Location> it = this.cage.iterator();
+		while (it.hasNext()) {
+			Location loc = it.next();
+			loc.getWorld().getBlockAt(loc).setType(Material.AIR);
+			it.remove();
 		}
-		this.cage = null;
+		this.cage = null; // Let GC do his job
 	}
 }

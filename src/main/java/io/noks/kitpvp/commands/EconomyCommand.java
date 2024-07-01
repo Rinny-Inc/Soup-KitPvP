@@ -47,39 +47,51 @@ public class EconomyCommand implements CommandExecutor {
 			return true;
 		}
 		if (command.getName().equalsIgnoreCase("pay")) {
-			if (args.length != 2) {
+			if (args.length < 2 || args.length > 3) {
 				sender.sendMessage(ChatColor.RED + "Usage: /pay <player> <amount>");
 				return false;
 			}
-			final Player target = Bukkit.getPlayer(args[0]);
+			boolean isBank = false;
+			if (args[0].equals("-b")) {
+				if (sender.isOp()) {
+					isBank = true;
+				} else {
+					sender.sendMessage(ChatColor.RED + "You cannot be identified as the Bank!");
+					return false;
+				}
+			}
+			final int playerPos = !isBank ? 0 : 1;
+			final Player target = Bukkit.getPlayer(args[playerPos]);
 			if (target == null) {
 				return false;
 			}
 			final Player player = (Player) sender;
-			if (target == player) {
+			if (!isBank && target == player) {
 				player.sendMessage(ChatColor.RED + "Why paying yourself?!");
 				return false;
 			}
-			if (!isInteger(args[1])) {
+			if (!isInteger(args[playerPos + 1])) {
 				player.sendMessage(ChatColor.RED + "Usage: /pay <player> <amount>");
 				return false;
 			}
-			final Integer amount = Integer.valueOf(args[1]);
+			final Integer amount = Integer.valueOf(args[playerPos + 1]);
 			final Economy pe = PlayerManager.get(player.getUniqueId()).getEconomy();
-			if (pe.getMoney() < amount) {
-				player.sendMessage(ChatColor.RED + "Not enough credits!");
-				return false;
+			if (!isBank) {
+				if (pe.getMoney() < amount) {
+					player.sendMessage(ChatColor.RED + "Not enough credits!");
+					return false;
+				}
+				pe.remove(amount);
 			}
-			pe.remove(amount);
 			PlayerManager.get(target.getUniqueId()).getEconomy().add(amount);
-			player.sendMessage(ChatColor.GREEN + "You've sent " + target.getName() + " " + ChatColor.YELLOW + amount + " credits.");
-			target.sendMessage(ChatColor.GREEN + player.getName() + " sent you " + ChatColor.YELLOW + amount + " credits.");
+			player.sendMessage(ChatColor.GREEN + "You've sent " + target.getName() + " " + ChatColor.YELLOW + amount + " credits" + (isBank ? " from bank" : "") + ".");
+			target.sendMessage(ChatColor.GREEN + (!isBank ? player.getName() : "Bank") + " sent you " + ChatColor.YELLOW + amount + " credits.");
 			return true;
 		}
 		return false;
 	}
 	
-	public boolean isInteger(String str) {
+	private boolean isInteger(String str) {
         if (str == null || str.isEmpty() || str.isBlank()) {
             return false;
         }

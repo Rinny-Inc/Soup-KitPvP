@@ -56,7 +56,7 @@ public class PlayerListener implements Listener, SignRotation {
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onJoin(PlayerJoinEvent event) {
 		if (this.plugin.getConfigManager().sendJoinAndQuitMessageToOP && this.plugin.getServer().getOnlinePlayers().size() > 1) {
 		    this.plugin.getServer().getOnlinePlayers().stream().filter(Player::isOp).forEach(opPlayers -> opPlayers.sendMessage(event.getJoinMessage()));

@@ -18,7 +18,7 @@ import io.noks.kitpvp.Main;
 
 public class Feast {
 	private World world = Bukkit.getWorld("world");
-	private Map<Location, Material> blocks = new HashMap<Location, Material>(13);
+	private Map<Location, Material> blocks;
 	
 	public Feast(Location location) {
 		this.setupFeast(location);
@@ -43,6 +43,9 @@ public class Feast {
 	            {-2.0, 2.0}
 	        };
 
+		if (this.blocks == null) {
+			this.blocks = new HashMap<Location, Material>(13);
+		}
 		for (double[] offset : offsets) {
 	        double offsetX = offset[0];
 	        double offsetZ = offset[1];
@@ -84,6 +87,8 @@ public class Feast {
 			Material oldMaterial = entry.getValue();
 			this.world.getBlockAt(loc).setType(oldMaterial);
 		}
+		this.blocks.clear();
+		this.blocks = null;
 		Bukkit.broadcastMessage(ChatColor.RED + "The feast just disappeared!");
 	}
 }

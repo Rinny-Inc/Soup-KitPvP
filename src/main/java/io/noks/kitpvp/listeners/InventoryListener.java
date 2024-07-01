@@ -19,7 +19,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scoreboard.DisplaySlot;
 
 import com.google.common.collect.Lists;
 
@@ -154,17 +153,33 @@ public class InventoryListener implements Listener, SignRotation {
 					case 0 -> {
 						player.closeInventory();
 						player.performCommand("repair");
+						return;
 					}
 					case 1 -> {
 						Economy eco = PlayerManager.get(player.getUniqueId()).getEconomy();
-						if (eco.getMoney() < 150) {
-							player.sendMessage(ChatColor.RED + "Missing " + (150 - eco.getMoney()) + " credits!");
+						final int price = 150;
+						if (eco.getMoney() < price) {
+							player.sendMessage(ChatColor.RED + "Missing " + (price - eco.getMoney()) + " credits!");
 							break;
 						}
 						player.closeInventory();
-						eco.remove(150);
-						player.sendMessage(ChatColor.GREEN + "Successfully bought Golden Apples for 150 credits!");
+						eco.remove(price);
+						player.sendMessage(ChatColor.GREEN + "Successfully bought Golden Apples for " + price + " credits!");
 						player.getInventory().addItem(new ItemStack(Material.GOLDEN_APPLE, 3));
+						return;
+					}
+					case 2 -> {
+						Economy eco = PlayerManager.get(player.getUniqueId()).getEconomy();
+						final int price = 25;
+						if (eco.getMoney() < price) {
+							player.sendMessage(ChatColor.RED + "Missing " + (price - eco.getMoney()) + " credits!");
+							break;
+						}
+						player.closeInventory();
+						eco.remove(price);
+						player.sendMessage(ChatColor.GREEN + "Successfully bought GrandPa Stick for " + price + " credits!");
+						player.getInventory().addItem(event.getCurrentItem());
+						return;
 					}
 				}
 			}
@@ -181,16 +196,15 @@ public class InventoryListener implements Listener, SignRotation {
 					return;
 				}
 				if (itemName.equals("scoreboard")) {
-					final PlayerManager pm = PlayerManager.get(player.getUniqueId());
+					player.sendMessage(ChatColor.RED + "Scoreboard is coming right back real soon ^^");
+					/*final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 					pm.getSettings().updateScoreboardState();
 					if (pm.getSettings().hasScoreboardEnabled()) {
 						pm.applyScoreboard();
 					} else {
-						if (player.getScoreboard().getObjective(DisplaySlot.SIDEBAR) != null) {
-							player.getScoreboard().getObjective(DisplaySlot.SIDEBAR).unregister();
-						}
+						player.setScoreboard(this.plugin.getServer().getScoreboardManager().getMainScoreboard());
 					}
-					player.openInventory(this.plugin.getInventoryManager().loadSettingsInventory(player));
+					player.openInventory(this.plugin.getInventoryManager().loadSettingsInventory(player));*/
 					return;
 				}
 				if (itemName.contains("slot")) {

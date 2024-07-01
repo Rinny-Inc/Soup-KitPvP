@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -91,6 +92,9 @@ public class InventoryManager {
 	private void initShopInventory() {
 		this.shopInventory.setItem(0, Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.IRON_CHESTPLATE), ChatColor.GREEN + "Repair All", new String[] { "", ChatColor.GRAY + "Repairs everything in your inventory.", "", ChatColor.WHITE + "Status: " + ChatColor.GREEN + "In Stock", ChatColor.WHITE + "Cost: " + ChatColor.GOLD + "50 Credits", "", ChatColor.YELLOW + "Click to purchase the Repair All!" }));
 		this.shopInventory.setItem(1, Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.GOLDEN_APPLE), ChatColor.GREEN + "Golden Apples", new String[] { "", ChatColor.GRAY + "3 premium golden apples.", "", ChatColor.WHITE + "Status: " + ChatColor.GREEN + "In Stock", ChatColor.WHITE + "Cost: " + ChatColor.GOLD + "150 Credits", "", ChatColor.YELLOW + "Click to purchase the Golden Apples!" }));
+		ItemStack stick = new ItemStack(Material.STICK);
+		stick.addUnsafeEnchantment(Enchantment.KNOCKBACK, 2);
+		this.shopInventory.setItem(2, Main.getInstance().getItemUtils().getItemStack(stick, ChatColor.GREEN + "GrandPa Stick", new String[] { "", ChatColor.GRAY + "GrandPa's knockback 2 stick", "", ChatColor.WHITE + "Status: " + ChatColor.GREEN + "In Stock", ChatColor.WHITE + "Cost: " + ChatColor.GOLD + "25 Credits", "", ChatColor.YELLOW + "Click to purchase the GrandPa Stick!" }));
 		
 		this.shopInventory.setItem(8, Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.CHEST), ChatColor.DARK_AQUA + "Perk Shop", new String[] { ChatColor.GRAY + "Click here to go to the perk shop", "", ChatColor.RED + "Coming Soon :)"}));
 	}

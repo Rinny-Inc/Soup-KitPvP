@@ -8,14 +8,13 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import com.avaje.ebean.validation.NotNull;
 import com.google.common.collect.Maps;
 
+import io.noks.kitpvp.Main;
 import io.noks.kitpvp.enums.RefreshType;
 import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.managers.caches.CombatTag;
@@ -46,7 +45,7 @@ public class PlayerManager extends Ability {
 		this.settings = new PlayerSettings();
 		this.economy = new Economy();
 		players.putIfAbsent(playerUUID, this);
-		this.applyScoreboard();
+		//this.applyScoreboard();
 	}
 	
 	public PlayerManager(UUID playerUUID, Stats stats, PlayerSettings settings, Economy economy, Perks perks) {
@@ -62,7 +61,7 @@ public class PlayerManager extends Ability {
 		if (!settings.hasScoreboardEnabled()) {
 			return;
 		}
-		this.applyScoreboard();
+		//this.applyScoreboard();
 	}
 
 	public static PlayerManager get(UUID playerUUID) {
@@ -137,9 +136,10 @@ public class PlayerManager extends Ability {
 			if (hasCombatTag()) {
 				this.combatTag = null;
 			}
-			stats.addDeaths();
-			refreshScoreboardLine(RefreshType.DEATHS);
-			refreshScoreboardLine(RefreshType.KILLSTREAK);
+			if (this.player.getLastDamage() != 0.0D) {
+				stats.addDeaths();
+			}
+			refreshScoreboardLine(RefreshType.DEATHS, RefreshType.KILLSTREAK);
 			if (stats.getKillStreak() > stats.getBestKillStreak()) {
 				stats.updateBestKillStreak();
 			}
@@ -156,7 +156,7 @@ public class PlayerManager extends Ability {
 		this.player.setItemOnCursor(null);
 	}
 	
-	public void applyScoreboard() {
+	/*public void applyScoreboard() {
 		final Scoreboard scoreboard = this.player.getServer().getScoreboardManager().getNewScoreboard();
 		if (scoreboard.getObjective("life") == null) {
 			final Objective life = scoreboard.registerNewObjective("life", "health");
@@ -214,11 +214,15 @@ public class PlayerManager extends Ability {
 			line.setSuffix("-------");
 			sidebar.getScore(ChatColor.RESET.toString() + ChatColor.GRAY + ChatColor.STRIKETHROUGH + "-----").setScore(10);
 		}
+		// TODO: COPY THE MAIN SCOREBOARD INTO THIS ONE AND UPDATE EVERYONE ELSE PERSONAL SCOREBOARD TEAM
 		this.player.setScoreboard(scoreboard);
-	}
+	}*/
 	
 	public void refreshScoreboardLine(RefreshType... rtype) {
 		final Scoreboard board = this.player.getScoreboard();
+		if (board == Main.getInstance().getServer().getScoreboardManager().getMainScoreboard()) {
+			return;
+		}
 		for (RefreshType type : rtype) {
 			final Team team = board.getTeam(type.getName());
 			switch (type) {
