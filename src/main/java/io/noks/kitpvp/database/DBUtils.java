@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,19 +23,14 @@ import io.noks.kitpvp.managers.caches.PlayerSettings.SlotType;
 import io.noks.kitpvp.managers.caches.Stats;
 
 public class DBUtils {
-	private Map<RefreshType, Map<UUID, Integer>> leaderboard = new HashMap<RefreshType, Map<UUID, Integer>>(RefreshType.values().length - 2);
+	private Map<RefreshType, Map<UUID, Integer>> leaderboard = new HashMap<RefreshType, Map<UUID, Integer>>(RefreshType.values().length - 3);
 	private boolean connected = false;
 
 	private final String address;
 	private final String name;
 	private final String username;
 	private final String password;
-
 	private HikariDataSource hikari;
-
-	private final String SAVE = "UPDATE stats SET kills=?, death=?, bestks=?, bounty=?, scoreboard=?, swordslot=?, itemslot=?, money=?, firstperk=?, secondperk=?, thirdperk=? WHERE uuid=?";
-	private final String INSERT = "INSERT INTO stats VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE uuid=?";
-	private final String SELECT = "SELECT kills,death,bestks,bounty,scoreboard,swordslot,itemslot,money,firstperk,secondperk,thirdperk FROM stats WHERE uuid=?";
 
 	public DBUtils(String address, String name, String user, String password) {
 		this.address = address;
@@ -40,12 +38,12 @@ public class DBUtils {
 		this.username = user;
 		this.password = password;
 		this.connectDatabase();
-		for (RefreshType type : RefreshType.values()) {
+		/*for (RefreshType type : RefreshType.values()) {
 			if (!type.canBeScanned()) {
 				continue;
 			}
 			updateLeaderboard(type);
-		}
+		}*/
 	}
 	
 	public void updateLeaderboard(RefreshType type) {
@@ -76,16 +74,17 @@ public class DBUtils {
 	
 	private void createTable() {
 		if (!isConnected()) {
-			System.out.println("NOT CONNECTED");
 			return;
 		}
 		Connection connection = null;
 		try {
 			connection = this.hikari.getConnection();
-			final PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS stats(uuid VARCHAR(36), kills INT, death INT, bestks INT, bounty INT, scoreboard TINYINT(1), swordslot INT, itemslot INT, money INT, firstperk VARCHAR(16), secondperk VARCHAR(20), thirdperk VARCHAR(18), PRIMARY KEY(`uuid`), UNIQUE(`uuid`));");
-			statement.executeUpdate();
+			Statement statement = connection.createStatement();
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS stats(uuid VARCHAR(36), kills INT, death INT, bestks INT, bounty INT, PRIMARY KEY(`uuid`), UNIQUE(`uuid`));");
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS economy(uuid VARCHAR(36), money INT, PRIMARY KEY(`uuid`), UNIQUE(`uuid`));");
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS settings(uuid VARCHAR(36), scoreboard TINYINT(1), swordslot INT, itemslot INT, PRIMARY KEY(`uuid`), UNIQUE(`uuid`));");
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS perks(uuid VARCHAR(36), firstperk VARCHAR(16), secondperk VARCHAR(20), thirdperk VARCHAR(18), PRIMARY KEY(`uuid`), UNIQUE(`uuid`));");
 			statement.close();
-			System.out.println("CREATED TABLE");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -107,36 +106,11 @@ public class DBUtils {
 		Connection connection = null;
 		try {
 			connection = this.hikari.getConnection();
-			PreparedStatement statement = connection.prepareStatement(INSERT);
-
-			statement.setString(1, uuid.toString());
-			statement.setInt(2, 0);
-			statement.setInt(3, 0);
-			statement.setInt(4, 0);
-			statement.setInt(5, 0); // Bounty
-			statement.setBoolean(6, true);
-			statement.setInt(7, 0);
-			statement.setInt(8, 1);
-			statement.setInt(9, 0); // Money
-			statement.setString(10, "none");
-			statement.setString(11, "none");
-			statement.setString(12, "none");
-			statement.setString(13, uuid.toString());
-			statement.executeUpdate();
-			statement.close();
-
-			statement = connection.prepareStatement(SELECT);
-			statement.setString(1, uuid.toString());
-			final ResultSet result = statement.executeQuery();
-			if (result.next()) {
-				new PlayerManager(uuid, 
-						new Stats(result.getInt("kills"), result.getInt("death"), result.getInt("bestks"), result.getInt("bounty")), 
-						new PlayerSettings(result.getBoolean("scoreboard"), result.getInt("swordslot"), result.getInt("itemslot")), 
-						new Economy(result.getInt("money")),
-						new Perks(new PerksEnum[] {PerksEnum.getPerksFromName(result.getString("firstperk")), PerksEnum.getPerksFromName(result.getString("secondperk")), PerksEnum.getPerksFromName(result.getString("thirdperk"))}));
-			}
-			statement.close();
-			result.close();
+			final Stats stats = this.loadPlayerStats(uuid, connection);
+			final PlayerSettings settings = this.loadPlayerSettings(uuid, connection);
+			final Economy eco = this.loadPlayerEconomy(uuid, connection);
+			final Perks perks = this.loadPlayerPerks(uuid, connection);
+			new PlayerManager(uuid, stats, settings, eco, perks); 
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 		} finally {
@@ -149,6 +123,101 @@ public class DBUtils {
 			}
 		}
 	}
+	
+	private Stats loadPlayerStats(UUID uuid, Connection connection) throws SQLException {
+		Stats stats = new Stats();
+		try (PreparedStatement statement = connection.prepareStatement("INSERT INTO stats VALUES(?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE uuid=?")){
+			statement.setString(1, uuid.toString());
+			statement.setInt(2, 0);
+			statement.setInt(3, 0);
+			statement.setInt(4, 0);
+			statement.setInt(5, 0);
+			statement.setString(6, uuid.toString());
+			statement.executeUpdate();
+			statement.close();
+		}
+		try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM stats WHERE uuid=?")){
+			statement.setString(1, uuid.toString());
+			try (ResultSet result = statement.executeQuery()) {
+                if (result.next()) {
+                    stats = new Stats(result.getInt("kills"), result.getInt("death"), result.getInt("bestks"), result.getInt("bounty"));
+                }
+                result.close();
+            }
+			statement.close();
+		}
+		return stats;
+	}
+	
+	private PlayerSettings loadPlayerSettings(UUID uuid, Connection connection) throws SQLException {
+		PlayerSettings settings = new PlayerSettings();
+		try (PreparedStatement statement = connection.prepareStatement("INSERT INTO settings VALUES(?, ?, ?, ?) ON DUPLICATE KEY UPDATE uuid=?")){
+			statement.setString(1, uuid.toString());
+			statement.setBoolean(2, true);
+			statement.setInt(3, 0);
+			statement.setInt(4, 1);
+			statement.setString(5, uuid.toString());
+			statement.executeUpdate();
+			statement.close();
+		}
+		try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM settings WHERE uuid=?")){
+			statement.setString(1, uuid.toString());
+			try (ResultSet result = statement.executeQuery()) {
+                if (result.next()) {
+                    settings = new PlayerSettings(result.getBoolean("scoreboard"), result.getInt("swordslot"), result.getInt("itemslot"));
+                }
+                result.close();
+            }
+			statement.close();
+		}
+		return settings;
+	}
+	
+	private Economy loadPlayerEconomy(UUID uuid, Connection connection) throws SQLException {
+		Economy eco = new Economy();
+		try (PreparedStatement statement = connection.prepareStatement("INSERT INTO economy VALUES(?, ?) ON DUPLICATE KEY UPDATE uuid=?")){
+			statement.setString(1, uuid.toString());
+			statement.setInt(2, 0);
+			statement.setString(3, uuid.toString());
+			statement.executeUpdate();
+			statement.close();
+		}
+		try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM economy WHERE uuid=?")){
+			statement.setString(1, uuid.toString());
+			try (ResultSet result = statement.executeQuery()) {
+                if (result.next()) {
+                    eco = new Economy(result.getInt("money"));
+                }
+                result.close();
+            }
+			statement.close();
+		}
+		return eco;
+	}
+	
+	private Perks loadPlayerPerks(UUID uuid, Connection connection) throws SQLException {
+		Perks perks = new Perks();
+		try (PreparedStatement statement = connection.prepareStatement("INSERT INTO perks VALUES(?, ?, ?, ?) ON DUPLICATE KEY UPDATE uuid=?")){
+			statement.setString(1, uuid.toString());
+			statement.setString(2, "none");
+			statement.setString(3, "none");
+			statement.setString(4, "none");
+			statement.setString(5, uuid.toString());
+			statement.executeUpdate();
+			statement.close();
+		}
+		try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM perks WHERE uuid=?")){
+			statement.setString(1, uuid.toString());
+			try (ResultSet result = statement.executeQuery()) {
+                if (result.next()) {
+                    perks = new Perks(new PerksEnum[] {PerksEnum.getPerksFromName(result.getString("firstperk")), PerksEnum.getPerksFromName(result.getString("secondperk")), PerksEnum.getPerksFromName(result.getString("thirdperk"))});
+                }
+                result.close();
+            }
+			statement.close();
+		}
+		return perks;
+	}
 
 	public void savePlayer(PlayerManager pm) {
 		if (!isConnected()) {
@@ -158,29 +227,18 @@ public class DBUtils {
 		Connection connection = null;
 		try {
 			connection = this.hikari.getConnection();
-			final PreparedStatement statement = connection.prepareStatement(SAVE);
-
-			statement.setInt(1, pm.getStats().getKills());
-			statement.setInt(2, pm.getStats().getDeaths());
-			statement.setInt(3, pm.getStats().getBestKillStreak());
-			statement.setInt(4, pm.getStats().getBounty());
-			statement.setBoolean(5, pm.getSettings().hasScoreboardEnabled());
-			statement.setInt(6, pm.getSettings().getSlot(SlotType.SWORD));
-			statement.setInt(7, pm.getSettings().getSlot(SlotType.ITEM));
-			statement.setInt(8, pm.getEconomy().getMoney());
-			statement.setString(9, "none"/*pm.getActivePerks().first().getName()*/); // TODO
-			statement.setString(10, "none"/*pm.getActivePerks().second().getName()*/); // TODO
-			statement.setString(11, "none"/*pm.getActivePerks().third().getName()*/); // TODO
-			statement.setString(12, pm.getPlayerUUID().toString());
-			statement.execute();
-			statement.close();
+			final UUID uuid = pm.getPlayerUUID();
+			this.savePlayerStats(uuid, pm.getStats(), connection);
+			this.savePlayerSettings(uuid, pm.getSettings(), connection);
+			this.savePlayerEconomy(uuid, pm.getEconomy(), connection);
+			this.savePlayerPerks(uuid, pm.getActivePerks(), connection);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
+			pm.drop();
 			if (connection != null) {
 				try {
 					connection.close();
-					pm.drop();
 				} catch (SQLException ex) {
 					ex.printStackTrace();
 				}
@@ -188,12 +246,54 @@ public class DBUtils {
 		}
 	}
 	
+	private void savePlayerStats(UUID uuid, Stats stats, Connection connection) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement("UPDATE stats SET kills=?, death=?, bestks=?, bounty=? WHERE uuid=?")) {
+            statement.setInt(1, stats.getKills());
+            statement.setInt(2, stats.getDeaths());
+            statement.setInt(3, stats.getBestKillStreak());
+            statement.setInt(4, stats.getBounty());
+            statement.setString(5, uuid.toString());
+            statement.executeUpdate();
+            statement.close();
+        }
+    }
+	
+	private void savePlayerSettings(UUID uuid, PlayerSettings settings, Connection connection) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement("UPDATE settings SET scoreboard=?, swordslot=?, itemslot=? WHERE uuid=?")) {
+            statement.setBoolean(1, settings.hasScoreboardEnabled());
+            statement.setInt(2, settings.getSlot(SlotType.SWORD));
+            statement.setInt(3, settings.getSlot(SlotType.ITEM));
+            statement.setString(4, uuid.toString());
+            statement.executeUpdate();
+            statement.close();
+        }
+    }
+	
+	private void savePlayerEconomy(UUID uuid, Economy eco, Connection connection) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement("UPDATE economy SET money=? WHERE uuid=?")) {
+            statement.setInt(1, eco.getMoney());
+            statement.setString(2, uuid.toString());
+            statement.executeUpdate();
+            statement.close();
+        }
+    }
+	
+	private void savePlayerPerks(UUID uuid, Perks perks, Connection connection) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement("UPDATE perks SET firstperk=?, secondperk=?, thirdperk=? WHERE uuid=?")) {
+            statement.setString(1, "none");
+            statement.setString(2, "none");
+            statement.setString(3, "none");
+            statement.setString(4, uuid.toString());
+            statement.executeUpdate();
+            statement.close();
+        }
+    }
+	
 	public Map<UUID, Integer> getLeaderboard(RefreshType type){
 		return this.leaderboard.get(type);
 	}
 	private Map<UUID, Integer> scanLeaderboard(RefreshType type) {
-		return null;
-		/*if (!isConnected()) {
+		if (!isConnected()) {
 			return null;
 		}
 		final Map<UUID, Integer> map = new LinkedHashMap<UUID, Integer>(10);
@@ -221,7 +321,7 @@ public class DBUtils {
 				}
 			}
 		}
-		return map.isEmpty() ? Collections.emptyMap() : map;*/
+		return map.isEmpty() ? Collections.emptyMap() : map;
 	}
 
 	public HikariDataSource getHikari() {

@@ -2,9 +2,10 @@ package io.noks.kitpvp.enums;
 
 public enum RefreshType {
 	KILLS("kills", true),
-	KILLSTREAK("ks", true),
-	DEATHS("deaths", true),
-	CREDITS("coins", false),
+	KILLSTREAK("ks", false),
+	BESTKS("bestks", true),
+	DEATHS("death", true),
+	CREDITS("money", false),
 	COMBATTAG("tag", false);
 	
 	private String name;
