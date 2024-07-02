@@ -16,13 +16,11 @@ public class PlayerSettings {
 		this.itemSlot = item;
 	}
 	public int getSlot(SlotType type) {
-		switch (type) {
-		case SWORD:
-			return this.swordSlot;
-		case ITEM:
-			return this.itemSlot;
-		}
-		return 0;
+		return switch (type) {
+			case SWORD -> this.swordSlot;
+			case ITEM -> this.itemSlot;
+			default -> 0;
+		};
 	}
 	
 	public boolean hasScoreboardEnabled() {

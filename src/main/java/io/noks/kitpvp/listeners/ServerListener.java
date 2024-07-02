@@ -22,7 +22,6 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
-import org.bukkit.event.server.ServerDateChangeEvent;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
@@ -181,28 +180,4 @@ public class ServerListener implements Listener {
 			}
 		}
 	}
-	
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onDateChange(ServerDateChangeEvent event) {
-		if (event.getDate().getDay() == 2) {
-			this.plugin.getServer().setWhitelist(true);
-			return;
-		}
-		if (event.getDate().getDay() == 6) {
-			this.plugin.getServer().setWhitelist(false);
-		}
-	}
-	
-	/*@EventHandler
-	public void onItemDespawn(ItemDespawnEvent event) {
-		final Entity entity = event.getEntity();
-		for (Player player : event.getEntity().getWorld().getPlayers()) {
-			if (!(entity instanceof Item)) return;
-			final Item item = (Item) entity;
-			if (!(item.getOwner() instanceof Player)) return;
-			final Player owner = (Player) item.getOwner();
-			if (!player.canSee(owner)) continue;
-			player.playEffect(entity.getLocation().add(0, 0.2, 0), Effect.SMOKE, null);
-		}
-	}*/
 }

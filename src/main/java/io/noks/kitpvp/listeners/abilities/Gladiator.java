@@ -177,26 +177,27 @@ public class Gladiator extends Abilities {
 		final int halfSize = 8;
 	    boolean blockFound = false;
 
-	    for (int x = centerX - halfSize; x <= centerX + halfSize; x++) {
-	        for (int y = centerY - halfSize; y <= centerY + halfSize; y++) {
-	            for (int z = centerZ - halfSize; z <= centerZ + halfSize; z++) {
-	                if (!world.getBlockAt(x, y, z).getType().equals(Material.AIR)) {
-	                    blockFound = true;
-	                    break;
-	                }
-	            }
-	            if (blockFound) break;
-	        }
-	        if (blockFound) break;
-	    }
-
-	    if (blockFound) {
-	        centerY += 50;
+	    foundBlock:
+	    if (!blockFound) {
+		    for (int x = centerX - halfSize; x <= centerX + halfSize; x++) {
+		        for (int z = centerZ - halfSize; z <= centerZ + halfSize; z++) {
+		        	 for (int y = centerY - halfSize; y <= centerY + halfSize; y++) {
+				        if (y > world.getMaxHeight()) continue;
+		                if (!world.getBlockAt(x, y, z).getType().equals(Material.AIR)) {
+		                    blockFound = true;
+		                    break foundBlock;
+		                }
+		            }
+		        }
+		    }
+	    } else {
+	    	centerY += 40;
 	    }
         
 		for (int x = centerX - halfSize; x <= centerX + halfSize; x++) {
-            for (int y = centerY - halfSize; y <= centerY + halfSize; y++) {
-                for (int z = centerZ - halfSize; z <= centerZ + halfSize; z++) {
+            for (int z = centerZ - halfSize; z <= centerZ + halfSize; z++) {
+            	for (int y = centerY - halfSize; y <= centerY + halfSize; y++) {
+            		if (y > world.getMaxHeight()) continue;
                     if ((x == centerX - halfSize || x == centerX + halfSize || y == centerY - halfSize || y == centerY + halfSize || z == centerZ - halfSize || z == centerZ + halfSize) || (y == centerY - halfSize && (x != centerX || z != centerZ))) {
                         Block block = world.getBlockAt(x, y, z);
                     	this.cage.add(block.getLocation());
@@ -205,6 +206,7 @@ public class Gladiator extends Abilities {
                 }
             }
         }
+		// TODO: set yaw and pitch
 		gladiator.teleport(new Location (world, centerX - halfSize, centerY - halfSize, centerZ - halfSize));
 		opps.teleport(new Location(world, centerX + halfSize, centerY + halfSize, centerZ + halfSize));
 	}
@@ -213,7 +215,7 @@ public class Gladiator extends Abilities {
 		Iterator<Location> it = this.cage.iterator();
 		while (it.hasNext()) {
 			Location loc = it.next();
-			loc.getWorld().getBlockAt(loc).setType(Material.AIR);
+			loc.getBlock().setType(Material.AIR);
 			it.remove();
 		}
 		this.cage = null; // Let GC do his job

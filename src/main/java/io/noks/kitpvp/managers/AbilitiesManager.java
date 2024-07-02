@@ -43,10 +43,10 @@ public class AbilitiesManager {
 		abilities.add(new Boxer());
 		abilities.add(new Fireman(main));
 		abilities.add(new Fisherman(main));
-		abilities.add(new Gladiator(main)); // Instancied TODO: need to be TESTED
+		//abilities.add(new Gladiator(main)); // Instancied TODO: need to be TESTED
 		abilities.add(new Hulk(main));
 		abilities.add(new Kangaroo(main));
-		abilities.add(new Ninja()); // Instancied
+		//abilities.add(new Ninja()); // Instancied
 		abilities.add(new Phantom(main));
 		abilities.add(new Reaper(main));
 		abilities.add(new Snail(main));
