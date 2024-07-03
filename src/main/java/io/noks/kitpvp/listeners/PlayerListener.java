@@ -59,7 +59,7 @@ public class PlayerListener implements Listener, SignRotation {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onJoin(PlayerJoinEvent event) {
 		if (this.plugin.getConfigManager().sendJoinAndQuitMessageToOP && this.plugin.getServer().getOnlinePlayers().size() > 1) {
-		    this.plugin.getServer().getOnlinePlayers().stream().filter(Player::isOp).forEach(opPlayers -> opPlayers.sendMessage(event.getJoinMessage()));
+		    this.plugin.getServer().getOnlinePlayers().stream().filter(opPlayers -> opPlayers.isOp()).forEach(opPlayers -> opPlayers.sendMessage(event.getJoinMessage()));
 		}
 		event.setJoinMessage(null);
 		final Player player = event.getPlayer();
@@ -86,7 +86,7 @@ public class PlayerListener implements Listener, SignRotation {
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onQuit(PlayerQuitEvent event) {
 		if (this.plugin.getConfigManager().sendJoinAndQuitMessageToOP && this.plugin.getServer().getOnlinePlayers().size() > 1) {
-		    this.plugin.getServer().getOnlinePlayers().stream().filter(Player::isOp).forEach(opPlayers -> opPlayers.sendMessage(event.getQuitMessage()));
+		    this.plugin.getServer().getOnlinePlayers().stream().filter(opPlayers -> opPlayers.isOp()).forEach(opPlayers -> opPlayers.sendMessage(event.getQuitMessage()));
 		}
 		event.setQuitMessage(null);
 		this.leaveAction(event.getPlayer());
