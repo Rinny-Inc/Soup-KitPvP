@@ -14,7 +14,6 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.util.Vector;
 
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
@@ -49,11 +48,9 @@ public class Batman extends Abilities implements Listener {
 		if (action == Action.RIGHT_CLICK_AIR && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.WOOD_SPADE && pm.hasAbility(this)) {
 			if (!pm.hasActiveAbilityCooldown()) {
 				pm.applyAbilityCooldown();
-				final Arrow arrow = (Arrow) p.launchProjectile(Arrow.class);
+				final Arrow arrow = p.launchProjectile(Arrow.class, p.getLocation().getDirection().multiply(3.0D));
 				arrow.setMetadata("batHook", new FixedMetadataValue(this.plugin, Boolean.valueOf(true)));
 				arrow.spigot().setDamage(0.0D);
-				final Vector handle = p.getEyeLocation().getDirection().multiply(3.0D);
-				arrow.setVelocity(handle);
 				return;
 			}
 			final double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
@@ -63,17 +60,22 @@ public class Batman extends Abilities implements Listener {
 
 	@EventHandler
 	public void onHit(ProjectileHitEvent event) {
-		if (event.getEntity() instanceof Arrow && event.getEntity().getShooter() instanceof Player && event.getHitEntity() instanceof Player) {
-			final Player shooter = (Player) event.getEntity().getShooter();
+		if (event.getEntity() instanceof Arrow && event.getEntity().getShooter() instanceof Player) {
+			final Arrow arrow = (Arrow) event.getEntity();
 
-			if (event.getEntity().hasMetadata("batHook")) {
-				final Player hit = (Player) event.getHitEntity();
-
-				if (hit == shooter) return;
-				final Location hitLoc = hit.getLocation();
-				shooter.teleport(hitLoc);
-				shooter.setFallDistance(0.0F);
+			if (!arrow.hasMetadata("batHook")) {
+				return;
 			}
+			final Player shooter = (Player) arrow.getShooter();
+			final Location hitLoc = event.getEntity().getLocation();
+			if (hitLoc == null) {
+				return;
+			}
+			hitLoc.setPitch(shooter.getLocation().getPitch());
+			hitLoc.setYaw(shooter.getLocation().getYaw());
+			shooter.teleport(hitLoc);
+			shooter.setFallDistance(0.0F);
+			arrow.remove();
 		}
 	}
 }

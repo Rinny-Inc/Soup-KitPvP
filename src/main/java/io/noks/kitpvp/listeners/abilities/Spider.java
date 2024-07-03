@@ -56,10 +56,9 @@ public class Spider extends Abilities implements Listener {
 				p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 				return;
 			}
-			final Snowball web = p.launchProjectile(Snowball.class);
+			final Snowball web = p.launchProjectile(Snowball.class, p.getLocation().getDirection().multiply(3.0D));
 			web.setShooter(p);
 			web.setMetadata("web", new FixedMetadataValue(this.main, Boolean.valueOf(true)));
-			web.setVelocity(p.getLocation().getDirection().multiply(2.5D));
 			pm.applyAbilityCooldown();
 		}
 	}
@@ -75,7 +74,7 @@ public class Spider extends Abilities implements Listener {
 			}
 			final Snowball ball = (Snowball) event.getEntity();
 			
-			if (ball.getMetadata("web") == null) {
+			if (!ball.hasMetadata("web")) {
 				return;
 			}
 			final Block block = ball.getLocation().getBlock();
