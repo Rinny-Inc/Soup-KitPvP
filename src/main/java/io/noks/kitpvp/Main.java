@@ -86,7 +86,7 @@ public class Main extends JavaPlugin implements TournamentManager {
 		this.getConfig().options().copyDefaults(true);
 		this.saveDefaultConfig();
 		this.configManager = new ConfigManager(this);
-		this.database = new DBUtils(getConfig().getString("DATABASE.ADDRESS"), getConfig().getString("DATABASE.NAME"), getConfig().getString("DATABASE.USER"), getConfig().getString("DATABASE.PASSWORD"));
+		this.database = new DBUtils(getConfig().getString("DATABASE.ADDRESS"), getConfig().getString("DATABASE.NAME"), getConfig().getString("DATABASE.USER"), getConfig().getString("DATABASE.PASSWORD"), this);
 		this.messages = new Messages(this.configManager.domainName);
 		this.itemUtils = new ItemUtils();
 		this.inventoryManager = new InventoryManager();

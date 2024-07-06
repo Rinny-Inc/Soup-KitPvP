@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
@@ -34,6 +35,7 @@ public class PlayerManager extends Ability {
 	private final @NotNull PlayerSettings settings;
 	private final @NotNull Economy economy;
 	private @Nullable CombatTag combatTag;
+	public @Nullable BukkitTask currentTask; // TEMP FIX
 
 	public PlayerManager(UUID playerUUID) {
 		this.playerUUID = playerUUID;
