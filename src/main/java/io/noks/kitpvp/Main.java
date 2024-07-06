@@ -33,6 +33,7 @@ import io.noks.kitpvp.commands.ReportCommand;
 import io.noks.kitpvp.commands.ShopCommand;
 import io.noks.kitpvp.commands.ShoutCommand;
 import io.noks.kitpvp.commands.SkullCommand;
+import io.noks.kitpvp.commands.SocialCommand;
 import io.noks.kitpvp.commands.SpawnCommand;
 import io.noks.kitpvp.commands.SponsorCommand;
 import io.noks.kitpvp.commands.StatisticCommand;
@@ -172,6 +173,7 @@ public class Main extends JavaPlugin implements TournamentManager {
 		new SpawnCommand(this);
 		getCommand("repair").setExecutor(new RepairCommand());
 		getCommand("shop").setExecutor(new ShopCommand());
+		getCommand("discord").setExecutor(new SocialCommand());
 	}
 	
 	private void spawnNPC(World world) {
