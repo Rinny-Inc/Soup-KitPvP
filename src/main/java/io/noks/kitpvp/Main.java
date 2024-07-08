@@ -38,6 +38,7 @@ import io.noks.kitpvp.commands.SpawnCommand;
 import io.noks.kitpvp.commands.SponsorCommand;
 import io.noks.kitpvp.commands.StatisticCommand;
 import io.noks.kitpvp.database.DBUtils;
+import io.noks.kitpvp.interfaces.ItemHelper;
 import io.noks.kitpvp.interfaces.TournamentManager;
 import io.noks.kitpvp.listeners.AbilityListener;
 import io.noks.kitpvp.listeners.InventoryListener;
@@ -55,11 +56,9 @@ import io.noks.kitpvp.task.MapTask;
 import io.noks.kitpvp.task.event.EventsTask;
 import io.noks.kitpvp.task.event.FallenGolemTask;
 import io.noks.kitpvp.utils.Cuboid;
-import io.noks.kitpvp.utils.ItemUtils;
-import io.noks.kitpvp.utils.MathUtils;
 import io.noks.kitpvp.utils.Messages;
 
-public class Main extends JavaPlugin implements TournamentManager, MathUtils, ItemUtils {
+public class Main extends JavaPlugin implements TournamentManager, ItemHelper /*<-- REMOVE IT FROM MAIN AND ADD IT WHERE NEEDED */ {
 	private @NotNull ConfigManager configManager;
 	private @NotNull DBUtils database;
 	private @NotNull AbilitiesManager abilitiesManager;

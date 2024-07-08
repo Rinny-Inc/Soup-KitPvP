@@ -15,10 +15,11 @@ import org.bukkit.block.Chest;
 import io.noks.kitpvp.interfaces.Fillable;
 
 public class Feast implements Fillable {
-	private World world = Bukkit.getWorld("world");
+	private World world;
 	private Map<Location, Material> blocks;
 	
 	public Feast(Location location) {
+		this.world = location.getWorld();
 		this.setupFeast(location);
 	}
 	
@@ -54,7 +55,7 @@ public class Feast implements Fillable {
 			this.fill(chest);
 	    }
 		final DecimalFormat format = new DecimalFormat("#.##");
-		Bukkit.broadcastMessage(ChatColor.GREEN.toString() + ChatColor.BOLD + "The feast just appear! " + ChatColor.GREEN + "(" + format.format(enchantmentTableLocation.getX()) + ", " + enchantmentTableLocation.getY() + ", " + format.format(enchantmentTableLocation.getZ()) + ")");
+		Bukkit.broadcastMessage(ChatColor.GREEN.toString() + ChatColor.BOLD + "The feast just appear! " + ChatColor.GREEN + "(at " + format.format(enchantmentTableLocation.getX()) + ", " + enchantmentTableLocation.getY() + ", " + format.format(enchantmentTableLocation.getZ()) + ")");
 	}
 	
 	public void clearFeast() {

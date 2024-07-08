@@ -1,4 +1,4 @@
-package io.noks.kitpvp.utils;
+package io.noks.kitpvp.interfaces;
 
 import java.util.Arrays;
 
@@ -24,7 +24,7 @@ import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.PlayerSettings;
 import io.noks.kitpvp.managers.caches.PlayerSettings.SlotType;
 
-public interface ItemUtils {
+public interface ItemHelper {
 	default ItemStack getItemStack(ItemStack item, @Nullable String name, @Nullable String[] lore) {
 		final ItemStack i = item;
 		final ItemMeta im = i.getItemMeta();
