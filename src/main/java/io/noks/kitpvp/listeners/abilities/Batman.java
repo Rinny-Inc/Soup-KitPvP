@@ -30,7 +30,7 @@ public class Batman extends Abilities implements Listener {
 	}
 	
 	public ItemStack specialItem() {
-		return this.plugin.getItemUtils().getItemUnbreakable(Material.WOOD_SPADE);
+		return this.plugin.getItemUnbreakable(Material.WOOD_SPADE);
 	}
 
 	public String specialItemName() {

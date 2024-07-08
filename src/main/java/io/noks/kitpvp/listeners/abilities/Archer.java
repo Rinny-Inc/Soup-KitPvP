@@ -28,7 +28,7 @@ public class Archer extends Abilities implements Listener {
 	
 	@Override
 	public ItemStack specialItem() {
-		return this.main.getItemUtils().getItemUnbreakable(Material.BOW);
+		return this.main.getItemUnbreakable(Material.BOW);
 	}
 
 	@Override
@@ -55,10 +55,10 @@ public class Archer extends Abilities implements Listener {
 	@Override
 	public void onKill(Player killer) {
 		if (killer.getInventory().firstEmpty() == -1 && !killer.getInventory().contains(Material.ARROW)) {
-			killer.getWorld().dropItem(killer.getLocation(), this.main.getItemUtils().getItemStack(new ItemStack(Material.ARROW, 2), null, null));
+			killer.getWorld().dropItem(killer.getLocation(), this.main.getItemStack(new ItemStack(Material.ARROW, 2), null, null));
 			return;
 		}
-		killer.getInventory().addItem(new ItemStack[] { this.main.getItemUtils().getItemStack(new ItemStack(Material.ARROW, 2), null, null) });
+		killer.getInventory().addItem(new ItemStack[] { this.main.getItemStack(new ItemStack(Material.ARROW, 2), null, null) });
 	}
 
 	/*@EventHandler

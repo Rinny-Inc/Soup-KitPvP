@@ -68,7 +68,7 @@ public class SpawnCommand implements CommandExecutor {
 							player.setArrowsStuck(0);
 						}
 						player.getInventory().setArmorContents(null);
-						player.getInventory().setContents(main.getItemUtils().getSpawnItems(player.getName()));
+						player.getInventory().setContents(main.getSpawnItems(player.getName()));
 						player.getActivePotionEffects().stream().map(PotionEffect::getType).forEach(player::removePotionEffect);
 						player.setHealth(20.0D);
 						main.applySpawnProtection(player, true);

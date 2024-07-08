@@ -47,11 +47,11 @@ public class InventoryManager {
 		}
 		sortPlayersKitsByRarity(player, inventories, rarity);
 		if (inventories[0].firstEmpty() == -1 && inventories[1] != null) {
-			inventories[0].setItem(9, new ItemStack(Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.ARROW, page + 1), ChatColor.YELLOW + "Next page", null)));
-			inventories[1].setItem(17, new ItemStack(Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.ARROW, page - 1), ChatColor.YELLOW + "Previous page", null)));
+			inventories[0].setItem(9, new ItemStack(Main.getInstance().getItemStack(new ItemStack(Material.ARROW, page + 1), ChatColor.YELLOW + "Next page", null)));
+			inventories[1].setItem(17, new ItemStack(Main.getInstance().getItemStack(new ItemStack(Material.ARROW, page - 1), ChatColor.YELLOW + "Previous page", null)));
 		}
 		if (rarity != null)
-			inventories[0].setItem(inventories[0].getSize() - 9, new ItemStack(Main.getInstance().getItemUtils().getItemMaterial(Material.PAPER, 0, ChatColor.YELLOW + "Your whole abilities")));
+			inventories[0].setItem(inventories[0].getSize() - 9, new ItemStack(Main.getInstance().getItemMaterial(Material.PAPER, 0, ChatColor.YELLOW + "Your whole abilities")));
 		return inventories[page - 1];
 	}
 
@@ -60,13 +60,13 @@ public class InventoryManager {
 		Inventory inv = Bukkit.createInventory(player, 27, ChatColor.DARK_AQUA + "Your Settings");
 		inv.clear();
 		for (int i = 0; i < inv.getSize(); i++) {
-			inv.setItem(i, Main.getInstance().getItemUtils().getItemMaterial(Material.STAINED_GLASS_PANE, 15, " "));
+			inv.setItem(i, Main.getInstance().getItemMaterial(Material.STAINED_GLASS_PANE, 15, " "));
 		}
-		inv.setItem(0, Main.getInstance().getItemUtils().getItemMaterial(Material.ARROW, ChatColor.YELLOW + "Previous page"));
+		inv.setItem(0, Main.getInstance().getItemMaterial(Material.ARROW, ChatColor.YELLOW + "Previous page"));
 		final PlayerSettings settings = PlayerManager.get(player.getUniqueId()).getSettings();
-		inv.setItem(10, Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.COMMAND), ChatColor.GRAY + "Scoreboard", new String[] { (settings.hasScoreboardEnabled() ? ChatColor.GREEN + "Enabled" : ChatColor.RED + "Disabled") }));
-		inv.setItem(12, Main.getInstance().getItemUtils().getItemMaterial(Material.STONE_SWORD, ChatColor.GRAY + "Sword Slot", settings.getSlot(PlayerSettings.SlotType.SWORD) + 1));
-		inv.setItem(14, Main.getInstance().getItemUtils().getItemMaterial(Material.POTATO_ITEM, ChatColor.GRAY + "Item Slot", settings.getSlot(PlayerSettings.SlotType.ITEM) + 1));
+		inv.setItem(10, Main.getInstance().getItemStack(new ItemStack(Material.COMMAND), ChatColor.GRAY + "Scoreboard", new String[] { (settings.hasScoreboardEnabled() ? ChatColor.GREEN + "Enabled" : ChatColor.RED + "Disabled") }));
+		inv.setItem(12, Main.getInstance().getItemMaterial(Material.STONE_SWORD, ChatColor.GRAY + "Sword Slot", settings.getSlot(PlayerSettings.SlotType.SWORD) + 1));
+		inv.setItem(14, Main.getInstance().getItemMaterial(Material.POTATO_ITEM, ChatColor.GRAY + "Item Slot", settings.getSlot(PlayerSettings.SlotType.ITEM) + 1));
 		return inv;
 	}
 
@@ -76,11 +76,11 @@ public class InventoryManager {
 		inv.clear();
 		for (int i = 0; i < inv.getSize(); i++) {
 			int correctedI = i + 1;
-			inv.setItem(i, Main.getInstance().getItemUtils().getItemMaterial(Material.STAINED_GLASS_PANE, correctedI, formatIntToColor(correctedI).toString() + correctedI));
+			inv.setItem(i, Main.getInstance().getItemMaterial(Material.STAINED_GLASS_PANE, correctedI, formatIntToColor(correctedI).toString() + correctedI));
 		}
 		PlayerSettings settings = PlayerManager.get(player.getUniqueId()).getSettings();
-		inv.setItem(settings.getSlot(PlayerSettings.SlotType.SWORD), Main.getInstance().getItemUtils().getItemMaterial(Material.STONE_SWORD, ChatColor.YELLOW + "Sword"));
-		inv.setItem(settings.getSlot(PlayerSettings.SlotType.ITEM), Main.getInstance().getItemUtils().getItemMaterial(Material.POTATO_ITEM, ChatColor.YELLOW + "Item"));
+		inv.setItem(settings.getSlot(PlayerSettings.SlotType.SWORD), Main.getInstance().getItemMaterial(Material.STONE_SWORD, ChatColor.YELLOW + "Sword"));
+		inv.setItem(settings.getSlot(PlayerSettings.SlotType.ITEM), Main.getInstance().getItemMaterial(Material.POTATO_ITEM, ChatColor.YELLOW + "Item"));
 		return inv;
 	}
 	
@@ -90,13 +90,13 @@ public class InventoryManager {
 	}
 	
 	private void initShopInventory() {
-		this.shopInventory.setItem(0, Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.IRON_CHESTPLATE), ChatColor.GREEN + "Repair All", new String[] { "", ChatColor.GRAY + "Repairs everything in your inventory.", "", ChatColor.WHITE + "Status: " + ChatColor.GREEN + "In Stock", ChatColor.WHITE + "Cost: " + ChatColor.GOLD + "50 Credits", "", ChatColor.YELLOW + "Click to purchase the Repair All!" }));
-		this.shopInventory.setItem(1, Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.GOLDEN_APPLE), ChatColor.GREEN + "Golden Apples", new String[] { "", ChatColor.GRAY + "3 premium golden apples.", "", ChatColor.WHITE + "Status: " + ChatColor.GREEN + "In Stock", ChatColor.WHITE + "Cost: " + ChatColor.GOLD + "150 Credits", "", ChatColor.YELLOW + "Click to purchase the Golden Apples!" }));
+		this.shopInventory.setItem(0, Main.getInstance().getItemStack(new ItemStack(Material.IRON_CHESTPLATE), ChatColor.GREEN + "Repair All", new String[] { "", ChatColor.GRAY + "Repairs everything in your inventory.", "", ChatColor.WHITE + "Status: " + ChatColor.GREEN + "In Stock", ChatColor.WHITE + "Cost: " + ChatColor.GOLD + "50 Credits", "", ChatColor.YELLOW + "Click to purchase the Repair All!" }));
+		this.shopInventory.setItem(1, Main.getInstance().getItemStack(new ItemStack(Material.GOLDEN_APPLE), ChatColor.GREEN + "Golden Apples", new String[] { "", ChatColor.GRAY + "3 premium golden apples.", "", ChatColor.WHITE + "Status: " + ChatColor.GREEN + "In Stock", ChatColor.WHITE + "Cost: " + ChatColor.GOLD + "150 Credits", "", ChatColor.YELLOW + "Click to purchase the Golden Apples!" }));
 		ItemStack stick = new ItemStack(Material.STICK);
 		stick.addUnsafeEnchantment(Enchantment.KNOCKBACK, 2);
-		this.shopInventory.setItem(2, Main.getInstance().getItemUtils().getItemStack(stick, ChatColor.GREEN + "GrandPa Stick", new String[] { "", ChatColor.GRAY + "GrandPa's knockback 2 stick", "", ChatColor.WHITE + "Status: " + ChatColor.GREEN + "In Stock", ChatColor.WHITE + "Cost: " + ChatColor.GOLD + "25 Credits", "", ChatColor.YELLOW + "Click to purchase the GrandPa Stick!" }));
+		this.shopInventory.setItem(2, Main.getInstance().getItemStack(stick, ChatColor.GREEN + "GrandPa Stick", new String[] { "", ChatColor.GRAY + "GrandPa's knockback 2 stick", "", ChatColor.WHITE + "Status: " + ChatColor.GREEN + "In Stock", ChatColor.WHITE + "Cost: " + ChatColor.GOLD + "25 Credits", "", ChatColor.YELLOW + "Click to purchase the GrandPa Stick!" }));
 		
-		this.shopInventory.setItem(8, Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.CHEST), ChatColor.DARK_AQUA + "Perk Shop", new String[] { ChatColor.GRAY + "Click here to go to the perk shop", "", ChatColor.RED + "Coming Soon :)"}));
+		this.shopInventory.setItem(8, Main.getInstance().getItemStack(new ItemStack(Material.CHEST), ChatColor.DARK_AQUA + "Perk Shop", new String[] { ChatColor.GRAY + "Click here to go to the perk shop", "", ChatColor.RED + "Coming Soon :)"}));
 	}
 	
 	@NotNull
@@ -147,30 +147,30 @@ public class InventoryManager {
 				continue;
 			if (inventory[0].firstEmpty() == -1) {
 				if (inventory[1] == null) continue;
-				inventory[1].addItem(Main.getInstance().getItemUtils().getItemStack(abilities.getIcon(), abilities.getRarity().getColor() + abilities.getName(), abilities.getLore()));
+				inventory[1].addItem(Main.getInstance().getItemStack(abilities.getIcon(), abilities.getRarity().getColor() + abilities.getName(), abilities.getLore()));
 			}
-			inventory[0].addItem(Main.getInstance().getItemUtils().getItemStack(abilities.getIcon(), abilities.getRarity().getColor() + abilities.getName(), abilities.getLore()));
+			inventory[0].addItem(Main.getInstance().getItemStack(abilities.getIcon(), abilities.getRarity().getColor() + abilities.getName(), abilities.getLore()));
 		}
 	}
 
 	private void fill(Inventory inventory, Player player) {
 		inventory.clear();
 		for (int i = 0; i < 18; i++) {
-			inventory.setItem(i, Main.getInstance().getItemUtils().getItemMaterial(Material.STAINED_GLASS_PANE, 15, " "));
+			inventory.setItem(i, Main.getInstance().getItemMaterial(Material.STAINED_GLASS_PANE, 15, " "));
 		}
-		inventory.setItem(2, Main.getInstance().getItemUtils().getItemStack(new ItemStack(Material.NOTE_BLOCK), ChatColor.YELLOW + "Ability Rotation", new String[] {null, ChatColor.GRAY + "Get free abilities!", "", ChatColor.RED + " Coming soon"}));
-		inventory.setItem(4, Main.getInstance().getItemUtils().getItemMaterial(Material.BEACON, 0, ChatColor.DARK_GRAY + "(" + ChatColor.DARK_AQUA + "SoupWorld" + ChatColor.DARK_GRAY + ")"));
+		inventory.setItem(2, Main.getInstance().getItemStack(new ItemStack(Material.NOTE_BLOCK), ChatColor.YELLOW + "Ability Rotation", new String[] {null, ChatColor.GRAY + "Get free abilities!", "", ChatColor.RED + " Coming soon"}));
+		inventory.setItem(4, Main.getInstance().getItemMaterial(Material.BEACON, 0, ChatColor.DARK_GRAY + "(" + ChatColor.DARK_AQUA + "SoupWorld" + ChatColor.DARK_GRAY + ")"));
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 		if (pm.getSelectedAbility() != null) {
 			final Abilities lastAbility = pm.getSelectedAbility();
-			inventory.setItem(6, Main.getInstance().getItemUtils().getItemStack(lastAbility.getIcon(), ChatColor.YELLOW + "Last used ability: " + lastAbility.getRarity().getColor() + lastAbility.getName(), lastAbility.getLore()));
+			inventory.setItem(6, Main.getInstance().getItemStack(lastAbility.getIcon(), ChatColor.YELLOW + "Last used ability: " + lastAbility.getRarity().getColor() + lastAbility.getName(), lastAbility.getLore()));
 		}
-		inventory.setItem(7, Main.getInstance().getItemUtils().getItemMaterial(Material.WATCH, 0, ChatColor.YELLOW + "Random Abilities"));
+		inventory.setItem(7, Main.getInstance().getItemMaterial(Material.WATCH, 0, ChatColor.YELLOW + "Random Abilities"));
 		int rarityStartSlot = 10;
 		for (Rarity rarity : Rarity.values()) {
 			if (rarity != Rarity.USELESS) {
 				boolean hasPermission = (player.hasPermission(rarity.getPermission()) || player.hasPermission("kit.*"));
-				inventory.setItem(rarityStartSlot, Main.getInstance().getItemUtils().getItemMaterial(Material.STAINED_GLASS_PANE, hasPermission ? rarity.getColorId() : 14, (hasPermission ? rarity.getColor() : ChatColor.RED) + rarity.getName()));
+				inventory.setItem(rarityStartSlot, Main.getInstance().getItemMaterial(Material.STAINED_GLASS_PANE, hasPermission ? rarity.getColorId() : 14, (hasPermission ? rarity.getColor() : ChatColor.RED) + rarity.getName()));
 				rarityStartSlot++;
 			}
 		}

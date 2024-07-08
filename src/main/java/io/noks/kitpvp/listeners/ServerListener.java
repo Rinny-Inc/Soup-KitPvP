@@ -1,7 +1,5 @@
 package io.noks.kitpvp.listeners;
 
-import java.util.Random;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -24,13 +22,13 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import io.noks.kitpvp.Main;
+import io.noks.kitpvp.interfaces.Fillable;
 import io.noks.kitpvp.managers.PlayerManager;
 
-public class ServerListener implements Listener {
+public class ServerListener implements Listener, Fillable {
 	private Main plugin;
 
 	public ServerListener(Main main) {
@@ -109,29 +107,6 @@ public class ServerListener implements Listener {
 		}
 	}
 
-	private void fillSponsor(Chest chest) {
-		final ItemStack lighter = new ItemStack(Material.FLINT_AND_STEEL, 1);
-		lighter.setDurability((short) this.plugin.getMathUtils().getRandom(59, 63));
-		final ItemStack[] items = { new ItemStack(Material.MUSHROOM_SOUP, this.plugin.getMathUtils().getRandom(3, 6)),
-				new ItemStack(Material.LEATHER_BOOTS),
-				new ItemStack(Material.BROWN_MUSHROOM, this.plugin.getMathUtils().getRandom(2, 9)),
-				new ItemStack(Material.LEATHER_LEGGINGS), new ItemStack(Material.LEATHER_CHESTPLATE),
-				new ItemStack(Material.RED_MUSHROOM, this.plugin.getMathUtils().getRandom(2, 9)),
-				new ItemStack(Material.LEATHER_HELMET),
-				new ItemStack(Material.BOWL, this.plugin.getMathUtils().getRandom(3, 12)),
-				new ItemStack(Material.GOLDEN_APPLE, this.plugin.getMathUtils().getRandom(1, 2)),
-				new ItemStack(Material.POTION, 1, (short) 16386),
-				this.plugin.getItemUtils().getItemUnbreakable(Material.STONE_SWORD),
-				this.plugin.getItemUtils().getItemUnbreakable(Material.IRON_SWORD), lighter,
-				new ItemStack(Material.EXP_BOTTLE, this.plugin.getMathUtils().getRandom(1, 3))};
-
-		final Random random = new Random();
-		final int rand = random.nextInt(4);
-		for (int i = 0; i < 4 + rand; i++) {
-			chest.getInventory().setItem((new Random()).nextInt(chest.getInventory().getSize()), new ItemStack(items[random.nextInt(items.length)]));
-		}
-	}
-
 	@EventHandler
 	public void onSponsorTouchGround(EntityChangeBlockEvent event) {
 		if (event.getEntity() instanceof FallingBlock) {
@@ -140,7 +115,7 @@ public class ServerListener implements Listener {
 				event.setCancelled(true);
 				event.getBlock().setType(Material.CHEST);
 				final Chest sponsor = (Chest) event.getBlock().getState();
-				fillSponsor(sponsor);
+				this.fill(sponsor);
 
 				new BukkitRunnable() {
 					public void run() {

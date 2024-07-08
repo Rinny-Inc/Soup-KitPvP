@@ -16,6 +16,8 @@ import io.noks.kitpvp.managers.PlayerManager;
 public class Fireman extends Abilities implements Listener {
 	private Main plugin;
 
+	// TODO: take damage in water
+	
 	public Fireman(Main main) {
 		super("Fireman", new ItemStack(Material.LAVA_BUCKET), Rarity.UNCOMMON, 0L, new String[] { ChatColor.AQUA + "Fire resistant" });
 		this.plugin = main;

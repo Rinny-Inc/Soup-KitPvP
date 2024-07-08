@@ -57,7 +57,7 @@ public class CookieMonster extends Abilities implements Listener {
 		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && PlayerManager.get(event.getPlayer().getUniqueId()).hasAbility(this)) {
 			final Player p = event.getPlayer();
 			if (p.getItemInHand().getType() == Material.COOKIE && p.getFoodLevel() == 20) {
-				p.setSaturation(0);;
+				p.setSaturation(0);
 				p.setFoodLevel(19);
 			}
 		}
@@ -79,9 +79,9 @@ public class CookieMonster extends Abilities implements Listener {
 	@Override
 	public void onKill(Player killer) {
 		if (killer.getInventory().firstEmpty() == -1 && (!killer.getInventory().contains(this.specialItem()))) {
-			killer.getWorld().dropItem(killer.getLocation(), Main.getInstance().getItemUtils().getItemStack(new ItemStack(this.specialItem().getType(), 2), ChatColor.RED + this.specialItemName(), null));
+			killer.getWorld().dropItem(killer.getLocation(), Main.getInstance().getItemStack(new ItemStack(this.specialItem().getType(), 2), ChatColor.RED + this.specialItemName(), null));
 			return;
 		}
-		killer.getInventory().addItem(new ItemStack[] { Main.getInstance().getItemUtils().getItemStack(new ItemStack(this.specialItem().getType(), 2), ChatColor.RED + this.specialItemName(), null) });
+		killer.getInventory().addItem(new ItemStack[] { Main.getInstance().getItemStack(new ItemStack(this.specialItem().getType(), 2), ChatColor.RED + this.specialItemName(), null) });
 	}
 }

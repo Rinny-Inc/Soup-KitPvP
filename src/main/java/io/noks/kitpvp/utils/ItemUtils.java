@@ -24,8 +24,8 @@ import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.PlayerSettings;
 import io.noks.kitpvp.managers.caches.PlayerSettings.SlotType;
 
-public class ItemUtils {
-	public ItemStack getItemStack(ItemStack item, @Nullable String name, @Nullable String[] lore) {
+public interface ItemUtils {
+	default ItemStack getItemStack(ItemStack item, @Nullable String name, @Nullable String[] lore) {
 		final ItemStack i = item;
 		final ItemMeta im = i.getItemMeta();
 		im.setDisplayName(name);
@@ -34,7 +34,7 @@ public class ItemUtils {
 		return i;
 	}
 
-	public ItemStack getItemMaterial(Material m, int data, String name) {
+	default ItemStack getItemMaterial(Material m, int data, String name) {
 		final ItemStack i = new ItemStack(m, 1, (short) data);
 		final ItemMeta im = i.getItemMeta();
 		im.setDisplayName(name);
@@ -42,11 +42,11 @@ public class ItemUtils {
 		return i;
 	}
 
-	public ItemStack getItemMaterial(Material m, String name) {
+	default ItemStack getItemMaterial(Material m, String name) {
 		return getItemMaterial(m, name, 1);
 	}
 
-	public ItemStack getItemMaterial(Material m, String name, int amount) {
+	default ItemStack getItemMaterial(Material m, String name, int amount) {
 		final ItemStack i = new ItemStack(m, amount);
 		final ItemMeta im = i.getItemMeta();
 		im.setDisplayName(name);
@@ -54,15 +54,15 @@ public class ItemUtils {
 		return i;
 	}
 
-	public ItemStack getItemMaterial(Material m, int amount) {
+	default ItemStack getItemMaterial(Material m, int amount) {
 		return new ItemStack(m, amount);
 	}
 
-	public ItemStack getItemUnbreakable(Material material) {
+	default ItemStack getItemUnbreakable(Material material) {
 		return getItemUnbreakable(material, null);
 	}
 
-	public ItemStack getItemUnbreakable(Material material, @Nullable String name) {
+	default ItemStack getItemUnbreakable(Material material, @Nullable String name) {
 		final ItemStack i = new ItemStack(material);
 		final ItemMeta im = i.getItemMeta();
 		im.setDisplayName(name);
@@ -71,7 +71,7 @@ public class ItemUtils {
 		return i;
 	}
 	
-	private ItemStack getPlayerHead(String name, String displayName) {
+	default ItemStack getPlayerHead(String name, String displayName) {
 		final ItemStack i = new ItemStack(Material.SKULL_ITEM, 1, (short)SkullType.PLAYER.ordinal());
 		final SkullMeta sm = (SkullMeta) i.getItemMeta();
 		sm.setOwner(name);
@@ -81,7 +81,7 @@ public class ItemUtils {
 	}
 
 	@NotNull
-	public final ItemStack[] getSpawnItems(String name) {
+	default ItemStack[] getSpawnItems(String name) {
 		return new ItemStack[] {getItemStack(new ItemStack(Material.ENCHANTED_BOOK), ChatColor.DARK_AQUA + "Ability Selector", new String[] {ChatColor.GRAY + "Choose your ability to fight other players"}),
 								getItemStack(new ItemStack(Material.CHEST), ChatColor.DARK_AQUA + "Perk Selector", new String[] {ChatColor.RED + "Coming Soon"}), 
 								null,
@@ -93,7 +93,7 @@ public class ItemUtils {
 								getItemStack(new ItemStack(Material.NETHER_STAR), ChatColor.DARK_AQUA + "Shop", new String[] {ChatColor.RED + "Coming Soon"})};
 	}
 	
-	public void giveEquipment(Player player, Abilities ability) {
+	default void giveEquipment(Player player, Abilities ability) {
 		player.setGameMode(GameMode.SURVIVAL);
 		final PlayerInventory inv = player.getInventory();
 		for (ItemStack items : inv.getContents()) {

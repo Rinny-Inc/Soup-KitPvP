@@ -79,7 +79,7 @@ public class PlayerListener implements Listener, SignRotation {
 		player.sendMessage(this.plugin.getMessages().WELCOME_MESSAGE);
 		player.setPlayerListHeaderFooter(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', this.plugin.getConfigManager().tabHeader)), TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', this.plugin.getConfigManager().tabFooter)));
 		this.plugin.getDataBase().loadPlayer(player.getUniqueId());
-		player.getInventory().setContents(this.plugin.getItemUtils().getSpawnItems(player.getName()));
+		player.getInventory().setContents(this.plugin.getSpawnItems(player.getName()));
 		player.updateInventory();
 	}
 
@@ -187,6 +187,10 @@ public class PlayerListener implements Listener, SignRotation {
 					final Stats killerStats = km.getStats();
 					killerStats.addKills();
 					killerStats.addKillStreak();
+					
+					if (killerStats.getKillStreak() == 50) {
+						// TODO: nuke
+					}
 
 					final Economy killerEconomy = km.getEconomy();
 					killerEconomy.add(((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 20 : 10));
@@ -231,7 +235,7 @@ public class PlayerListener implements Listener, SignRotation {
 		player.setFoodLevel(20);
 		player.setLevel(0);
 		player.setExp(0.0F);
-		player.getInventory().setContents(this.plugin.getItemUtils().getSpawnItems(player.getName()));
+		player.getInventory().setContents(this.plugin.getSpawnItems(player.getName()));
 		player.updateInventory();
 		this.plugin.applySpawnProtection(player, true);
 	}
@@ -418,7 +422,7 @@ public class PlayerListener implements Listener, SignRotation {
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 		if (!pm.hasAbility() && !this.plugin.spawnCuboid().isIn(event.getFrom())) {
 			pm.setAbility((pm.getSelectedAbility().needCloning() ? pm.getSelectedAbility().clone() : pm.getSelectedAbility()));
-			this.plugin.getItemUtils().giveEquipment(player, pm.ability());
+			this.plugin.giveEquipment(player, pm.ability());
 			this.plugin.applySpawnProtection(player, false);
 			return;
 		}

@@ -59,12 +59,10 @@ import io.noks.kitpvp.utils.ItemUtils;
 import io.noks.kitpvp.utils.MathUtils;
 import io.noks.kitpvp.utils.Messages;
 
-public class Main extends JavaPlugin implements TournamentManager {
+public class Main extends JavaPlugin implements TournamentManager, MathUtils, ItemUtils {
 	private @NotNull ConfigManager configManager;
 	private @NotNull DBUtils database;
-	private @NotNull MathUtils mathUtils;
 	private @NotNull AbilitiesManager abilitiesManager;
-	private @NotNull ItemUtils itemUtils;
 	private @NotNull InventoryManager inventoryManager;
 	private @NotNull Messages messages;
 	private @NotNull EventsTask eventsTask;
@@ -83,13 +81,11 @@ public class Main extends JavaPlugin implements TournamentManager {
 		instance = this;
 		final World world = this.getServer().getWorld("world");
 		this.spawnCuboid = new Cuboid(new Location(world, -34, 96, 31), new Location(world, 23, 102, -15));
-		this.mathUtils = new MathUtils();
 		this.getConfig().options().copyDefaults(true);
 		this.saveDefaultConfig();
 		this.configManager = new ConfigManager(this);
 		this.database = new DBUtils(getConfig().getString("DATABASE.ADDRESS"), getConfig().getString("DATABASE.NAME"), getConfig().getString("DATABASE.USER"), getConfig().getString("DATABASE.PASSWORD"), this);
 		this.messages = new Messages(this.configManager.domainName);
-		this.itemUtils = new ItemUtils();
 		this.inventoryManager = new InventoryManager();
 		this.abilitiesManager = new AbilitiesManager(this);
 		this.registerScoreboard();
@@ -184,20 +180,12 @@ public class Main extends JavaPlugin implements TournamentManager {
 		world.spawnNPC(UUID.randomUUID(), "Battle Pass", fs, ss, new Location(world, -17.5, 99.0D, 5.5D, -49.0F, 0.0F));
 	}
 	
-	public MathUtils getMathUtils() {
-		return this.mathUtils;
-	}
-	
 	public DBUtils getDataBase() {
 		return this.database;
 	}
 	
 	public AbilitiesManager getAbilitiesManager() {
 		return this.abilitiesManager;
-	}
-	
-	public ItemUtils getItemUtils() {
-		return this.itemUtils;
 	}
 	
 	public InventoryManager getInventoryManager() {
