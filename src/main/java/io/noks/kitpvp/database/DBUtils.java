@@ -83,10 +83,22 @@ public class DBUtils {
 		try {
 			connection = this.hikari.getConnection();
 			Statement statement = connection.createStatement();
-			statement.executeUpdate("CREATE TABLE IF NOT EXISTS stats(uuid VARCHAR(36), nickname VARCHAR(16), kills INT, death INT, bestks INT, bounty INT, PRIMARY KEY(`uuid`), UNIQUE(`uuid`));");
-			statement.executeUpdate("CREATE TABLE IF NOT EXISTS economy(uuid VARCHAR(36), nickname VARCHAR(16), money INT, PRIMARY KEY(`uuid`), UNIQUE(`uuid`));");
-			statement.executeUpdate("CREATE TABLE IF NOT EXISTS settings(uuid VARCHAR(36), scoreboard TINYINT(1), swordslot INT, itemslot INT, PRIMARY KEY(`uuid`), UNIQUE(`uuid`));");
-			statement.executeUpdate("CREATE TABLE IF NOT EXISTS perks(uuid VARCHAR(36), firstperk VARCHAR(16), secondperk VARCHAR(20), thirdperk VARCHAR(18), PRIMARY KEY(`uuid`), UNIQUE(`uuid`));");
+			// STATS
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS stats(uuid VARCHAR(36) PRIMARY KEY, nickname VARCHAR(16), kills INT, death INT, bestks INT, bounty INT, UNIQUE(`uuid`));");
+			// ECONOMY
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS economy(uuid VARCHAR(36) PRIMARY KEY, nickname VARCHAR(16), money INT, UNIQUE(`uuid`));");
+			// SETTINGS
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS settings(uuid VARCHAR(36) PRIMARY KEY, scoreboard TINYINT(1), swordslot INT, itemslot INT, UNIQUE(`uuid`));");
+			// PERK
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS perks(uuid VARCHAR(36) PRIMARY KEY, firstperk VARCHAR(16), secondperk VARCHAR(20), thirdperk VARCHAR(18), UNIQUE(`uuid`));");
+			// GUILD START
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS guilds(name VARCHAR(16) PRIMARY KEY, owner VARCHAR(36), tag VARCHAR(4), money INT, UNIQUE(`name`));");
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS members(uuid VARCHAR(36) PRIMARY KEY, nickname VARCHAR(16), UNIQUE(`uuid`));");
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS guild_members(guild_name VARCHAR(16), member_uuid VARCHAR(36), PRIMARY KEY (`guild_name`, `member_uuid`), "
+																													 + "FOREIGN KEY (guild_name) REFERENCES guilds(name), "
+																													 + "FOREIGN KEY (member_uuid) REFERENCES members(uuid) "
+																													 + "UNIQUE(`uuid`));");
+			// GUILD END
 			statement.close();
 		} catch (SQLException e) {
 			e.printStackTrace();

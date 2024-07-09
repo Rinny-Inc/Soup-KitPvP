@@ -240,26 +240,31 @@ public class PlayerListener implements Listener, SignRotation {
 		this.plugin.applySpawnProtection(player, true);
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerInteractSoup(PlayerInteractEvent event) {
 		if (!event.hasItem()) {
 			return;
 		}
-		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-			final Player player = event.getPlayer();
-			if (!player.isDead() && player.getItemInHand().getType() == Material.MUSHROOM_SOUP && player.getHealth() < player.getMaxHealth()) {
-				event.setUseItemInHand(Result.DENY);
-				final double newHealth = Math.min(player.getHealth() + 7.0D, player.getMaxHealth());
-				player.setHealth(newHealth);
-				if (player.getItemInHand().getAmount() > 1) {
-					final int amount = player.getItemInHand().getAmount();
-					player.getInventory().addItem(new ItemStack(Material.BOWL, 1));
-					player.getItemInHand().setAmount(amount - 1);
-				} else {
-					player.getItemInHand().setType(Material.BOWL);
-				}
-				player.updateInventory();
-			} 
+		switch (event.getAction()) {			
+			case RIGHT_CLICK_AIR: 
+			case RIGHT_CLICK_BLOCK: {
+				final Player player = event.getPlayer();
+				if (!player.isDead() && player.getItemInHand().getType() == Material.MUSHROOM_SOUP && player.getHealth() < player.getMaxHealth()) {
+					event.setUseItemInHand(Result.DENY);
+					final double newHealth = Math.min(player.getHealth() + 7.0D, player.getMaxHealth());
+					player.setHealth(newHealth);
+					if (player.getItemInHand().getAmount() > 1) {
+						final int amount = player.getItemInHand().getAmount();
+						player.getInventory().addItem(new ItemStack(Material.BOWL, 1));
+						player.getItemInHand().setAmount(amount - 1);
+					} else {
+						player.getItemInHand().setType(Material.BOWL);
+					}
+					player.updateInventory();
+				} 
+				return;
+			}
+			default: return;
 		} 
 	}
 	
@@ -288,7 +293,7 @@ public class PlayerListener implements Listener, SignRotation {
 		}
 	}
 
-	@EventHandler(priority=EventPriority.LOWEST)
+	@EventHandler(priority=EventPriority.NORMAL)
 	public void onAbilitySelectorClick(PlayerInteractEvent event) {
 		if (!event.hasItem()) {
 			return;
