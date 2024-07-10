@@ -356,6 +356,16 @@ public class DBUtils {
 		return this.connected;
 	}
 	
+	public void close() {
+		if(isConnected()) {
+			if (executorService != null && !executorService.isShutdown()) {
+				executorService.shutdown();
+			}
+			this.hikari.close();
+			this.connected = false;
+		}
+	}
+	
 	// Leaderboard
 	public Map<UUID, Integer> getLeaderboard(RefreshType type){
 		return this.leaderboard.get(type);

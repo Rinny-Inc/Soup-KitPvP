@@ -51,6 +51,7 @@ import io.noks.kitpvp.managers.InventoryManager;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.RefillInventoryManager;
 import io.noks.kitpvp.managers.caches.Feast;
+import io.noks.kitpvp.managers.caches.Guild;
 import io.noks.kitpvp.managers.caches.Tournament;
 import io.noks.kitpvp.task.MapTask;
 import io.noks.kitpvp.task.event.EventsTask;
@@ -112,6 +113,7 @@ public class Main extends JavaPlugin implements TournamentManager, ItemHelper /*
 			entity.remove();
 		}
 		this.getServer().getScheduler().cancelAllTasks();
+		// TODO update players DB info before clearing
 		PlayerManager.players.clear();
 		if (!RefillInventoryManager.inventories.isEmpty()) {
 			for (RefillInventoryManager invs : RefillInventoryManager.inventories) {
@@ -122,11 +124,13 @@ public class Main extends JavaPlugin implements TournamentManager, ItemHelper /*
 			}
 			RefillInventoryManager.inventories.clear();
 		}
+		// TODO update guilds DB info before clearing
+		Guild.guildList.clear();
 		if (RefillInventoryManager.cooldownTask != null) {
 			RefillInventoryManager.cooldownTask = null;
 		}
 		if (this.database.getHikari() != null) {
-			this.database.getHikari().close();
+			this.database.close();
 		}
 	}
 	
