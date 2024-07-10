@@ -8,35 +8,42 @@ import java.util.UUID;
 import io.noks.kitpvp.enums.GuildRank;
 
 public class Guild {
-	public static Map<UUID, Guild> guildList = new HashMap<UUID, Guild>(); 
-	private UUID uuid;
+	public static Map<String, Guild> guildList = new HashMap<String, Guild>(); 
+	private UUID leaderUuid;
 	private String name;
 	private Map<UUID, GuildRank> membersUUIDList;
 	private String motd;
 	private String tag;
 	private boolean open;
 	
-	public Guild(String name) {
+	public Guild(String name, UUID leaderUUID) {
 		this.name = name;
-		this.uuid = UUID.randomUUID();
+		this.leaderUuid = leaderUUID;
 		this.membersUUIDList = new LinkedHashMap<UUID, GuildRank>();
 		this.open = false;
-		guildList.putIfAbsent(this.uuid, this);
+		guildList.putIfAbsent(name, this);
 	}
-	public Guild(UUID uuid, String name, String motd, String tag, Map<UUID, GuildRank> membersList, boolean open) {
-		this.uuid = uuid;
+	public Guild(String name, UUID leaderuuid, String motd, String tag, Map<UUID, GuildRank> membersList, boolean open) {
 		this.name = name;
+		this.leaderUuid = leaderuuid;
 		this.membersUUIDList = membersList;
 		this.motd = motd;
 		this.tag = tag;
 		this.open = open;
-		guildList.putIfAbsent(uuid, this);
+		guildList.putIfAbsent(name, this);
 	}
 	
 	public UUID leaderUUID() {
-		for (Map.Entry<UUID, GuildRank> entry : this.membersUUIDList.entrySet()) {
-			return entry.getKey(); // WE DONT CARE HE'S THE FIRST IN THE LIST
+		return this.leaderUuid;
+	}
+	
+	public void addMember(UUID uuid) {
+		this.membersUUIDList.putIfAbsent(uuid, GuildRank.MEMBER);
+	}
+	
+	public void kick(UUID uuid) {
+		if (this.membersUUIDList.containsKey(uuid)) {
+			this.membersUUIDList.remove(uuid);
 		}
-		return null;
 	}
 }
