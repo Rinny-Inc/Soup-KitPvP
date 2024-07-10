@@ -12,10 +12,10 @@ public class Messages {
 	
 	public Messages(String domain) {
 		WELCOME_MESSAGE = new String[]{ChatColor.DARK_GRAY.toString() + ChatColor.STRIKETHROUGH + "-------------------------------------------------",
-				ChatColor.GRAY + "Welcome on the BETA phase of " + ChatColor.DARK_AQUA.toString() + ChatColor.BOLD + domain + ChatColor.GRAY + " the home of soup pvp!",
+				ChatColor.DARK_AQUA + "| " + ChatColor.RESET + "Welcome on the BETA phase of " + ChatColor.DARK_AQUA.toString() + ChatColor.BOLD + domain + ChatColor.RESET + " the home of soup pvp!",
 				"", 
-				ChatColor.GRAY + "Our Website -> " + ChatColor.DARK_AQUA + "Coming Soon",
-				ChatColor.GRAY + "Our Discord -> " + ChatColor.DARK_AQUA + "discord." + domain,
+				ChatColor.DARK_AQUA + "| " + ChatColor.RESET + "Our Website >> " + ChatColor.RED + "http://soupworld.net",
+				ChatColor.DARK_AQUA + "| " + ChatColor.RESET + "Our Discord >> " + ChatColor.DARK_AQUA + "http://discord." + domain,
 				ChatColor.RED + "-> Keep in mind this is a beta ^^", 
 				ChatColor.RED + "If you encounter a bug, report it on the discord ^^",
 				ChatColor.DARK_GRAY.toString() + ChatColor.STRIKETHROUGH + "-------------------------------------------------" };

@@ -32,7 +32,7 @@ public class SpawnCommand implements CommandExecutor {
 		final Player player = (Player) sender;
 		final PlayerManager pm = PlayerManager.get(player.getUniqueId());
 		
-		final String spawnMessage = ChatColor.GREEN + "Teleporting to spawn..";
+		final String spawnMessage = ChatColor.GREEN + "Warping to spawn..";
 		if (!pm.hasAbility() && !pm.hasCombatTag()) {
 			player.teleport(player.getWorld().getSpawnLocation());
 			player.sendMessage(spawnMessage);
@@ -76,7 +76,7 @@ public class SpawnCommand implements CommandExecutor {
 						pm.currentTask = null;
 						return;
 					}
-					player.sendMessage("Teleporting in " + i + " seconds.");
+					player.sendMessage(ChatColor.DARK_AQUA + "Warping in " + ChatColor.WHITE + i + ChatColor.DARK_AQUA + " seconds.");
 					ticks = 0;
 					i--;
 				}

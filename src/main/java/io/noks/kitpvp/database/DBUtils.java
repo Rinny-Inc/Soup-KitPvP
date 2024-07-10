@@ -97,11 +97,11 @@ public class DBUtils {
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS perks(uuid VARCHAR(36) PRIMARY KEY, firstperk VARCHAR(16), secondperk VARCHAR(20), thirdperk VARCHAR(18), UNIQUE(`uuid`));");
 			// GUILD START
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS guilds(name VARCHAR(16) PRIMARY KEY, owner VARCHAR(36), tag VARCHAR(4), money INT, UNIQUE(`name`));");
-			statement.executeUpdate("CREATE TABLE IF NOT EXISTS members(uuid VARCHAR(36) PRIMARY KEY, nickname VARCHAR(16), rank VARCHAR(9), UNIQUE(`uuid`));");
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS members(uuid VARCHAR(36) PRIMARY KEY, nickname VARCHAR(16), guild_rank VARCHAR(9), UNIQUE(`uuid`));");
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS guild_members(guild_name VARCHAR(16), member_uuid VARCHAR(36), PRIMARY KEY (`guild_name`, `member_uuid`), "
 																													 + "FOREIGN KEY (guild_name) REFERENCES guilds(name), "
-																													 + "FOREIGN KEY (member_uuid) REFERENCES members(uuid) "
-																													 + "UNIQUE(`uuid`));");
+																													 + "FOREIGN KEY (member_uuid) REFERENCES members(uuid), "
+																													 + "UNIQUE(`member_uuid`));");
 			// GUILD END
 			statement.close();
 		} catch (SQLException e) {
@@ -149,10 +149,10 @@ public class DBUtils {
 	
 	private Stats loadPlayerStats(final UUID uuid, final String name, final Connection connection) throws SQLException {
 		Stats stats = new Stats();
-		try (PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM stats WHERE uuid=?")) {
+		try (PreparedStatement selectStatement = connection.prepareStatement("SELECT COUNT(*) AS count FROM stats WHERE uuid=?")) {
 	        selectStatement.setString(1, uuid.toString());
 	        try (ResultSet resultSet = selectStatement.executeQuery()) {
-	            if (resultSet.next() && resultSet.getInt(1) == 0) {
+	            if (resultSet.next() && resultSet.getInt("count") == 0) {
 	                try (PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO stats VALUES(?, ?, ?, ?, ?, ?)")) {
 	                	insertStatement.setString(1, uuid.toString());
 	                	insertStatement.setString(2, name);
@@ -183,10 +183,10 @@ public class DBUtils {
 	
 	private PlayerSettings loadPlayerSettings(final UUID uuid, final Connection connection) throws SQLException {
 		PlayerSettings settings = new PlayerSettings();
-		try (PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM settings WHERE uuid=?")) {
+		try (PreparedStatement selectStatement = connection.prepareStatement("SELECT COUNT(*) AS count FROM settings WHERE uuid=?")) {
 	        selectStatement.setString(1, uuid.toString());
 	        try (ResultSet resultSet = selectStatement.executeQuery()) {
-	            if (resultSet.next() && resultSet.getInt(1) == 0) {
+	            if (resultSet.next() && resultSet.getInt("count") == 0) {
 	                try (PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO settings VALUES(?, ?, ?, ?)")) {
 	                	insertStatement.setString(1, uuid.toString());
 	                	insertStatement.setBoolean(2, true);
@@ -215,10 +215,10 @@ public class DBUtils {
 	
 	private Economy loadPlayerEconomy(final UUID uuid, final String name, final Connection connection) throws SQLException {
 		Economy eco = new Economy();
-		try (PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM economy WHERE uuid=?")) {
+		try (PreparedStatement selectStatement = connection.prepareStatement("SELECT COUNT(*) AS count FROM economy WHERE uuid=?")) {
 	        selectStatement.setString(1, uuid.toString());
 	        try (ResultSet resultSet = selectStatement.executeQuery()) {
-	            if (resultSet.next() && resultSet.getInt(1) == 0) {
+	            if (resultSet.next() && resultSet.getInt("count") == 0) {
 	                try (PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO economy VALUES(?, ?, ?)")) {
 	                	insertStatement.setString(1, uuid.toString());
 	                	insertStatement.setString(2, name);
@@ -245,10 +245,10 @@ public class DBUtils {
 	}
 	private Perks loadPlayerPerks(final UUID uuid, final Connection connection) throws SQLException {
 		Perks perks = new Perks();
-		try (PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM perks WHERE uuid=?")) {
+		try (PreparedStatement selectStatement = connection.prepareStatement("SELECT COUNT(*) AS count FROM perks WHERE uuid=?")) {
 	        selectStatement.setString(1, uuid.toString());
 	        try (ResultSet resultSet = selectStatement.executeQuery()) {
-	            if (resultSet.next() && resultSet.getInt(1) == 0) {
+	            if (resultSet.next() && resultSet.getInt("count") == 0) {
 	                try (PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO perks VALUES(?, ?, ?, ?)")) {
 	                    insertStatement.setString(1, uuid.toString());
 	                    insertStatement.setString(2, "none");

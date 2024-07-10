@@ -13,6 +13,15 @@ tab:
 motd:
   first-line: "noks.io"
   second-line: "soup server"
+welcome-message:
+  - "&8&m-------------------------------------------------"
+  - "&3| &rWelcome on the BETA phase of &3&lSoupWorld &rthe home of soup pvp!"
+  - " "
+  - "&3| &rOur Website >> &cComing Soon"
+  - "&3| &rOur Discord >> &3discord.soupworld.net"
+  - "&c-> Keep in mind this is a beta ^^"
+  - "&cIf you encounter a bug, report it on the discord ^^"
+  - "&8&m-------------------------------------------------"
 # Setup KOTH Locations with names you can also use /koth setup <KOTH NAME>
 KoTH:
   NAME:
