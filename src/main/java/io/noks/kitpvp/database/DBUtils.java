@@ -44,8 +44,8 @@ public class DBUtils {
 		this.username = user;
 		this.password = password;
 		this.main = main;
-		this.executorService = Executors.newCachedThreadPool();
 		this.connectDatabase();
+		this.executorService = (this.connected ? Executors.newCachedThreadPool() : null);
 		/*for (RefreshType type : RefreshType.values()) {
 			if (!type.canBeScanned()) {
 				continue;
@@ -53,8 +53,8 @@ public class DBUtils {
 			updateLeaderboard(type);
 		}*/
 	}
-	public CompletableFuture<Void> updateLeaderboard(RefreshType type) {
-        return CompletableFuture.runAsync(() -> this.leaderboard.put(type, scanLeaderboard(type)), executorService);
+	public void updateLeaderboard(RefreshType type) {
+        this.leaderboard.put(type, scanLeaderboard(type));
     }
 	
 	private void connectDatabase() {
@@ -117,34 +117,33 @@ public class DBUtils {
 		}
 	}
 
-	public CompletableFuture<Void> loadPlayerAsync(UUID uuid) {
-        return CompletableFuture.runAsync(() -> loadPlayer(uuid), executorService);
-    }
-	private void loadPlayer(final UUID uuid) {
+	public void loadPlayer(final UUID uuid) {
 		if (!isConnected()) {
 			new PlayerManager(uuid);
 			return;
 		}
-		Connection connection = null;
-		try {
-			connection = this.hikari.getConnection();
-			final String name = this.main.getServer().getPlayer(uuid).getName();
-			final Stats stats = this.loadPlayerStats(uuid, name, connection);
-			final PlayerSettings settings = this.loadPlayerSettings(uuid, connection);
-			final Economy eco = this.loadPlayerEconomy(uuid, name, connection);
-			final Perks perks = this.loadPlayerPerks(uuid, connection);
-			new PlayerManager(uuid, stats, settings, eco, perks); 
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-		} finally {
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException ex) {
-					ex.printStackTrace();
+		CompletableFuture.runAsync(() -> {
+			Connection connection = null;
+			try {
+				connection = this.hikari.getConnection();
+				final String name = this.main.getServer().getPlayer(uuid).getName();
+				final Stats stats = this.loadPlayerStats(uuid, name, connection);
+				final PlayerSettings settings = this.loadPlayerSettings(uuid, connection);
+				final Economy eco = this.loadPlayerEconomy(uuid, name, connection);
+				final Perks perks = this.loadPlayerPerks(uuid, connection);
+				new PlayerManager(uuid, stats, settings, eco, perks); 
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			} finally {
+				if (connection != null) {
+					try {
+						connection.close();
+					} catch (SQLException ex) {
+						ex.printStackTrace();
+					}
 				}
 			}
-		}
+		}, executorService);
 	}
 	
 	private Stats loadPlayerStats(final UUID uuid, final String name, final Connection connection) throws SQLException {
@@ -275,35 +274,34 @@ public class DBUtils {
 		return perks;
 	}
 	
-	public CompletableFuture<Void> savePlayerAsync(PlayerManager pm) {
-        return CompletableFuture.runAsync(() -> savePlayer(pm), executorService);
-    }
-	private void savePlayer(final PlayerManager pm) {
+	public void savePlayer(final PlayerManager pm) {
 		if (!isConnected()) {
 			pm.drop();
 			return;
 		}
-		Connection connection = null;
-		try {
-			connection = this.hikari.getConnection();
-			final UUID uuid = pm.getPlayerUUID();
-			final String name = pm.getPlayer().getName();
-			this.savePlayerStats(uuid, name, pm.getStats(), connection);
-			this.savePlayerSettings(uuid, pm.getSettings(), connection);
-			this.savePlayerEconomy(uuid, name, pm.getEconomy(), connection);
-			this.savePlayerPerks(uuid, pm.getActivePerks(), connection);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			pm.drop();
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException ex) {
-					ex.printStackTrace();
+		CompletableFuture.runAsync(() -> {
+			Connection connection = null;
+			try {
+				connection = this.hikari.getConnection();
+				final UUID uuid = pm.getPlayerUUID();
+				final String name = pm.getPlayer().getName();
+				this.savePlayerStats(uuid, name, pm.getStats(), connection);
+				this.savePlayerSettings(uuid, pm.getSettings(), connection);
+				this.savePlayerEconomy(uuid, name, pm.getEconomy(), connection);
+				this.savePlayerPerks(uuid, pm.getActivePerks(), connection);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				pm.drop();
+				if (connection != null) {
+					try {
+						connection.close();
+					} catch (SQLException ex) {
+						ex.printStackTrace();
+					}
 				}
 			}
-		}
+		}, executorService);
 	}
 	
 	private void savePlayerStats(final UUID uuid, final String name, final Stats stats, final Connection connection) throws SQLException {
@@ -376,29 +374,31 @@ public class DBUtils {
 		}
 		final Map<UUID, Integer> map = new LinkedHashMap<UUID, Integer>(10);
 		final String selectLine = "SELECT uuid," + type.getName().toLowerCase() + " FROM stats ORDER BY " + type.getName().toLowerCase() + " DESC LIMIT 10";
-		Connection connection = null;
-		try {
-			connection = this.hikari.getConnection();
-			final PreparedStatement statement = connection.prepareStatement(selectLine);
-			final ResultSet result = statement.executeQuery();
-			while (result.next()) {
-				UUID uuid = UUID.fromString(result.getString("uuid"));
-				int stat = result.getInt(type.getName().toLowerCase());
-				map.put(uuid, stat);
-			}
-			result.close();
-			statement.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException ex) {
-					ex.printStackTrace();
+		CompletableFuture.runAsync(() -> {
+			Connection connection = null;
+			try {
+				connection = this.hikari.getConnection();
+				final PreparedStatement statement = connection.prepareStatement(selectLine);
+				final ResultSet result = statement.executeQuery();
+				while (result.next()) {
+					UUID uuid = UUID.fromString(result.getString("uuid"));
+					int stat = result.getInt(type.getName().toLowerCase());
+					map.put(uuid, stat);
+				}
+				result.close();
+				statement.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				if (connection != null) {
+					try {
+						connection.close();
+					} catch (SQLException ex) {
+						ex.printStackTrace();
+					}
 				}
 			}
-		}
+		}, executorService);
 		return map.isEmpty() ? Collections.emptyMap() : map;
 	}
 	

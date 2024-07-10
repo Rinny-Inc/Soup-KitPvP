@@ -78,7 +78,7 @@ public class PlayerListener implements Listener, SignRotation {
 		player.setFlying(false);
 		player.sendMessage(this.plugin.getMessages().WELCOME_MESSAGE);
 		player.setPlayerListHeaderFooter(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', this.plugin.getConfigManager().tabHeader)), TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', this.plugin.getConfigManager().tabFooter)));
-		this.plugin.getDataBase().loadPlayerAsync(player.getUniqueId());
+		this.plugin.getDataBase().loadPlayer(player.getUniqueId());
 		player.getInventory().setContents(this.plugin.getSpawnItems(player.getName()));
 		player.updateInventory();
 	}
@@ -151,7 +151,7 @@ public class PlayerListener implements Listener, SignRotation {
 				this.plugin.mapTask = null;
 			}
 		}
-		this.plugin.getDataBase().savePlayerAsync(pm);
+		this.plugin.getDataBase().savePlayer(pm);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
