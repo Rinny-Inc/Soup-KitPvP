@@ -15,15 +15,11 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import io.noks.kitpvp.Main;
+import io.noks.kitpvp.abstracts.AbstractBossTask;
 import io.noks.kitpvp.enums.EventsType;
 import io.noks.kitpvp.managers.PlayerManager;
 
-public class FallenGolemTask implements Listener {
-	private static FallenGolemTask instance = new FallenGolemTask();
-	public static FallenGolemTask getInstance() {
-		return instance;
-	}
-
+public class FallenGolemTask extends AbstractBossTask implements Listener {
 	private World world = Bukkit.getWorld("world");
 	private int countdown = EventsType.GOLEM.getCountdown();
 	private String prefix = EventsType.GOLEM.getPrefix(ChatColor.RED);
@@ -38,6 +34,40 @@ public class FallenGolemTask implements Listener {
 		golem.setCustomNameVisible(true);
 		golem.setMaxHealth(350.0D);
 		golem.setHealth(golem.getMaxHealth());
+	}
+	
+	@Override
+	public void run() {
+		this.spawned = false;
+		this.countdown = FallenGolemTask.this.countdown - 20;
+		int minute = FallenGolemTask.this.countdown / 60 / 20;
+		String countdownminute = FallenGolemTask.this.prefix + ChatColor.GRAY
+				+ "The Fallen Golem will appear in " + ChatColor.YELLOW + ChatColor.ITALIC + minute
+				+ ChatColor.GRAY + " minute";
+		String countdownsec = FallenGolemTask.this.prefix + ChatColor.GRAY + "The Fallen Golem will appear in "
+				+ ChatColor.YELLOW + ChatColor.ITALIC + (FallenGolemTask.this.countdown / 20) + ChatColor.GRAY
+				+ " second";
+		if (!Bukkit.getOnlinePlayers().isEmpty()) {
+			if (FallenGolemTask.this.countdown == 2400) {
+				Bukkit.broadcastMessage(countdownminute + "s");
+			}
+			if (FallenGolemTask.this.countdown == 1200) {
+				Bukkit.broadcastMessage(countdownminute);
+			}
+			if (FallenGolemTask.this.countdown == 900 || FallenGolemTask.this.countdown == 600
+					|| FallenGolemTask.this.countdown == 300 || FallenGolemTask.this.countdown == 200
+					|| FallenGolemTask.this.countdown == 100) {
+				Bukkit.broadcastMessage(countdownsec + "s");
+			}
+		}
+		if (FallenGolemTask.this.countdown == 0) {
+			if (!Bukkit.getOnlinePlayers().isEmpty()) {
+				FallenGolemTask.this.spawned = true;
+				FallenGolemTask.this.setupFallenGolem();
+			}
+			if (!FallenGolemTask.this.spawned)
+				FallenGolemTask.this.countdown = 8400;
+		}
 	}
 
 	public void doFallenGolem() {
@@ -69,7 +99,7 @@ public class FallenGolemTask implements Listener {
 					if (!Bukkit.getOnlinePlayers().isEmpty()) {
 						FallenGolemTask.this.spawned = true;
 						FallenGolemTask.this.setupFallenGolem();
-						cancel();
+						this.cancel();
 					}
 					if (!FallenGolemTask.this.spawned)
 						FallenGolemTask.this.countdown = 8400;

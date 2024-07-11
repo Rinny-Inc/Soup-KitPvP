@@ -22,6 +22,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import com.avaje.ebean.validation.NotNull;
 
 import io.noks.Hologram;
+import io.noks.kitpvp.abstracts.AbstractBossTask;
 import io.noks.kitpvp.commands.AbilityListCommand;
 import io.noks.kitpvp.commands.BootCommand;
 import io.noks.kitpvp.commands.BuildCommand;
@@ -54,7 +55,6 @@ import io.noks.kitpvp.managers.caches.Feast;
 import io.noks.kitpvp.managers.caches.Guild;
 import io.noks.kitpvp.managers.caches.Tournament;
 import io.noks.kitpvp.task.MapTask;
-import io.noks.kitpvp.task.event.EventsTask;
 import io.noks.kitpvp.task.event.FallenGolemTask;
 import io.noks.kitpvp.utils.Cuboid;
 import io.noks.kitpvp.utils.Messages;
@@ -65,7 +65,7 @@ public class Main extends JavaPlugin implements TournamentManager, ItemHelper /*
 	private @NotNull AbilitiesManager abilitiesManager;
 	private @NotNull InventoryManager inventoryManager;
 	private @NotNull Messages messages;
-	private @NotNull EventsTask eventsTask;
+	private @NotNull AbstractBossTask abstractBossTask;
 	public @Nullable Feast feast = null;
 	public @NotNull HologramManager hologramManager;
 	private @NotNull Cuboid spawnCuboid;
@@ -91,7 +91,7 @@ public class Main extends JavaPlugin implements TournamentManager, ItemHelper /*
 		this.registerScoreboard();
 		this.registerListeners();
 		this.registerCommands();
-		this.eventsTask = new EventsTask(this); // TODO: need to execute it (see in class)
+		this.abstractBossTask = new AbstractBossTask(this); // TODO: need to execute it (see in class)
 		this.hologramManager = new HologramManager();
 		final Hologram parent = this.getServer().newHologram(new Location(world, 5.5, 102, -5.5), ChatColor.DARK_AQUA.toString() + ChatColor.BOLD + "Active Event");
 		parent.addLineBelow(ChatColor.RED + "Coming Soon :)");
@@ -199,8 +199,8 @@ public class Main extends JavaPlugin implements TournamentManager, ItemHelper /*
 		return this.messages;
 	}
 	
-	public EventsTask getEventsTask() {
-		return this.eventsTask;
+	public AbstractBossTask getEventsTask() {
+		return this.abstractBossTask;
 	}
 	
 	public ConfigManager getConfigManager() {
