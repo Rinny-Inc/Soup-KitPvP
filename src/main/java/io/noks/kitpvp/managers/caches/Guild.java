@@ -5,6 +5,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
 import io.noks.kitpvp.enums.GuildRank;
 
 public class Guild {
@@ -33,6 +36,10 @@ public class Guild {
 		guildList.putIfAbsent(name, this);
 	}
 	
+	public void drop() {
+		guildList.remove(this.name);
+	}
+	
 	public UUID leaderUUID() {
 		return this.leaderUuid;
 	}
@@ -45,5 +52,20 @@ public class Guild {
 		if (this.membersUUIDList.containsKey(uuid)) {
 			this.membersUUIDList.remove(uuid);
 		}
+	}
+	
+	public static Guild getGuildFromName(String name) {
+		return guildList.get(name);
+	}
+	
+	public boolean isAnyMemberOnline() {
+		for (UUID uuids : this.membersUUIDList.keySet()) {
+			Player player = Bukkit.getPlayer(uuids);
+			
+			if (player != null && player.isOnline()) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

@@ -27,7 +27,7 @@ public class Hulk extends Abilities implements Listener {
 	private Random random = new Random();
 
 	public Hulk(Main main) {
-		super("Hulk", new ItemStack(Material.SLIME_BALL), Rarity.UNCOMMON, 3L, new String[] { ChatColor.AQUA + "Launch the player in your hand" });
+		super("Hulk", new ItemStack(Material.SLIME_BALL), Rarity.UNCOMMON, 3L, new String[] { ChatColor.AQUA + "Grab players and launch them" });
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}

@@ -91,7 +91,6 @@ public class Main extends JavaPlugin implements TournamentManager, ItemHelper /*
 		this.registerScoreboard();
 		this.registerListeners();
 		this.registerCommands();
-		this.abstractBossTask = new AbstractBossTask(this); // TODO: need to execute it (see in class)
 		this.hologramManager = new HologramManager();
 		final Hologram parent = this.getServer().newHologram(new Location(world, 5.5, 102, -5.5), ChatColor.DARK_AQUA.toString() + ChatColor.BOLD + "Active Event");
 		parent.addLineBelow(ChatColor.RED + "Coming Soon :)");
