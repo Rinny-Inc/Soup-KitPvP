@@ -23,6 +23,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -368,6 +369,38 @@ public class PlayerListener implements Listener, SignRotation {
 			if (damagerM.hasAbility()) {
 				damagedM.ability().onEntityDamageByEntity(event);
 			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onCombatTagMelee(EntityDamageByEntityEvent event) {
+		if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
+			if (event.getEntity().getUniqueId() == event.getDamager().getUniqueId()) {
+				return;
+			}
+			final PlayerManager damagedM = PlayerManager.get(event.getEntity().getUniqueId());
+			if (!damagedM.hasAbility()) {
+				return;
+			}
+			final PlayerManager damagerM = PlayerManager.get(event.getDamager().getUniqueId());
+			damagedM.updateCombatTag(new CombatTag(damagerM.getPlayerUUID()));
+			damagerM.updateCombatTag(new CombatTag(damagedM.getPlayerUUID()));
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onCombatTagDistance(ProjectileHitEvent event) {
+		if (event.getEntity().getShooter() instanceof Player && (event.getHitEntity() != null && event.getHitEntity() instanceof Player)) {
+			final Player shooter = (Player) event.getEntity().getShooter();
+			final Player hit = (Player) event.getHitEntity();
+			if (shooter.getUniqueId() == hit.getUniqueId()) {
+				return;
+			}
+			final PlayerManager damagedM = PlayerManager.get(hit.getUniqueId());
+			if (!damagedM.hasAbility()) {
+				return;
+			}
+			final PlayerManager damagerM = PlayerManager.get(shooter.getUniqueId());
 			damagedM.updateCombatTag(new CombatTag(damagerM.getPlayerUUID()));
 			damagerM.updateCombatTag(new CombatTag(damagedM.getPlayerUUID()));
 		}
