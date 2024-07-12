@@ -44,23 +44,23 @@ public class Hulk extends Abilities implements Listener {
 			}
 			final PlayerManager pm = PlayerManager.get(p.getUniqueId());
 			if (p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.AIR && pm.hasAbility(this) && !p.isInsideVehicle() && p.getPassenger() == null && r.getPassenger() == null) {
-				if (!pm.hasActiveAbilityCooldown()) {
-					p.setPassenger(r);
-					final String text = ChatColor.GREEN + "You have been picked up by a Hulk! Press SHIFT to try to dismount!";
-					if (r.getProtocolVersion() < 47) {
-						r.sendMessage(text);
-					}
-					r.sendActionBar(text);
-					pm.applyAbilityCooldown();
+				if (pm.hasActiveAbilityCooldown()) {
+					final double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
+					p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 					return;
 				}
-				final double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
-				p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
+				p.setPassenger(r);
+				final String text = ChatColor.GREEN + "You have been picked up by a Hulk! Press SHIFT to try to dismount!";
+				if (r.getProtocolVersion() < 47) {
+					r.sendMessage(text);
+				}
+				r.sendActionBar(text);
+				pm.applyAbilityCooldown();
 			}
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerAttack(EntityDamageByEntityEvent e) {
 		if (e.getEntity() instanceof Player && e.getDamager() instanceof Player) {
 			final Player damager = (Player) e.getDamager();
