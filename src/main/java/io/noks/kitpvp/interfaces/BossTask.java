@@ -3,5 +3,7 @@ package io.noks.kitpvp.interfaces;
 public interface BossTask {
 	void start();
 	void stop();
-	void run();
+	void doTask();
+	void spawn();
+	boolean hasSpawned();
 }
