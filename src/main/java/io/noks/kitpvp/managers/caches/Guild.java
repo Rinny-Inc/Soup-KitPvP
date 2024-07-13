@@ -17,6 +17,7 @@ public class Guild {
 	private Map<UUID, GuildRank> membersUUIDList;
 	private String motd;
 	private String tag;
+	private int money;
 	private boolean open;
 	
 	public Guild(String name, UUID leaderUUID) {
@@ -26,12 +27,13 @@ public class Guild {
 		this.open = false;
 		guildList.putIfAbsent(name, this);
 	}
-	public Guild(String name, UUID leaderuuid, String motd, String tag, Map<UUID, GuildRank> membersList, boolean open) {
+	public Guild(String name, UUID leaderuuid, String motd, String tag, Map<UUID, GuildRank> membersList, int money, boolean open) {
 		this.name = name;
 		this.leaderUuid = leaderuuid;
 		this.membersUUIDList = membersList;
 		this.motd = motd;
 		this.tag = tag;
+		this.money = money;
 		this.open = open;
 		guildList.putIfAbsent(name, this);
 	}
@@ -56,6 +58,27 @@ public class Guild {
 	
 	public static Guild getGuildFromName(String name) {
 		return guildList.get(name);
+	}
+	
+	public static Guild getGuildFromLeader(UUID uuid) {
+		for (Guild guilds : guildList.values()) {
+			if (guilds.leaderUuid == uuid) {
+				return guilds;
+			}
+		}
+		return null;
+	}
+	
+	public static Guild getGuildFromMember(UUID uuid) {
+		for (Guild guilds : guildList.values()) {
+			for (UUID members : guilds.membersUUIDList.keySet()) {
+				if (members != uuid) {
+					continue;
+				}
+				return guilds;
+			}
+		}
+		return null;
 	}
 	
 	public boolean isAnyMemberOnline() {

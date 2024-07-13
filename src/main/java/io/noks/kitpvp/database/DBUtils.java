@@ -17,10 +17,12 @@ import java.util.concurrent.Executors;
 import com.zaxxer.hikari.HikariDataSource;
 
 import io.noks.kitpvp.Main;
+import io.noks.kitpvp.enums.GuildRank;
 import io.noks.kitpvp.enums.PerksEnum;
 import io.noks.kitpvp.enums.RefreshType;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Economy;
+import io.noks.kitpvp.managers.caches.Guild;
 import io.noks.kitpvp.managers.caches.Perks;
 import io.noks.kitpvp.managers.caches.PlayerSettings;
 import io.noks.kitpvp.managers.caches.PlayerSettings.SlotType;
@@ -398,18 +400,167 @@ public class DBUtils {
 					}
 				}
 			}
-		}, executorService);
+		}, executorService).join();
 		return map.isEmpty() ? Collections.emptyMap() : map;
 	}
 	
 	// GUILDS TODO
-	
 		//void addGuildMember(GuildName, memberUuid)
 		//void removeGuildMember(GuildName, memberUuid)
 		//Guild getGuildFromMember(UUID)
 		//boolean isGuildMember(uuid)
-		//void unloadGuild(name)
-		//void loadGuild(name)
-		//load Guild in map when guild member online
-		//remove Guild from map when no members is online
+	
+	private Guild loadGuildByOwner(UUID leaderUUID) {
+		if (!isConnected()) {
+			return null;
+		}
+		Guild guild = Guild.getGuildFromLeader(leaderUUID);
+		if (guild != null) {
+			return guild;
+		}
+		// TODO: search DB
+		// TODO guild = new Guild...
+		return guild;
+	}
+	
+	private Guild loadGuildByMember(UUID memberUUID) {
+		if (!isConnected()) {
+			return null;
+		}
+		Guild[] guild = {Guild.getGuildFromMember(memberUUID)};
+		if (guild[0] != null) {
+			return guild[0];
+		}
+	    CompletableFuture.runAsync(() -> {
+	        Connection connection = null;
+	        try {
+	            connection = this.hikari.getConnection();
+	            try (PreparedStatement statement = connection.prepareStatement("SELECT guild_name FROM guild_members WHERE member_uuid=?")) {
+	                statement.setString(1, memberUUID.toString());
+	                try (ResultSet resultSet = statement.executeQuery()) {
+	                    if (resultSet.next()) {
+	                        final String guildName = resultSet.getString("guild_name");
+	                        guild[0] = this.loadGuildByName(guildName);
+	                    }
+	                    resultSet.close();
+	                }
+	                statement.close();
+	            }
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        } finally {
+	            if (connection != null) {
+	                try {
+	                    connection.close();
+	                } catch (SQLException ex) {
+	                    ex.printStackTrace();
+	                }
+	            }
+	        }
+	    }, executorService).join();
+		return guild[0];
+	}
+	
+	private boolean is_Part_Of_A_Guild(UUID uuid) {
+		if (!isConnected()) {
+			return false;
+		}
+		boolean[] isMember = {false};
+		CompletableFuture.runAsync(() -> {
+	        Connection connection = null;
+	        try {
+	            connection = this.hikari.getConnection();
+	            try (PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) AS count FROM guild_members WHERE member_uuid=?")) {
+	                statement.setString(1, uuid.toString());
+	                try (ResultSet resultSet = statement.executeQuery()) {
+	                    if (resultSet.next() && resultSet.getInt("count") > 0) {
+	                        isMember[0] = true;
+	                    }
+	                    resultSet.close();
+	                }
+	                statement.close();
+	            }
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        } finally {
+	            if (connection != null) {
+	                try {
+	                    connection.close();
+	                } catch (SQLException ex) {
+	                    ex.printStackTrace();
+	                }
+	            }
+	        }
+	    }, executorService).join();
+	    return isMember[0];
+	}
+	
+	// SPAGHET
+	private Guild loadGuildByName(String name) {
+	    if (!isConnected()) {
+	        return null;
+	    }
+	    if (Guild.guildList.containsKey(name)) {
+	        return Guild.getGuildFromName(name);
+	    }
+	    Guild[] guild = {null};
+	    CompletableFuture.runAsync(() -> {
+	        Connection connection = null;
+	        try {
+	            connection = this.hikari.getConnection();
+	            try (PreparedStatement guildStatement = connection.prepareStatement("SELECT * FROM guilds WHERE name=?")) {
+	                guildStatement.setString(1, name);
+	                try (ResultSet guildResult = guildStatement.executeQuery()) {
+	                    if (guildResult.next()) {
+	                        final UUID leaderUUID = UUID.fromString(guildResult.getString("owner"));
+	                        final String motd = guildResult.getString("motd");
+	                        final String tag = guildResult.getString("tag");
+	                        final int money = guildResult.getInt("money");
+	                        final boolean open = guildResult.getBoolean("open");
+
+	                        final Map<UUID, GuildRank> membersList = new LinkedHashMap<>();
+	                        try (PreparedStatement memberStatement = connection.prepareStatement("SELECT * FROM guild_members WHERE guild_name=?")) {
+	                            memberStatement.setString(1, name);
+	                            try (ResultSet memberResult = memberStatement.executeQuery()) {
+	                                while (memberResult.next()) {
+	                                    UUID memberUUID = UUID.fromString(memberResult.getString("member_uuid"));
+	                                    GuildRank rank = GuildRank.valueOf(memberResult.getString("guild_rank"));
+	                                    
+	                                    membersList.put(memberUUID, rank);
+	                                }
+	                                memberResult.close();
+	                            }
+	                            memberStatement.close();
+	                        }
+	                        guild[0] = new Guild(name, leaderUUID, motd, tag, membersList, money, open);
+	                    }
+	                    guildResult.close();
+	                }
+	                guildStatement.close();
+	            }
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        } finally {
+	            if (connection != null) {
+	                try {
+	                    connection.close();
+	                } catch (SQLException ex) {
+	                    ex.printStackTrace();
+	                }
+	            }
+	        }
+	    }, executorService).join();
+	    return guild[0];
+	}
+	
+	private void try_Unload_N_Save_Guild(Guild guild) {
+		if (!isConnected()) {
+			return;
+		}
+		if (guild.isAnyMemberOnline()) {
+			return;
+		}
+		// TODO: save guild in DB
+		guild.drop();
+	}
 }
