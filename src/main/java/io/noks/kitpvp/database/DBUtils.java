@@ -99,10 +99,9 @@ public class DBUtils {
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS perks(uuid VARCHAR(36) PRIMARY KEY, firstperk VARCHAR(16), secondperk VARCHAR(20), thirdperk VARCHAR(18), UNIQUE(`uuid`));");
 			// GUILD START
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS guilds(name VARCHAR(16) PRIMARY KEY, owner VARCHAR(36), tag VARCHAR(4), money INT, UNIQUE(`name`));");
-			statement.executeUpdate("CREATE TABLE IF NOT EXISTS members(uuid VARCHAR(36) PRIMARY KEY, nickname VARCHAR(16), guild_rank VARCHAR(9), UNIQUE(`uuid`));");
-			statement.executeUpdate("CREATE TABLE IF NOT EXISTS guild_members(guild_name VARCHAR(16), member_uuid VARCHAR(36), PRIMARY KEY (`guild_name`, `member_uuid`), "
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS guild_members(guild_name VARCHAR(16), member_uuid VARCHAR(36), guild_rank VARCHAR(9), PRIMARY KEY (`guild_name`, `member_uuid`), "
 																													 + "FOREIGN KEY (guild_name) REFERENCES guilds(name), "
-																													 + "FOREIGN KEY (member_uuid) REFERENCES members(uuid), "
+																													 /*+ "FOREIGN KEY (member_uuid) REFERENCES members(uuid), "*/
 																													 + "UNIQUE(`member_uuid`));");
 			// GUILD END
 			statement.close();
@@ -564,7 +563,6 @@ public class DBUtils {
 			return;
 		}
 	    Connection connection = null;
-	    // TODO: need to DELETE removed members from members table
 	    try {
 	        connection = this.hikari.getConnection();
 	        try (PreparedStatement guildStatement = connection.prepareStatement("UPDATE guilds SET owner=?, motd=?, tag=?, money=?, open=? WHERE name=?")) {
