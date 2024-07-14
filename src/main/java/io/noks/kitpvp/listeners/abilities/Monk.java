@@ -1,6 +1,5 @@
 package io.noks.kitpvp.listeners.abilities;
 
-import java.text.DecimalFormat;
 import java.util.Random;
 
 import org.bukkit.ChatColor;
@@ -70,7 +69,7 @@ public class Monk extends Abilities implements Listener {
 		if (pm.hasAbility(this) && event.getRightClicked() instanceof Player && item.getType() == Material.BLAZE_ROD) {
 			if (pm.hasActiveAbilityCooldown()) {
 				double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
-				player.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
+				player.sendMessage(ChatColor.RED + "You can use your ability in " + df.format(cooldown) + " seconds.");
 				return;
 			}
 			pm.applyAbilityCooldown();

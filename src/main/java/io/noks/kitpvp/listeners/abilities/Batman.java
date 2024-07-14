@@ -1,7 +1,5 @@
 package io.noks.kitpvp.listeners.abilities;
 
-import java.text.DecimalFormat;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -54,7 +52,7 @@ public class Batman extends Abilities implements Listener {
 				return;
 			}
 			final double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
-			p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
+			p.sendMessage(ChatColor.RED + "You can use your ability in " + df.format(cooldown) + " seconds.");
 		}
 	}
 

@@ -564,6 +564,7 @@ public class DBUtils {
 			return;
 		}
 	    Connection connection = null;
+	    // TODO: need to DELETE removed members from members table
 	    try {
 	        connection = this.hikari.getConnection();
 	        try (PreparedStatement guildStatement = connection.prepareStatement("UPDATE guilds SET owner=?, motd=?, tag=?, money=?, open=? WHERE name=?")) {

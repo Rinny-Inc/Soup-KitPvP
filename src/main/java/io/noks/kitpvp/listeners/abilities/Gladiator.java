@@ -1,6 +1,5 @@
 package io.noks.kitpvp.listeners.abilities;
 
-import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -61,7 +60,7 @@ public class Gladiator extends Abilities {
 			if (p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.IRON_FENCE && pm.hasAbility(this)) {
 				if (pm.hasActiveAbilityCooldown()) {
 					final double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
-					p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
+					p.sendMessage(ChatColor.RED + "You can use your ability in " + df.format(cooldown) + " seconds.");
 					return;
 				}
 				final Player r = (Player) e.getRightClicked();
@@ -198,6 +197,7 @@ public class Gladiator extends Abilities {
             for (int z = centerZ - halfSize; z <= centerZ + halfSize; z++) {
             	for (int y = centerY - halfSize; y <= centerY + halfSize; y++) {
             		if (y > world.getMaxHeight()) continue;
+            		
                     if ((x == centerX - halfSize || x == centerX + halfSize || y == centerY - halfSize || y == centerY + halfSize || z == centerZ - halfSize || z == centerZ + halfSize) || (y == centerY - halfSize && (x != centerX || z != centerZ))) {
                         Block block = world.getBlockAt(x, y, z);
                     	this.cage.add(block.getLocation());

@@ -57,36 +57,42 @@ public class Phantom extends Abilities implements Listener {
 		final Action action = e.getAction();
 		if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.FEATHER && PlayerManager.get(p.getUniqueId()).hasAbility(this)) {
 			final PlayerManager pm = PlayerManager.get(p.getUniqueId());
-			if (!pm.hasActiveAbilityCooldown()) {
-				pm.applyAbilityCooldown();
-				for (Entity n : p.getNearbyEntities(20.0D, 20.0D, 20.0D)) {
-					if (n instanceof Player) {
-						Player nearby = (Player) n;
-						nearby.playSound(p.getLocation(), Sound.WITHER_DEATH, 2.0F, 2.0F);
-					}
-				}
-				p.setAllowFlight(true);
-				p.setFlying(true);
-				p.sendMessage(ChatColor.BLUE + "You can now flying for 5 seconds");
-				p.playSound(p.getLocation(), Sound.WITHER_DEATH, 1.0F, 1.0F);
-				givePhantomEquipment(p);
-				new BukkitRunnable() {
-					public void run() {
-						if (Phantom.this.equipments.containsKey(p.getUniqueId())) {
-							p.playSound(p.getLocation(), Sound.WITHER_SPAWN, 1.0F, 1.0F);
-							p.sendMessage(ChatColor.RED + "Fly unabled!");
-							p.setFlying(false);
-							p.setAllowFlight(false);
-							p.getInventory().setArmorContents((ItemStack[]) Phantom.this.equipments.get(p.getUniqueId()));
-							p.updateInventory();
-							Phantom.this.equipments.remove(p.getUniqueId());
-						}
-					}
-				}.runTaskLater(this.plugin, 120L);
+			if (pm.hasActiveAbilityCooldown()) {
+				final double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
+				p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
 				return;
 			}
-			final double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
-			p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
+			pm.applyAbilityCooldown();
+			for (Entity n : p.getNearbyEntities(20.0D, 20.0D, 20.0D)) {
+				if (n instanceof Player) {
+					Player nearby = (Player) n;
+					nearby.playSound(p.getLocation(), Sound.WITHER_DEATH, 2.0F, 2.0F);
+				}
+			}
+			p.setAllowFlight(true);
+			p.setFlying(true);
+			p.sendMessage(ChatColor.BLUE + "You can now flying for 5 seconds");
+			p.playSound(p.getLocation(), Sound.WITHER_DEATH, 1.0F, 1.0F);
+			givePhantomEquipment(p);
+			new BukkitRunnable() {
+				
+				@Override
+				public void run() {
+					if (p == null || !p.isOnline()) {
+						Phantom.this.equipments.remove(p.getUniqueId());
+						return;
+					}
+					if (Phantom.this.equipments.containsKey(p.getUniqueId())) {
+						p.playSound(p.getLocation(), Sound.WITHER_SPAWN, 1.0F, 1.0F);
+						p.sendMessage(ChatColor.RED + "Fly unabled!");
+						p.setFlying(false);
+						p.setAllowFlight(false);
+						p.getInventory().setArmorContents((ItemStack[]) Phantom.this.equipments.get(p.getUniqueId()));
+						p.updateInventory();
+						Phantom.this.equipments.remove(p.getUniqueId());
+					}
+				}
+			}.runTaskLaterAsynchronously(plugin, 120L);
 		}
 	}
 

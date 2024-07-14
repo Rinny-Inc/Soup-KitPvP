@@ -1,7 +1,5 @@
 package io.noks.kitpvp.listeners.abilities;
 
-import java.text.DecimalFormat;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -51,7 +49,7 @@ public class Blink extends Abilities {
 		if (action == Action.RIGHT_CLICK_AIR && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.NETHER_STAR && pm.hasAbility(this)) {
 			if (pm.hasActiveAbilityCooldown()) {
 				final double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
-				p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
+				p.sendMessage(ChatColor.RED + "You can use your ability in " + df.format(cooldown) + " seconds.");
 				return;
 			}
 			final Block block = p.getTargetBlock(null, 10);

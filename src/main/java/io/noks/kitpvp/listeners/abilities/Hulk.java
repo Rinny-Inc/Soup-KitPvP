@@ -1,6 +1,5 @@
 package io.noks.kitpvp.listeners.abilities;
 
-import java.text.DecimalFormat;
 import java.util.Random;
 
 import org.bukkit.ChatColor;
@@ -38,15 +37,20 @@ public class Hulk extends Abilities implements Listener {
 		final Player p = e.getPlayer();
 		if (e.getRightClicked() instanceof Player) {
 			final Player r = (Player) e.getRightClicked();
-			if (!PlayerManager.get(r.getUniqueId()).hasAbility()) {
+			PlayerManager rm = PlayerManager.get(r.getUniqueId());
+			if(rm == null) {
+				return;
+			}
+			if (!rm.hasAbility()) {
 				e.setCancelled(true);
 				return;
 			}
+			rm = null;
 			final PlayerManager pm = PlayerManager.get(p.getUniqueId());
 			if (p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.AIR && pm.hasAbility(this) && !p.isInsideVehicle() && p.getPassenger() == null && r.getPassenger() == null) {
 				if (pm.hasActiveAbilityCooldown()) {
 					final double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
-					p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
+					p.sendMessage(ChatColor.RED + "You can use your ability in " + df.format(cooldown) + " seconds.");
 					return;
 				}
 				p.setPassenger(r);

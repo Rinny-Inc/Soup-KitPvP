@@ -1,6 +1,5 @@
 package io.noks.kitpvp.listeners.abilities;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +52,7 @@ public class Spider extends Abilities implements Listener {
 		if (action == Action.RIGHT_CLICK_AIR && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.WEB && pm.hasAbility(this)) {
 			if (pm.hasActiveAbilityCooldown()) {
 				final double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
-				p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
+				p.sendMessage(ChatColor.RED + "You can use your ability in " + df.format(cooldown) + " seconds.");
 				return;
 			}
 			final Snowball web = p.launchProjectile(Snowball.class, p.getLocation().getDirection().multiply(3.0D));

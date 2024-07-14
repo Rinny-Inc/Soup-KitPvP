@@ -11,13 +11,13 @@ import org.bukkit.entity.Player;
 import io.noks.kitpvp.enums.GuildRank;
 
 public class Guild {
-	public static Map<String, Guild> guildList = new HashMap<String, Guild>(); 
+	public static final Map<String, Guild> guildList = new HashMap<String, Guild>(); 
 	private UUID leaderUuid;
 	private String name;
-	private Map<UUID, GuildRank> membersUUIDList;
+	private final Map<UUID, GuildRank> membersUUIDList;
 	private String motd;
 	private String tag;
-	private int money;
+	private final Economy economy;
 	private boolean open;
 	
 	public Guild(String name, UUID leaderUUID) {
@@ -25,6 +25,7 @@ public class Guild {
 		this.leaderUuid = leaderUUID;
 		this.membersUUIDList = new LinkedHashMap<UUID, GuildRank>();
 		this.open = false;
+		this.economy = new Economy();
 		guildList.putIfAbsent(name, this);
 	}
 	public Guild(String name, UUID leaderuuid, String motd, String tag, Map<UUID, GuildRank> membersList, int money, boolean open) {
@@ -33,7 +34,7 @@ public class Guild {
 		this.membersUUIDList = membersList;
 		this.motd = motd;
 		this.tag = tag;
-		this.money = money;
+		this.economy = new Economy(money);
 		this.open = open;
 		guildList.putIfAbsent(name, this);
 	}
@@ -63,7 +64,7 @@ public class Guild {
 	}
 	
 	public int getMoney() {
-		return this.money;
+		return this.economy.getMoney();
 	}
 	
 	public boolean isOpen() {

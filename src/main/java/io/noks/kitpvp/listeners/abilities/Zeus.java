@@ -57,7 +57,7 @@ public class Zeus extends Abilities implements Listener {
 				return;
 			}
 			final double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
-			p.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
+			p.sendMessage(ChatColor.RED + "You can use your ability in " + df.format(cooldown) + " seconds.");
 		}
 	}
 

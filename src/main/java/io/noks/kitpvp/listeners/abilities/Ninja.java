@@ -1,6 +1,5 @@
 package io.noks.kitpvp.listeners.abilities;
 
-import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -106,7 +105,7 @@ public class Ninja extends Abilities {
 			}
 			if (pm.hasActiveAbilityCooldown()) {
 				double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
-				player.sendMessage(ChatColor.RED + "You can use your ability in " + (new DecimalFormat("#.#")).format(cooldown) + " seconds.");
+				player.sendMessage(ChatColor.RED + "You can use your ability in " + df.format(cooldown) + " seconds.");
 				return;
 			}
 			pm.applyAbilityCooldown();

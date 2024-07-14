@@ -1,5 +1,6 @@
 package io.noks.kitpvp.abstracts;
 
+import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,6 +25,7 @@ public abstract class Abilities implements Cloneable {
 	private final Rarity rarity;
 	private final Long cooldown;
 	private final String[] lore;
+	protected static final DecimalFormat df = new DecimalFormat("#.#");
 	
 	public Abilities(String name, ItemStack icon, Rarity rarity, Long cooldown, String[] lore) {
 		this.name = name;
