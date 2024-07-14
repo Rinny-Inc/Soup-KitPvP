@@ -46,6 +46,30 @@ public class Guild {
 		return this.leaderUuid;
 	}
 	
+	public String getName() {
+		return this.name;
+	}
+	
+	public Map<UUID, GuildRank> getMembers() {
+		return this.membersUUIDList;
+	}
+	
+	public String getMOTD() {
+		return this.motd;
+	}
+	
+	public String getTag() {
+		return this.tag;
+	}
+	
+	public int getMoney() {
+		return this.money;
+	}
+	
+	public boolean isOpen() {
+		return this.open;
+	}
+	
 	public void addMember(UUID uuid) {
 		this.membersUUIDList.putIfAbsent(uuid, GuildRank.MEMBER);
 	}
@@ -60,16 +84,12 @@ public class Guild {
 		return guildList.get(name);
 	}
 	
-	public static Guild getGuildFromLeader(UUID uuid) {
+	public static Guild getGuildByPlayer(UUID uuid) {
 		for (Guild guilds : guildList.values()) {
 			if (guilds.leaderUuid == uuid) {
 				return guilds;
 			}
 		}
-		return null;
-	}
-	
-	public static Guild getGuildFromMember(UUID uuid) {
 		for (Guild guilds : guildList.values()) {
 			for (UUID members : guilds.membersUUIDList.keySet()) {
 				if (members != uuid) {

@@ -118,6 +118,22 @@ public class DBUtils {
 			}
 		}
 	}
+	
+	public HikariDataSource getHikari() {
+		return this.hikari;
+	}
+	public boolean isConnected() {
+		return this.connected;
+	}
+	public void close() {
+		if(isConnected()) {
+			if (executorService != null && !executorService.isShutdown()) {
+				executorService.shutdown();
+			}
+			this.hikari.close();
+			this.connected = false;
+		}
+	}
 
 	public void loadPlayer(final UUID uuid) {
 		if (!isConnected()) {
@@ -133,7 +149,8 @@ public class DBUtils {
 				final PlayerSettings settings = this.loadPlayerSettings(uuid, connection);
 				final Economy eco = this.loadPlayerEconomy(uuid, name, connection);
 				final Perks perks = this.loadPlayerPerks(uuid, connection);
-				new PlayerManager(uuid, stats, settings, eco, perks); 
+				final Guild guild = (this.is_Part_Of_A_Guild(uuid) ? this.loadGuildByPlayer(uuid) : null);
+				new PlayerManager(uuid, stats, settings, eco, perks, guild); 
 			} catch (SQLException ex) {
 				ex.printStackTrace();
 			} finally {
@@ -291,6 +308,9 @@ public class DBUtils {
 				this.savePlayerSettings(uuid, pm.getSettings(), connection);
 				this.savePlayerEconomy(uuid, name, pm.getEconomy(), connection);
 				this.savePlayerPerks(uuid, pm.getActivePerks(), connection);
+				if (pm.isPartOfAGuild()) {
+					this.try_Unload_N_Save_Guild(pm.getGuild());
+				}
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} finally {
@@ -348,24 +368,6 @@ public class DBUtils {
         }
     }
 	
-	public HikariDataSource getHikari() {
-		return this.hikari;
-	}
-
-	public boolean isConnected() {
-		return this.connected;
-	}
-	
-	public void close() {
-		if(isConnected()) {
-			if (executorService != null && !executorService.isShutdown()) {
-				executorService.shutdown();
-			}
-			this.hikari.close();
-			this.connected = false;
-		}
-	}
-	
 	// Leaderboard
 	public Map<UUID, Integer> getLeaderboard(RefreshType type){
 		return this.leaderboard.get(type);
@@ -404,95 +406,98 @@ public class DBUtils {
 		return map.isEmpty() ? Collections.emptyMap() : map;
 	}
 	
-	// GUILDS TODO
-		//void addGuildMember(GuildName, memberUuid)
-		//void removeGuildMember(GuildName, memberUuid)
-		//Guild getGuildFromMember(UUID)
-		//boolean isGuildMember(uuid)
-	
-	private Guild loadGuildByOwner(UUID leaderUUID) {
+	// GUILDS
+	private Guild loadGuildByPlayer(UUID playerUUID) {
 		if (!isConnected()) {
 			return null;
 		}
-		Guild guild = Guild.getGuildFromLeader(leaderUUID);
+		Guild guild = Guild.getGuildByPlayer(playerUUID);
 		if (guild != null) {
 			return guild;
 		}
-		// TODO: search DB
-		// TODO guild = new Guild...
-		return guild;
-	}
-	
-	private Guild loadGuildByMember(UUID memberUUID) {
-		if (!isConnected()) {
-			return null;
-		}
-		Guild[] guild = {Guild.getGuildFromMember(memberUUID)};
-		if (guild[0] != null) {
-			return guild[0];
-		}
-	    CompletableFuture.runAsync(() -> {
-	        Connection connection = null;
-	        try {
-	            connection = this.hikari.getConnection();
-	            try (PreparedStatement statement = connection.prepareStatement("SELECT guild_name FROM guild_members WHERE member_uuid=?")) {
-	                statement.setString(1, memberUUID.toString());
-	                try (ResultSet resultSet = statement.executeQuery()) {
-	                    if (resultSet.next()) {
-	                        final String guildName = resultSet.getString("guild_name");
-	                        guild[0] = this.loadGuildByName(guildName);
-	                    }
-	                    resultSet.close();
+	    Connection connection = null;
+	    try {
+	        connection = this.hikari.getConnection();
+	        try (PreparedStatement statement = connection.prepareStatement("SELECT name FROM guilds WHERE owner=?")) {
+	            statement.setString(1, playerUUID.toString());
+	            try (ResultSet resultSet = statement.executeQuery()) {
+	                if (resultSet.next()) {
+	                    final String guildName = resultSet.getString("name");
+	                    guild = this.loadGuildByName(guildName);
 	                }
-	                statement.close();
+	                resultSet.close();
 	            }
-	        } catch (SQLException e) {
-	            e.printStackTrace();
-	        } finally {
-	            if (connection != null) {
-	                try {
-	                    connection.close();
-	                } catch (SQLException ex) {
-	                    ex.printStackTrace();
-	                }
+	            statement.close();
+	        }
+	        if (guild == null) {
+		        try (PreparedStatement statement = connection.prepareStatement("SELECT guild_name FROM guild_members WHERE member_uuid=?")) {
+		            statement.setString(1, playerUUID.toString());
+		            try (ResultSet resultSet = statement.executeQuery()) {
+		                if (resultSet.next()) {
+		                    final String guildName = resultSet.getString("guild_name");
+		                    guild = this.loadGuildByName(guildName);
+		                }
+		                resultSet.close();
+		            }
+		            statement.close();
+		        }
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	         if (connection != null) {
+	            try {
+	                connection.close();
+	            } catch (SQLException ex) {
+	                ex.printStackTrace();
 	            }
 	        }
-	    }, executorService).join();
-		return guild[0];
+	    }
+		return guild;
 	}
 	
 	private boolean is_Part_Of_A_Guild(UUID uuid) {
 		if (!isConnected()) {
 			return false;
 		}
-		boolean[] isMember = {false};
-		CompletableFuture.runAsync(() -> {
-	        Connection connection = null;
-	        try {
-	            connection = this.hikari.getConnection();
-	            try (PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) AS count FROM guild_members WHERE member_uuid=?")) {
-	                statement.setString(1, uuid.toString());
-	                try (ResultSet resultSet = statement.executeQuery()) {
-	                    if (resultSet.next() && resultSet.getInt("count") > 0) {
-	                        isMember[0] = true;
-	                    }
-	                    resultSet.close();
+		boolean isMember = false;
+	    Connection connection = null;
+	    try {
+	        connection = this.hikari.getConnection();
+	        try (PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) AS count FROM guilds WHERE owner=?")) {
+	            statement.setString(1, uuid.toString());
+	            try (ResultSet resultSet = statement.executeQuery()) {
+	                if (resultSet.next() && resultSet.getInt("count") > 0) {
+	                    isMember = true;
 	                }
-	                statement.close();
+	                resultSet.close();
 	            }
-	        } catch (SQLException e) {
-	            e.printStackTrace();
-	        } finally {
-	            if (connection != null) {
-	                try {
-	                    connection.close();
-	                } catch (SQLException ex) {
-	                    ex.printStackTrace();
-	                }
+	            statement.close();
+	        }
+	        if (!isMember) {
+		        try (PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) AS count FROM guild_members WHERE member_uuid=?")) {
+		            statement.setString(1, uuid.toString());
+		            try (ResultSet resultSet = statement.executeQuery()) {
+		                if (resultSet.next() && resultSet.getInt("count") > 0) {
+		                    isMember = true;
+		                }
+		                resultSet.close();
+		            }
+		            statement.close();
+		        }
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        if (connection != null) {
+	            try {
+	                connection.close();
+	            } catch (SQLException ex) {
+	                ex.printStackTrace();
 	            }
 	        }
-	    }, executorService).join();
-	    return isMember[0];
+	    }
+	    return isMember;
 	}
 	
 	// SPAGHET
@@ -503,54 +508,52 @@ public class DBUtils {
 	    if (Guild.guildList.containsKey(name)) {
 	        return Guild.getGuildFromName(name);
 	    }
-	    Guild[] guild = {null};
-	    CompletableFuture.runAsync(() -> {
-	        Connection connection = null;
-	        try {
-	            connection = this.hikari.getConnection();
-	            try (PreparedStatement guildStatement = connection.prepareStatement("SELECT * FROM guilds WHERE name=?")) {
-	                guildStatement.setString(1, name);
-	                try (ResultSet guildResult = guildStatement.executeQuery()) {
-	                    if (guildResult.next()) {
-	                        final UUID leaderUUID = UUID.fromString(guildResult.getString("owner"));
-	                        final String motd = guildResult.getString("motd");
-	                        final String tag = guildResult.getString("tag");
-	                        final int money = guildResult.getInt("money");
-	                        final boolean open = guildResult.getBoolean("open");
+	    Guild guild = null;
+	    Connection connection = null;
+	    try {
+	        connection = this.hikari.getConnection();
+	        try (PreparedStatement guildStatement = connection.prepareStatement("SELECT * FROM guilds WHERE name=?")) {
+	            guildStatement.setString(1, name);
+	            try (ResultSet guildResult = guildStatement.executeQuery()) {
+	                if (guildResult.next()) {
+	                    final UUID leaderUUID = UUID.fromString(guildResult.getString("owner"));
+	                    final String motd = guildResult.getString("motd");
+	                    final String tag = guildResult.getString("tag");
+	                    final int money = guildResult.getInt("money");
+	                    final boolean open = guildResult.getBoolean("open");
 
-	                        final Map<UUID, GuildRank> membersList = new LinkedHashMap<>();
-	                        try (PreparedStatement memberStatement = connection.prepareStatement("SELECT * FROM guild_members WHERE guild_name=?")) {
-	                            memberStatement.setString(1, name);
-	                            try (ResultSet memberResult = memberStatement.executeQuery()) {
-	                                while (memberResult.next()) {
-	                                    UUID memberUUID = UUID.fromString(memberResult.getString("member_uuid"));
-	                                    GuildRank rank = GuildRank.valueOf(memberResult.getString("guild_rank"));
+	                    final Map<UUID, GuildRank> membersList = new LinkedHashMap<>();
+	                    try (PreparedStatement memberStatement = connection.prepareStatement("SELECT * FROM guild_members WHERE guild_name=?")) {
+	                        memberStatement.setString(1, name);
+	                        try (ResultSet memberResult = memberStatement.executeQuery()) {
+	                            while (memberResult.next()) {
+	                                UUID memberUUID = UUID.fromString(memberResult.getString("member_uuid"));
+	                                GuildRank rank = GuildRank.valueOf(memberResult.getString("guild_rank"));
 	                                    
-	                                    membersList.put(memberUUID, rank);
-	                                }
-	                                memberResult.close();
+	                                membersList.put(memberUUID, rank);
 	                            }
-	                            memberStatement.close();
+	                            memberResult.close();
 	                        }
-	                        guild[0] = new Guild(name, leaderUUID, motd, tag, membersList, money, open);
+	                        memberStatement.close();
 	                    }
-	                    guildResult.close();
+	                    guild = new Guild(name, leaderUUID, motd, tag, membersList, money, open);
 	                }
-	                guildStatement.close();
+	                guildResult.close();
 	            }
-	        } catch (SQLException e) {
-	            e.printStackTrace();
-	        } finally {
-	            if (connection != null) {
-	                try {
-	                    connection.close();
-	                } catch (SQLException ex) {
-	                    ex.printStackTrace();
-	                }
+	            guildStatement.close();
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        if (connection != null) {
+	            try {
+	                connection.close();
+	            } catch (SQLException ex) {
+	                ex.printStackTrace();
 	            }
 	        }
-	    }, executorService).join();
-	    return guild[0];
+	    }
+	    return guild;
 	}
 	
 	private void try_Unload_N_Save_Guild(Guild guild) {
@@ -560,7 +563,45 @@ public class DBUtils {
 		if (guild.isAnyMemberOnline()) {
 			return;
 		}
-		// TODO: save guild in DB
+	    Connection connection = null;
+	    try {
+	        connection = this.hikari.getConnection();
+	        try (PreparedStatement guildStatement = connection.prepareStatement("UPDATE guilds SET owner=?, motd=?, tag=?, money=?, open=? WHERE name=?")) {
+	            guildStatement.setString(1, guild.leaderUUID().toString());
+	            guildStatement.setString(2, guild.getMOTD());
+	            guildStatement.setString(3, guild.getTag());
+	            guildStatement.setInt(4, guild.getMoney());
+	            guildStatement.setBoolean(5, guild.isOpen());
+	            guildStatement.setString(6, guild.getName());
+	            guildStatement.executeUpdate();
+	            guildStatement.close();
+	        }
+	        try (PreparedStatement deleteMembersStatement = connection.prepareStatement("DELETE FROM guild_members WHERE guild_name=?")) {
+	            deleteMembersStatement.setString(1, guild.getName());
+	            deleteMembersStatement.executeUpdate();
+	            deleteMembersStatement.close();
+	        }
+	        try (PreparedStatement insertMembersStatement = connection.prepareStatement("INSERT INTO guild_members (guild_name, member_uuid, guild_rank) VALUES (?, ?, ?)")) {
+	            for (Map.Entry<UUID, GuildRank> memberEntry : guild.getMembers().entrySet()) {
+	                insertMembersStatement.setString(1, guild.getName());
+	                insertMembersStatement.setString(2, memberEntry.getKey().toString());
+	                insertMembersStatement.setString(3, memberEntry.getValue().getName());
+	                insertMembersStatement.addBatch();
+	            }
+	            insertMembersStatement.executeBatch();
+	            insertMembersStatement.close();
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        if (connection != null) {
+	            try {
+	                connection.close();
+	            } catch (SQLException ex) {
+	                ex.printStackTrace();
+	            }
+	        }
+	    }
 		guild.drop();
 	}
 }

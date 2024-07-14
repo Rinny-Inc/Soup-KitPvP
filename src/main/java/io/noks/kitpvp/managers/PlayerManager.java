@@ -20,6 +20,7 @@ import io.noks.kitpvp.enums.RefreshType;
 import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.managers.caches.CombatTag;
 import io.noks.kitpvp.managers.caches.Economy;
+import io.noks.kitpvp.managers.caches.Guild;
 import io.noks.kitpvp.managers.caches.Perks;
 import io.noks.kitpvp.managers.caches.PlayerSettings;
 import io.noks.kitpvp.managers.caches.Stats;
@@ -36,6 +37,7 @@ public class PlayerManager extends Ability {
 	private final @NotNull Economy economy;
 	private @Nullable CombatTag combatTag;
 	public @Nullable BukkitTask currentTask; // TEMP FIX
+	private @Nullable Guild guild;
 
 	public PlayerManager(UUID playerUUID) {
 		this.playerUUID = playerUUID;
@@ -50,7 +52,7 @@ public class PlayerManager extends Ability {
 		//this.applyScoreboard();
 	}
 	
-	public PlayerManager(UUID playerUUID, Stats stats, PlayerSettings settings, Economy economy, Perks perks) {
+	public PlayerManager(UUID playerUUID, Stats stats, PlayerSettings settings, Economy economy, Perks perks, Guild guild) {
 		this.playerUUID = playerUUID;
 		this.player = Bukkit.getPlayer(this.playerUUID);
 		this.perks = perks;
@@ -59,6 +61,7 @@ public class PlayerManager extends Ability {
 		this.stats = stats;
 		this.settings = settings;
 		this.economy = economy;
+		this.guild = guild;
 		players.putIfAbsent(playerUUID, this);
 		if (!settings.hasScoreboardEnabled()) {
 			return;
@@ -131,6 +134,14 @@ public class PlayerManager extends Ability {
 	
 	public Perks getActivePerks() {
 		return this.perks;
+	}
+	
+	public boolean isPartOfAGuild() {
+		return this.guild == null;
+	}
+	
+	public Guild getGuild() {
+		return this.guild;
 	}
 	
 	public void kill(boolean backToSpawn) {
