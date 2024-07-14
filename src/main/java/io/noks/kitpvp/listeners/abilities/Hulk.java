@@ -36,18 +36,13 @@ public class Hulk extends Abilities implements Listener {
 	public void onCarry(PlayerInteractEntityEvent e) {
 		final Player p = e.getPlayer();
 		if (e.getRightClicked() instanceof Player) {
-			final Player r = (Player) e.getRightClicked();
-			PlayerManager rm = PlayerManager.get(r.getUniqueId());
-			if(rm == null) {
-				return;
-			}
-			if (!rm.hasAbility()) {
-				e.setCancelled(true);
-				return;
-			}
-			rm = null;
 			final PlayerManager pm = PlayerManager.get(p.getUniqueId());
+			final Player r = (Player) e.getRightClicked();
 			if (p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.AIR && pm.hasAbility(this) && !p.isInsideVehicle() && p.getPassenger() == null && r.getPassenger() == null) {
+				if (!PlayerManager.get(r.getUniqueId()).hasAbility()) {
+					e.setCancelled(true);
+					return;
+				}
 				if (pm.hasActiveAbilityCooldown()) {
 					final double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
 					p.sendMessage(ChatColor.RED + "You can use your ability in " + df.format(cooldown) + " seconds.");
