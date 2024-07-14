@@ -279,14 +279,25 @@ public class PlayerListener implements Listener, SignRotation {
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof Player) {
-			PlayerManager pm = PlayerManager.get(event.getPlayer().getUniqueId());
+			final PlayerManager pm = PlayerManager.get(event.getPlayer().getUniqueId());
 			
 			if (!pm.hasAbility()) {
-				Player npc = (Player) event.getRightClicked();
+				final Player npc = (Player) event.getRightClicked();
+				final String name = npc.getName().toLowerCase();
 				
-				if (npc.getName().toLowerCase().contains("shop")) {
+				if (name.contains(ChatColor.GREEN + "shop")) {
 					event.setCancelled(true);
 					event.getPlayer().openInventory(this.plugin.getInventoryManager().openShopInventory());
+					return;
+				}
+				if (name.contains(ChatColor.RED + "battle pass")) {
+					event.setCancelled(true);
+					pm.getPlayer().sendMessage(ChatColor.RED + "Coming Soon ^^");
+					return;
+				}
+				if (name.contains(ChatColor.YELLOW + "storage")) {
+					event.setCancelled(true);
+					pm.getPlayer().sendMessage(ChatColor.RED + "Coming Soon ^^");
 				}
 				return;
 			}
