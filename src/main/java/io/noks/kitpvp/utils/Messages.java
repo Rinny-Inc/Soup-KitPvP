@@ -11,11 +11,13 @@ public class Messages {
 	public final @NotNull String YOU_ARENT_IN_THE_SPAWN;
 	
 	public Messages(String domain) {
+		final char line = '\u258F';
 		WELCOME_MESSAGE = new String[]{ChatColor.DARK_GRAY.toString() + ChatColor.STRIKETHROUGH + "-------------------------------------------------",
-				ChatColor.DARK_AQUA + "▏ " + ChatColor.RESET + "Welcome on the BETA phase of " + ChatColor.DARK_AQUA.toString() + ChatColor.BOLD + domain + ChatColor.RESET + " the home of soup pvp!",
+				ChatColor.DARK_AQUA.toString() + line + ChatColor.RESET + " Welcome on the BETA phase of " + ChatColor.DARK_AQUA.toString() + ChatColor.BOLD + domain + ChatColor.RESET + " the home of soup pvp!",
 				"", 
-				ChatColor.DARK_AQUA + "▏ " + ChatColor.RESET + "Our Website >> " + ChatColor.DARK_AQUA + "http://soupworld.net",
-				ChatColor.DARK_AQUA + "▏ " + ChatColor.RESET + "Our Discord >> " + ChatColor.DARK_AQUA + "http://discord." + domain,
+				ChatColor.DARK_AQUA.toString() + line + ChatColor.RESET + " Our Website >> " + ChatColor.DARK_AQUA + "http://soupworld.net",
+				ChatColor.DARK_AQUA.toString() + line + ChatColor.RESET + " Our NameMC page >> " + ChatColor.DARK_AQUA + "http://namemc." + domain,
+				ChatColor.DARK_AQUA.toString() + line + ChatColor.RESET + " Our Discord >> " + ChatColor.DARK_AQUA + "http://discord." + domain,
 				ChatColor.RED + "-> Keep in mind this is a beta ^^", 
 				ChatColor.RED + "If you encounter a bug, report it on the discord ^^",
 				ChatColor.DARK_GRAY.toString() + ChatColor.STRIKETHROUGH + "-------------------------------------------------" };
