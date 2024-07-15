@@ -7,8 +7,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -99,9 +101,10 @@ public class DBUtils {
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS perks(uuid VARCHAR(36) PRIMARY KEY, firstperk VARCHAR(16), secondperk VARCHAR(20), thirdperk VARCHAR(18), UNIQUE(`uuid`));");
 			// GUILD START
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS guilds(name VARCHAR(16) PRIMARY KEY, owner VARCHAR(36), tag VARCHAR(4), money INT, UNIQUE(`name`));");
-			statement.executeUpdate("CREATE TABLE IF NOT EXISTS guild_members(guild_name VARCHAR(16), member_uuid VARCHAR(36), guild_rank VARCHAR(9), PRIMARY KEY (`guild_name`, `member_uuid`), "
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS members(uuid VARCHAR(36) PRIMARY KEY, nickname VARCHAR(16), guild_rank VARCHAR(9), UNIQUE(`uuid`));");
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS guild_members(guild_name VARCHAR(16), member_uuid VARCHAR(36), PRIMARY KEY (`guild_name`, `member_uuid`), "
 																													 + "FOREIGN KEY (guild_name) REFERENCES guilds(name), "
-																													 /*+ "FOREIGN KEY (member_uuid) REFERENCES members(uuid), "*/
+																													 + "FOREIGN KEY (member_uuid) REFERENCES members(uuid), "
 																													 + "UNIQUE(`member_uuid`));");
 			// GUILD END
 			statement.close();
@@ -414,11 +417,21 @@ public class DBUtils {
 		if (guild != null) {
 			return guild;
 		}
+		final String query = "SELECT g.name " +
+                			 "FROM guilds g " +
+                			 "JOIN guild_members gm ON g.name = gm.guild_name " +
+                			 "WHERE gm.member_uuid = ? " +
+                			 "UNION " +
+                			 "SELECT name " +
+                			 "FROM guilds " +
+                			 "WHERE owner = ?";
 	    Connection connection = null;
 	    try {
 	        connection = this.hikari.getConnection();
-	        try (PreparedStatement statement = connection.prepareStatement("SELECT name FROM guilds WHERE owner=?")) {
+	        try (PreparedStatement statement = connection.prepareStatement(query)) {
 	            statement.setString(1, playerUUID.toString());
+	            statement.setString(2, playerUUID.toString());
+
 	            try (ResultSet resultSet = statement.executeQuery()) {
 	                if (resultSet.next()) {
 	                    final String guildName = resultSet.getString("name");
@@ -427,19 +440,6 @@ public class DBUtils {
 	                resultSet.close();
 	            }
 	            statement.close();
-	        }
-	        if (guild == null) {
-		        try (PreparedStatement statement = connection.prepareStatement("SELECT guild_name FROM guild_members WHERE member_uuid=?")) {
-		            statement.setString(1, playerUUID.toString());
-		            try (ResultSet resultSet = statement.executeQuery()) {
-		                if (resultSet.next()) {
-		                    final String guildName = resultSet.getString("guild_name");
-		                    guild = this.loadGuildByName(guildName);
-		                }
-		                resultSet.close();
-		            }
-		            statement.close();
-		        }
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -460,30 +460,31 @@ public class DBUtils {
 			return false;
 		}
 		boolean isMember = false;
+		final String query = "SELECT COUNT(*) AS count " +
+                			 "FROM guilds g " +
+                			 "JOIN guild_members gm ON g.name = gm.guild_name " +
+                			 "WHERE gm.member_uuid = ? " +
+                			 "UNION ALL " +
+                			 "SELECT COUNT(*) AS count " +
+                			 "FROM guilds " +
+                			 "WHERE owner = ?";
 	    Connection connection = null;
 	    try {
 	        connection = this.hikari.getConnection();
-	        try (PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) AS count FROM guilds WHERE owner=?")) {
-	            statement.setString(1, uuid.toString());
+	        try (PreparedStatement statement = connection.prepareStatement(query)) {
+	        	statement.setString(1, uuid.toString());
+	            statement.setString(2, uuid.toString());
+
 	            try (ResultSet resultSet = statement.executeQuery()) {
-	                if (resultSet.next() && resultSet.getInt("count") > 0) {
-	                    isMember = true;
+	                while (resultSet.next()) {
+	                    if (resultSet.getInt("count") > 0) {
+	                        isMember = true;
+	                        break;
+	                    }
 	                }
 	                resultSet.close();
 	            }
 	            statement.close();
-	        }
-	        if (!isMember) {
-		        try (PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) AS count FROM guild_members WHERE member_uuid=?")) {
-		            statement.setString(1, uuid.toString());
-		            try (ResultSet resultSet = statement.executeQuery()) {
-		                if (resultSet.next() && resultSet.getInt("count") > 0) {
-		                    isMember = true;
-		                }
-		                resultSet.close();
-		            }
-		            statement.close();
-		        }
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -499,7 +500,6 @@ public class DBUtils {
 	    return isMember;
 	}
 	
-	// SPAGHET
 	private Guild loadGuildByName(String name) {
 	    if (!isConnected()) {
 	        return null;
@@ -508,11 +508,17 @@ public class DBUtils {
 	        return Guild.getGuildFromName(name);
 	    }
 	    Guild guild = null;
+	    final String guildQuery = "SELECT * FROM guilds WHERE name=?";
+	    final String memberQuery = "SELECT m.uuid, m.guild_rank " +
+	                         	   "FROM members m " +
+	                         	   "JOIN guild_members gm ON m.uuid = gm.member_uuid " +
+	                         	   "WHERE gm.guild_name=?";
 	    Connection connection = null;
 	    try {
 	        connection = this.hikari.getConnection();
-	        try (PreparedStatement guildStatement = connection.prepareStatement("SELECT * FROM guilds WHERE name=?")) {
+	        try (PreparedStatement guildStatement = connection.prepareStatement(guildQuery); PreparedStatement memberStatement = connection.prepareStatement(memberQuery)) {
 	            guildStatement.setString(1, name);
+
 	            try (ResultSet guildResult = guildStatement.executeQuery()) {
 	                if (guildResult.next()) {
 	                    final UUID leaderUUID = UUID.fromString(guildResult.getString("owner"));
@@ -522,24 +528,23 @@ public class DBUtils {
 	                    final boolean open = guildResult.getBoolean("open");
 
 	                    final Map<UUID, GuildRank> membersList = new LinkedHashMap<>();
-	                    try (PreparedStatement memberStatement = connection.prepareStatement("SELECT * FROM guild_members WHERE guild_name=?")) {
-	                        memberStatement.setString(1, name);
-	                        try (ResultSet memberResult = memberStatement.executeQuery()) {
-	                            while (memberResult.next()) {
-	                                UUID memberUUID = UUID.fromString(memberResult.getString("member_uuid"));
-	                                GuildRank rank = GuildRank.valueOf(memberResult.getString("guild_rank"));
-	                                    
-	                                membersList.put(memberUUID, rank);
-	                            }
-	                            memberResult.close();
+
+	                    memberStatement.setString(1, name);
+
+	                    try (ResultSet memberResult = memberStatement.executeQuery()) {
+	                        while (memberResult.next()) {
+	                            UUID memberUUID = UUID.fromString(memberResult.getString("uuid"));
+	                            GuildRank rank = GuildRank.valueOf(memberResult.getString("guild_rank"));
+	                            membersList.put(memberUUID, rank);
 	                        }
-	                        memberStatement.close();
+	                        memberResult.close();
 	                    }
 	                    guild = new Guild(name, leaderUUID, motd, tag, membersList, money, open);
+	                    guildResult.close();
 	                }
-	                guildResult.close();
+	                guildStatement.close();
+	                memberStatement.close();
 	            }
-	            guildStatement.close();
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -562,33 +567,84 @@ public class DBUtils {
 		if (guild.isAnyMemberOnline()) {
 			return;
 		}
+		final String updateGuildQuery = "UPDATE guilds SET owner=?, tag=?, money=? WHERE name=?";
+	    final String deleteMembersQuery = "DELETE FROM guild_members WHERE guild_name=? AND member_uuid=?";
+	    final String insertMembersQuery = "INSERT INTO guild_members (guild_name, member_uuid) VALUES (?, ?)";
+	    final String selectExistingMembersQuery = "SELECT m.uuid FROM members m INNER JOIN guild_members gm ON m.uuid = gm.member_uuid WHERE gm.guild_name=?";
+	    final String deleteMemberQuery = "DELETE FROM members WHERE uuid=?";
+	    final String insertMemberQuery = "INSERT IGNORE INTO members (uuid, nickname, guild_rank) VALUES (?, ?, ?)";
+
 	    Connection connection = null;
 	    try {
 	        connection = this.hikari.getConnection();
-	        try (PreparedStatement guildStatement = connection.prepareStatement("UPDATE guilds SET owner=?, motd=?, tag=?, money=?, open=? WHERE name=?")) {
+	        
+	        try (PreparedStatement guildStatement = connection.prepareStatement(updateGuildQuery)) {
 	            guildStatement.setString(1, guild.leaderUUID().toString());
-	            guildStatement.setString(2, guild.getMOTD());
-	            guildStatement.setString(3, guild.getTag());
-	            guildStatement.setInt(4, guild.getMoney());
-	            guildStatement.setBoolean(5, guild.isOpen());
-	            guildStatement.setString(6, guild.getName());
+	            guildStatement.setString(2, guild.getTag());
+	            guildStatement.setInt(3, guild.getMoney());
+	            guildStatement.setString(4, guild.getName());
 	            guildStatement.executeUpdate();
 	            guildStatement.close();
 	        }
-	        try (PreparedStatement deleteMembersStatement = connection.prepareStatement("DELETE FROM guild_members WHERE guild_name=?")) {
-	            deleteMembersStatement.setString(1, guild.getName());
-	            deleteMembersStatement.executeUpdate();
+
+	        Set<UUID> currentMembers = new HashSet<>();
+	        try (PreparedStatement selectCurrentMembersStatement = connection.prepareStatement("SELECT member_uuid FROM guild_members WHERE guild_name=?")) {
+	            selectCurrentMembersStatement.setString(1, guild.getName());
+	            try (ResultSet currentMembersResultSet = selectCurrentMembersStatement.executeQuery()) {
+	                while (currentMembersResultSet.next()) {
+	                    currentMembers.add(UUID.fromString(currentMembersResultSet.getString("member_uuid")));
+	                }
+	                currentMembersResultSet.close();
+	            }
+	            selectCurrentMembersStatement.close();
+	        }
+
+	        try (PreparedStatement deleteMembersStatement = connection.prepareStatement(deleteMembersQuery)) {
+	            for (UUID memberUUID : currentMembers) {
+	                if (!guild.getMembers().containsKey(memberUUID)) {
+	                    deleteMembersStatement.setString(1, guild.getName());
+	                    deleteMembersStatement.setString(2, memberUUID.toString());
+	                    deleteMembersStatement.addBatch();
+	                }
+	            }
+	            deleteMembersStatement.executeBatch();
 	            deleteMembersStatement.close();
 	        }
-	        try (PreparedStatement insertMembersStatement = connection.prepareStatement("INSERT INTO guild_members (guild_name, member_uuid, guild_rank) VALUES (?, ?, ?)")) {
+
+	        try (PreparedStatement insertMembersStatement = connection.prepareStatement(insertMembersQuery)) {
 	            for (Map.Entry<UUID, GuildRank> memberEntry : guild.getMembers().entrySet()) {
-	                insertMembersStatement.setString(1, guild.getName());
-	                insertMembersStatement.setString(2, memberEntry.getKey().toString());
-	                insertMembersStatement.setString(3, memberEntry.getValue().getName());
-	                insertMembersStatement.addBatch();
+	            	UUID uuid = memberEntry.getKey();
+	                if (!currentMembers.contains(uuid)) {
+	                    insertMembersStatement.setString(1, guild.getName());
+	                    insertMembersStatement.setString(2, uuid.toString());
+	                    insertMembersStatement.addBatch();
+
+	                    try (PreparedStatement insertMemberStatement = connection.prepareStatement(insertMemberQuery)) {
+	                        insertMemberStatement.setString(1, uuid.toString());
+	                        insertMembersStatement.setString(2, this.main.getServer().getOfflinePlayer(uuid).getName());
+	                        insertMembersStatement.setString(3, memberEntry.getValue().getName());
+	                        insertMemberStatement.executeUpdate();
+	                        insertMemberStatement.close();
+	                    }
+	                }
 	            }
 	            insertMembersStatement.executeBatch();
 	            insertMembersStatement.close();
+	        }
+
+	        try (PreparedStatement checkMemberExistsStatement = connection.prepareStatement(selectExistingMembersQuery); PreparedStatement deleteMemberStatement = connection.prepareStatement(deleteMemberQuery)) {
+	            for (UUID memberUUID : currentMembers) {
+	                checkMemberExistsStatement.setString(1, memberUUID.toString());
+	                try (ResultSet resultSet = checkMemberExistsStatement.executeQuery()) {
+	                    if (!resultSet.next()) {
+	                        deleteMemberStatement.setString(1, memberUUID.toString());
+	                        deleteMemberStatement.executeUpdate();
+	                    }
+	                    resultSet.close();
+	                }
+	            }
+	            checkMemberExistsStatement.close();
+	            deleteMemberStatement.close();
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
