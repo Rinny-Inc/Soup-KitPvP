@@ -7,7 +7,7 @@ import com.avaje.ebean.validation.NotNull;
 
 import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Abilities;
-import io.noks.kitpvp.listeners.abilities.Archer;
+import io.noks.kitpvp.listeners.abilities.Sniper;
 import io.noks.kitpvp.listeners.abilities.Batman;
 import io.noks.kitpvp.listeners.abilities.Blink;
 import io.noks.kitpvp.listeners.abilities.Boxer;
@@ -36,7 +36,7 @@ public class AbilitiesManager {
 	
 	public AbilitiesManager(Main main) {
 		abilities.add(new PvP());
-		abilities.add(new Archer(main));
+		abilities.add(new Sniper(main));
 		abilities.add(new Blink()); // Instancied
 		abilities.add(new Boxer());
 		abilities.add(new Fireman(main));

@@ -17,9 +17,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 import com.avaje.ebean.validation.NotNull;
 
 import io.noks.kitpvp.abstracts.Abilities;
-import io.noks.kitpvp.listeners.abilities.Archer;
-import io.noks.kitpvp.listeners.abilities.Chemist;
-import io.noks.kitpvp.listeners.abilities.Jesus;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.PlayerSettings;
 import io.noks.kitpvp.managers.caches.PlayerSettings.SlotType;
@@ -90,7 +87,7 @@ public interface ItemHelper {
 								null,
 								null,
 								getItemStack(new ItemStack(Material.WATCH), ChatColor.DARK_AQUA + "Settings", new String[] {ChatColor.GRAY + "Edit your settings"}),
-								getItemStack(new ItemStack(Material.NETHER_STAR), ChatColor.DARK_AQUA + "Shop", new String[] {ChatColor.RED + "Coming Soon"})};
+								getItemStack(new ItemStack(Material.NETHER_STAR), ChatColor.DARK_AQUA + "Shop", new String[] {ChatColor.GRAY + "Enter the shop"})};
 	}
 	
 	default void giveEquipment(Player player, Abilities ability) {
@@ -113,14 +110,20 @@ public interface ItemHelper {
 		if (ability.specialItem().getType() != Material.MUSHROOM_SOUP) {
 			inv.setItem(settings.getSlot(SlotType.ITEM), getItemStack(ability.specialItem(), ChatColor.RED + ability.specialItemName(), null));
 		}
-		if (ability instanceof Jesus) {
-			
-		}
-		if (ability instanceof Archer) {
-			inv.setItem(9, new ItemStack(Material.ARROW, 18));
-		}
-		if (ability instanceof Chemist) {
-			inv.setItem(2, new ItemStack(Material.POTION, 1, (short) 16420));
+		switch(ability.getName().toLowerCase()) {
+			case "jesus": {
+				// TODO
+				break;
+			}
+			case "sniper": {
+				inv.setItem(9, new ItemStack(Material.ARROW, 18));
+				break;
+			}
+			case "chemist": {
+				inv.setItem(2, new ItemStack(Material.POTION, 1, (short) 16420));
+				break;
+			}
+			default: break;
 		}
 		while (inv.firstEmpty() != -1) {
 			inv.addItem(new ItemStack(Material.MUSHROOM_SOUP));

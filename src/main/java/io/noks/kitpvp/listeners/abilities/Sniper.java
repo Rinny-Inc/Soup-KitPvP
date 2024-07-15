@@ -16,12 +16,12 @@ import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.Rarity;
 import io.noks.kitpvp.managers.PlayerManager;
 
-public class Archer extends Abilities implements Listener {
+public class Sniper extends Abilities implements Listener {
 
 	private Main main;
 	
-	public Archer(Main main) {
-		super("Archer", new ItemStack(Material.BOW), Rarity.COMMON, 0L, new String[] { "(Distance x 1.3) = damage" });
+	public Sniper(Main main) {
+		super("Sniper", new ItemStack(Material.BOW), Rarity.COMMON, 0L, new String[] { "(Distance x 1.3) = damage" });
 		this.main = main;
 		main.getServer().getPluginManager().registerEvents(this, main);
 	}
@@ -33,7 +33,7 @@ public class Archer extends Abilities implements Listener {
 
 	@Override
 	public String specialItemName() {
-		return "Enchanced Bow";
+		return "Sniper";
 	}
 	
 	@EventHandler
