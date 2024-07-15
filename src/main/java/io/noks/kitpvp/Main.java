@@ -28,6 +28,7 @@ import io.noks.kitpvp.commands.BootCommand;
 import io.noks.kitpvp.commands.BuildCommand;
 import io.noks.kitpvp.commands.EconomyCommand;
 import io.noks.kitpvp.commands.FeastCommand;
+import io.noks.kitpvp.commands.GuildCommand;
 import io.noks.kitpvp.commands.PingCommand;
 import io.noks.kitpvp.commands.RepairCommand;
 import io.noks.kitpvp.commands.ReportCommand;
@@ -112,7 +113,7 @@ public class Main extends JavaPlugin implements TournamentManager, ItemHelper /*
 			entity.remove();
 		}
 		this.getServer().getScheduler().cancelAllTasks();
-		// TODO update players DB info before clearing
+		// TODO: are players kicked before the firing of onDisable?!?
 		PlayerManager.players.clear();
 		if (!RefillInventoryManager.inventories.isEmpty()) {
 			for (RefillInventoryManager invs : RefillInventoryManager.inventories) {
@@ -123,6 +124,7 @@ public class Main extends JavaPlugin implements TournamentManager, ItemHelper /*
 			}
 			RefillInventoryManager.inventories.clear();
 		}
+		// TODO: are players kicked before the firing of onDisable?!?
 		// TODO update guilds DB info before clearing
 		Guild.guildList.clear();
 		if (RefillInventoryManager.cooldownTask != null) {
@@ -172,6 +174,7 @@ public class Main extends JavaPlugin implements TournamentManager, ItemHelper /*
 		getCommand("repair").setExecutor(new RepairCommand());
 		getCommand("shop").setExecutor(new ShopCommand());
 		getCommand("discord").setExecutor(new SocialCommand());
+		new GuildCommand(this);
 	}
 	
 	private void spawnNPC(World world) {

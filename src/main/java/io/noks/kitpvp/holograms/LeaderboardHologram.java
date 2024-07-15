@@ -8,6 +8,7 @@ import org.bukkit.Location;
 
 import io.noks.Hologram;
 import io.noks.kitpvp.abstracts.Holograms;
+import net.minecraft.util.com.google.common.collect.Lists;
 
 public class LeaderboardHologram implements Holograms {
 	private List<Hologram> content;
@@ -42,12 +43,13 @@ public class LeaderboardHologram implements Holograms {
 
 	@Override
 	public void spawn() {
+		List<Hologram> holow = Lists.newLinkedList();
 		Hologram parent = Bukkit.getServer().newHologram(location(), header());
 		for (int i = 0; i < 10; i++) {
 			String name = ChatColor.YELLOW.toString() + (i + 1) + ". " + ChatColor.AQUA + "NAME " + ChatColor.GRAY + "- " + ChatColor.YELLOW + "STATS";
-			parent.addLineBelow(name);
+			holow.add(parent = parent.addLineBelow(name));
 		}
-		parent.addLineBelow(footer());
-		this.content = parent.getChild();
+		holow.add(parent = parent.addLineBelow(footer()));
+		this.content = holow;
 	}
 }

@@ -23,6 +23,10 @@ public class GuildCommand implements CommandExecutor {
 		if (!(sender instanceof Player)) {
 			return false;
 		}
+		if (!sender.isOp()) {
+			sender.sendMessage(ChatColor.RED + "Coming soon ^^");
+			return false;
+		}
 		if (args.length == 0) {
 			// TODO: send guild help
 			return true;

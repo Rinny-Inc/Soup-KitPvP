@@ -23,3 +23,5 @@ commands:
   repair:
   shop:
   discord:
+  guild:
+    aliases: [clan, teams, team, clans, guilds, g]
