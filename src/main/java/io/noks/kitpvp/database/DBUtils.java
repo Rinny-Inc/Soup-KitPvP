@@ -22,6 +22,7 @@ import io.noks.kitpvp.Main;
 import io.noks.kitpvp.enums.GuildRank;
 import io.noks.kitpvp.enums.PerksEnum;
 import io.noks.kitpvp.enums.RefreshType;
+import io.noks.kitpvp.exceptions.GuildExistenceException;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Economy;
 import io.noks.kitpvp.managers.caches.Guild;
@@ -100,7 +101,7 @@ public class DBUtils {
 			// PERK
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS perks(uuid VARCHAR(36) PRIMARY KEY, firstperk VARCHAR(16), secondperk VARCHAR(20), thirdperk VARCHAR(18), UNIQUE(`uuid`));");
 			// GUILD START
-			statement.executeUpdate("CREATE TABLE IF NOT EXISTS guilds(name VARCHAR(16) PRIMARY KEY, owner VARCHAR(36), tag VARCHAR(4), money INT, UNIQUE(`name`));");
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS guilds(name VARCHAR(24) PRIMARY KEY, owner VARCHAR(36), motd VARCHAR(48), tag VARCHAR(4), money INT, open TINYINT(1), UNIQUE(`name`));");
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS members(uuid VARCHAR(36) PRIMARY KEY, nickname VARCHAR(16), guild_rank VARCHAR(9), UNIQUE(`uuid`));");
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS guild_members(guild_name VARCHAR(16), member_uuid VARCHAR(36), PRIMARY KEY (`guild_name`, `member_uuid`), "
 																													 + "FOREIGN KEY (guild_name) REFERENCES guilds(name), "
@@ -409,6 +410,123 @@ public class DBUtils {
 	}
 	
 	// GUILDS
+	public boolean createGuild(String name, UUID owner) throws GuildExistenceException {
+		if (!isConnected()) {
+			return false;
+		}
+		final String checkGuildExistenceQuery = "SELECT COUNT(*) AS count FROM guilds WHERE name=?";
+		final String insertGuildQuery = "INSERT INTO guilds (name, owner, motd, tag, money, open) VALUES (?, ?, ?, ?, ?)";
+		boolean[] exist = {false};
+		CompletableFuture.runAsync(() -> {
+			Connection connection = null;
+		    try {
+		        connection = this.hikari.getConnection();
+		        try (PreparedStatement checkGuildExistenceStatement = connection.prepareStatement(checkGuildExistenceQuery)) {
+		            checkGuildExistenceStatement.setString(1, name);
+		            try (ResultSet resultSet = checkGuildExistenceStatement.executeQuery()) {
+		                if (resultSet.next() && resultSet.getInt("count") > 0) {
+		                	exist[0] = true;
+		                }
+		                resultSet.close();
+		            }
+		            checkGuildExistenceStatement.close();
+		        }
+		        if (exist[0]) {
+		        	throw new GuildExistenceException("Guild with name '" + name + "' already exists.");
+		        }
+				try (PreparedStatement insertGuildStatement = connection.prepareStatement(insertGuildQuery)) {
+			        insertGuildStatement.setString(1, name);
+			        insertGuildStatement.setString(2, owner.toString());
+			        insertGuildStatement.setString(3, "New Guild");
+			        insertGuildStatement.setString(4, "");
+			        insertGuildStatement.setInt(5, 0);
+			        insertGuildStatement.setBoolean(6, false);
+			        insertGuildStatement.executeUpdate();
+			        insertGuildStatement.close();
+			    }
+		    } catch (SQLException|GuildExistenceException e) {
+		        // DONT PRINT WE KNOW!
+		    } finally {
+		    	if (connection != null) {
+		    		try {
+		    			connection.close();
+		    		} catch (SQLException ex) {
+		    			ex.printStackTrace();
+		    		}
+		    	}
+		    }
+		}, executorService).join();
+	    return exist[0];
+	}
+	
+	public void dropGuild(String name) {
+		if (!isConnected()) {
+			return;
+		}
+		final String selectMembersQuery = "SELECT member_uuid FROM guild_members WHERE guild_name=?";
+		final String deleteGuildQuery = "DELETE FROM guilds WHERE name=?";
+		final String deleteGuildMembersQuery = "DELETE FROM guild_members WHERE guild_name=?";
+		final String deleteMembersQuery = "DELETE FROM members WHERE uuid=?";
+		final String checkMemberGuildsQuery = "SELECT COUNT(*) AS count FROM guild_members WHERE member_uuid=?";
+		CompletableFuture.runAsync(() -> {
+			Connection connection = null;
+		    try {
+		        connection = this.hikari.getConnection();
+		        
+	            Set<String> memberUUIDs = new HashSet<>();
+	            try (PreparedStatement selectMembersStatement = connection.prepareStatement(selectMembersQuery)) {
+	                selectMembersStatement.setString(1, name);
+	                try (ResultSet resultSet = selectMembersStatement.executeQuery()) {
+	                    while (resultSet.next()) {
+	                        memberUUIDs.add(resultSet.getString("member_uuid"));
+	                    }
+	                    resultSet.close();
+	                }
+	                selectMembersStatement.close();
+	            }
+
+	            try (PreparedStatement deleteGuildStatement = connection.prepareStatement(deleteGuildQuery)) {
+	                deleteGuildStatement.setString(1, name);
+	                deleteGuildStatement.executeUpdate();
+	                deleteGuildStatement.close();
+	            }
+
+	            try (PreparedStatement deleteGuildMembersStatement = connection.prepareStatement(deleteGuildMembersQuery)) {
+	                deleteGuildMembersStatement.setString(1, name);
+	                deleteGuildMembersStatement.executeUpdate();
+	                deleteGuildMembersStatement.close();
+	            }
+
+	            try (PreparedStatement deleteMemberStatement = connection.prepareStatement(deleteMembersQuery)) {
+	                for (String memberUUID : memberUUIDs) {
+	                    try (PreparedStatement checkMemberGuildsStatement = connection.prepareStatement(checkMemberGuildsQuery)) {
+	                        checkMemberGuildsStatement.setString(1, memberUUID);
+	                        try (ResultSet resultSet = checkMemberGuildsStatement.executeQuery()) {
+	                            if (resultSet.next() && resultSet.getInt("count") == 0) {
+	                                deleteMemberStatement.setString(1, memberUUID);
+	                                deleteMemberStatement.executeUpdate();
+	                            }
+	                            resultSet.close();
+	                        }
+	                        checkMemberGuildsStatement.close();
+	                    }
+	                    deleteMemberStatement.close();
+	                }
+	            }
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		    } finally {
+		    	if (connection != null) {
+		            try {
+		                connection.close();
+		            } catch (SQLException ex) {
+		                ex.printStackTrace();
+		            }
+		        }
+			}
+		}, executorService);
+	}
+	
 	private Guild loadGuildByPlayer(UUID playerUUID) {
 		if (!isConnected()) {
 			return null;
