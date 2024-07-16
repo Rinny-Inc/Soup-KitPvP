@@ -85,34 +85,22 @@ public class GuildCommand implements CommandExecutor {
 				player.sendMessage(ChatColor.RED + "Player's not in the guild!");
 				return false;
 			}
-			if (args[0].equalsIgnoreCase("promote")) {
-				final GuildRank rank = guild.getMemberRank(target.getUniqueId());
-				final GuildRank newRank = GuildRank.getRankFromPower((byte) (rank.getPower() + 1));
-				if (newRank == null) {
-					player.sendMessage(ChatColor.RED + "Max promote rank reached!");
-					return false;
-				}
-				guild.getMembers().remove(target.getUniqueId());
-				guild.getMembers().put(target.getUniqueId(), newRank);
-				// TODO: promote message
-				return true;
-			}
-			if (args[0].equalsIgnoreCase("demote")) {
-				final GuildRank rank = guild.getMemberRank(target.getUniqueId());
-				final GuildRank newRank = GuildRank.getRankFromPower((byte) (rank.getPower() - 1));
-				if (newRank == null) {
-					player.sendMessage(ChatColor.RED + "Max demote rank reached!");
-					return false;
-				}
-				guild.getMembers().remove(target.getUniqueId());
-				guild.getMembers().put(target.getUniqueId(), newRank);
-				// TODO: demote message
-				return true;
-			}
-			
 			// TODO
 			// /guild kick <player>
-			return true;
+			boolean promote = false;
+			if ((promote = args[0].equalsIgnoreCase("promote")) || args[0].equalsIgnoreCase("demote")) {
+				final GuildRank rank = guild.getMemberRank(target.getUniqueId());
+				final GuildRank newRank = GuildRank.getRankFromPower((byte) (rank.getPower() + (promote ? 1 : -1)));
+				if (newRank == null) {
+					player.sendMessage(ChatColor.RED + "Max " + args[0].toLowerCase() + " rank reached!");
+					return false;
+				}
+				guild.getMembers().remove(target.getUniqueId());
+				guild.getMembers().put(target.getUniqueId(), newRank);
+				// TODO: promote/demote message
+				return true;
+			}
+			return false;
 		}
 		return false;
 	}
