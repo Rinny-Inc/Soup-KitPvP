@@ -410,28 +410,29 @@ public class DBUtils {
 	}
 	
 	// GUILDS
-	public boolean createGuild(String name, UUID owner) throws GuildExistenceException {
+	public Guild createGuild(String name, UUID owner) throws GuildExistenceException {
 		if (!isConnected()) {
-			return false;
+			return new Guild(name, owner);
 		}
 		final String checkGuildExistenceQuery = "SELECT COUNT(*) AS count FROM guilds WHERE name=?";
 		final String insertGuildQuery = "INSERT INTO guilds (name, owner, motd, tag, money, open) VALUES (?, ?, ?, ?, ?)";
-		boolean[] exist = {false};
+		Guild[] guild = {null};
 		CompletableFuture.runAsync(() -> {
 			Connection connection = null;
+			boolean exist = false;
 		    try {
 		        connection = this.hikari.getConnection();
 		        try (PreparedStatement checkGuildExistenceStatement = connection.prepareStatement(checkGuildExistenceQuery)) {
 		            checkGuildExistenceStatement.setString(1, name);
 		            try (ResultSet resultSet = checkGuildExistenceStatement.executeQuery()) {
 		                if (resultSet.next() && resultSet.getInt("count") > 0) {
-		                	exist[0] = true;
+		                	exist = true;
 		                }
 		                resultSet.close();
 		            }
 		            checkGuildExistenceStatement.close();
 		        }
-		        if (exist[0]) {
+		        if (exist) {
 		        	throw new GuildExistenceException("Guild with name '" + name + "' already exists.");
 		        }
 				try (PreparedStatement insertGuildStatement = connection.prepareStatement(insertGuildQuery)) {
@@ -443,9 +444,12 @@ public class DBUtils {
 			        insertGuildStatement.setBoolean(6, false);
 			        insertGuildStatement.executeUpdate();
 			        insertGuildStatement.close();
+			        guild[0] = new Guild(name, owner);
 			    }
-		    } catch (SQLException|GuildExistenceException e) {
-		        // DONT PRINT WE KNOW!
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		    } catch (GuildExistenceException e) {
+		    	// DO NOTHING :)
 		    } finally {
 		    	if (connection != null) {
 		    		try {
@@ -456,7 +460,7 @@ public class DBUtils {
 		    	}
 		    }
 		}, executorService).join();
-	    return exist[0];
+	    return guild[0];
 	}
 	
 	public void dropGuild(String name) {

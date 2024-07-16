@@ -54,7 +54,7 @@ public class GuildCommand implements CommandExecutor {
 					return false;
 				}
 				try {
-					this.main.getDataBase().createGuild(name, player.getUniqueId());
+					pm.updateGuild(this.main.getDataBase().createGuild(name, player.getUniqueId()));
 					player.sendMessage(ChatColor.GREEN + "Successfully created " + name + " guild!");
 					return true;
 				} catch (GuildExistenceException e) {
@@ -68,12 +68,8 @@ public class GuildCommand implements CommandExecutor {
 			}
 			final Guild guild = Guild.getGuildByPlayer(player.getUniqueId());
 			
-			
-			// TODO: guild invite only for co_leader and leader
-			
-			
-			if (guild.leaderUUID() != player.getUniqueId()) {
-				player.sendMessage("Only leader is allowed to do these action!");
+			if (!guild.isMemberOp(player.getUniqueId())) {
+				player.sendMessage("Only Guild Leader and Co-Leader are allowed to do these action!");
 				return false;
 			}
 			final Player target = this.main.getServer().getPlayer(args[1]);

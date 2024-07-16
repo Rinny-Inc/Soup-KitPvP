@@ -24,6 +24,7 @@ public class Guild {
 	public Guild(String name, UUID leaderUUID) {
 		this.name = name;
 		this.leaderUuid = leaderUUID;
+		this.motd = "New Guild";
 		this.membersUUIDList = new LinkedHashMap<UUID, GuildRank>();
 		this.open = false;
 		this.economy = new Economy();
@@ -74,6 +75,10 @@ public class Guild {
 	
 	public boolean isOpen() {
 		return this.open;
+	}
+	
+	public boolean isMemberOp(UUID uuid) {
+		return this.leaderUuid == uuid || this.membersUUIDList.get(uuid) == GuildRank.CO_LEADER;
 	}
 	
 	public void addMember(UUID uuid) {

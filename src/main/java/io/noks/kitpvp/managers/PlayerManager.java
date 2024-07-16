@@ -140,6 +140,10 @@ public class PlayerManager extends Ability {
 		return this.guild == null;
 	}
 	
+	public void updateGuild(Guild guild) {
+		this.guild = guild;
+	}
+	
 	public Guild getGuild() {
 		return this.guild;
 	}
