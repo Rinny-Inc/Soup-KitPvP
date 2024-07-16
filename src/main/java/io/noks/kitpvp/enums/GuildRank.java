@@ -1,22 +1,37 @@
 package io.noks.kitpvp.enums;
 
 public enum GuildRank {
-	CO_LEADER("co_leader"),
-	MEMBER("member");
+	CO_LEADER("co_leader", (byte)1),
+	MEMBER("member", (byte)0);
 	
 	private String name;
+	private byte power;
 	
-	GuildRank(String name) {
+	GuildRank(String name, byte power) {
 		this.name = name;
+		this.power = power;
 	}
 	
 	public String getName() {
 		return this.name;
 	}
 	
-	public GuildRank getRankFromName(String name) {
+	public byte getPower() {
+		return this.power;
+	}
+	
+	public static GuildRank getRankFromName(String name) {
 		for (GuildRank ranks : values()) {
-			if (this.name.equals(name)) {
+			if (ranks.getName().toLowerCase().equals(name)) {
+				return ranks;
+			}
+		}
+		return null;
+	}
+	
+	public static GuildRank getRankFromPower(byte powr) {
+		for (GuildRank ranks : values()) {
+			if (ranks.getPower() == powr) {
 				return ranks;
 			}
 		}

@@ -7,8 +7,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import io.noks.kitpvp.Main;
+import io.noks.kitpvp.enums.GuildRank;
 import io.noks.kitpvp.exceptions.GuildExistenceException;
 import io.noks.kitpvp.managers.PlayerManager;
+import io.noks.kitpvp.managers.caches.Guild;
 
 public class GuildCommand implements CommandExecutor {
 	private Main main;
@@ -57,14 +59,59 @@ public class GuildCommand implements CommandExecutor {
 					return true;
 				} catch (GuildExistenceException e) {
 					player.sendMessage(ChatColor.RED + e.getMessage());
+					return false;
 				}
+			}
+			if (pm.getGuild() == null) {
+				player.sendMessage(ChatColor.RED + "You need to be in a guild to do that!");
 				return false;
 			}
+			final Guild guild = Guild.getGuildByPlayer(player.getUniqueId());
+			
+			
+			// TODO: guild invite only for co_leader and leader
+			
+			
+			if (guild.leaderUUID() != player.getUniqueId()) {
+				player.sendMessage("Only leader is allowed to do these action!");
+				return false;
+			}
+			final Player target = this.main.getServer().getPlayer(args[1]);
+			if (target == null) {
+				player.sendMessage(ChatColor.RED + "Player's not online! (This will be allowed soon enough)"); // TODO remove and allow offlineplayer promote
+				return false;
+			}
+			if (!guild.getMembers().containsKey(target.getUniqueId())) {
+				player.sendMessage(ChatColor.RED + "Player's not in the guild!");
+				return false;
+			}
+			if (args[0].equalsIgnoreCase("promote")) {
+				final GuildRank rank = guild.getMemberRank(target.getUniqueId());
+				final GuildRank newRank = GuildRank.getRankFromPower((byte) (rank.getPower() + 1));
+				if (newRank == null) {
+					player.sendMessage(ChatColor.RED + "Max promote rank reached!");
+					return false;
+				}
+				guild.getMembers().remove(target.getUniqueId());
+				guild.getMembers().put(target.getUniqueId(), newRank);
+				// TODO: promote message
+				return true;
+			}
+			if (args[0].equalsIgnoreCase("demote")) {
+				final GuildRank rank = guild.getMemberRank(target.getUniqueId());
+				final GuildRank newRank = GuildRank.getRankFromPower((byte) (rank.getPower() - 1));
+				if (newRank == null) {
+					player.sendMessage(ChatColor.RED + "Max demote rank reached!");
+					return false;
+				}
+				guild.getMembers().remove(target.getUniqueId());
+				guild.getMembers().put(target.getUniqueId(), newRank);
+				// TODO: demote message
+				return true;
+			}
+			
 			// TODO
-			// /guild invite <player>
 			// /guild kick <player>
-			// /guild promote <player>
-			// /guild demote <player>
 			return true;
 		}
 		return false;

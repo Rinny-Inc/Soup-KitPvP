@@ -19,6 +19,7 @@ public class Guild {
 	private String tag;
 	private final Economy economy;
 	private boolean open;
+	// TODO invite
 	
 	public Guild(String name, UUID leaderUUID) {
 		this.name = name;
@@ -55,6 +56,10 @@ public class Guild {
 		return this.membersUUIDList;
 	}
 	
+	public GuildRank getMemberRank(UUID uuid) {
+		return this.membersUUIDList.get(uuid);
+	}
+	
 	public String getMOTD() {
 		return this.motd;
 	}
@@ -81,6 +86,17 @@ public class Guild {
 		}
 	}
 	
+	public boolean isAnyMemberOnline() {
+		for (UUID uuids : this.membersUUIDList.keySet()) {
+			Player player = Bukkit.getPlayer(uuids);
+			
+			if (player != null && player.isOnline()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public static Guild getGuildFromName(String name) {
 		return guildList.get(name);
 	}
@@ -100,16 +116,5 @@ public class Guild {
 			}
 		}
 		return null;
-	}
-	
-	public boolean isAnyMemberOnline() {
-		for (UUID uuids : this.membersUUIDList.keySet()) {
-			Player player = Bukkit.getPlayer(uuids);
-			
-			if (player != null && player.isOnline()) {
-				return true;
-			}
-		}
-		return false;
 	}
 }

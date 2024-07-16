@@ -81,7 +81,7 @@ public class Main extends JavaPlugin implements TournamentManager, ItemHelper /*
 	public void onEnable() {
 		instance = this;
 		final World world = this.getServer().getWorld("world");
-		this.spawnCuboid = new Cuboid(new Location(world, -34, 96, 31), new Location(world, 23, 102, -15));
+		this.spawnCuboid = new Cuboid(new Location(world, -34, 96, 31), new Location(world, 23, 106, -15));
 		this.getConfig().options().copyDefaults(true);
 		this.saveDefaultConfig();
 		this.configManager = new ConfigManager(this);
