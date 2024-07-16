@@ -78,7 +78,7 @@ public class Phantom extends Abilities implements Listener {
 				
 				@Override
 				public void run() {
-					if (p == null || !p.isOnline()) {
+					if (p == null || !p.isOnline() || !pm.hasAbility()) {
 						Phantom.this.equipments.remove(p.getUniqueId());
 						return;
 					}

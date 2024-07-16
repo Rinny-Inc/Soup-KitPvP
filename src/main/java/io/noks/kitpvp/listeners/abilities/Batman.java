@@ -44,15 +44,15 @@ public class Batman extends Abilities implements Listener {
 		final Action action = e.getAction();
 		final PlayerManager pm = PlayerManager.get(p.getUniqueId());
 		if (action == Action.RIGHT_CLICK_AIR && p.getItemInHand().getType() != null && p.getItemInHand().getType() == Material.WOOD_SPADE && pm.hasAbility(this)) {
-			if (!pm.hasActiveAbilityCooldown()) {
-				pm.applyAbilityCooldown();
-				final Arrow arrow = p.launchProjectile(Arrow.class, p.getLocation().getDirection().multiply(3.0D));
-				arrow.setMetadata("batHook", new FixedMetadataValue(this.plugin, Boolean.valueOf(true)));
-				arrow.spigot().setDamage(0.0D);
+			if (pm.hasActiveAbilityCooldown()) {
+				final double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
+				p.sendMessage(ChatColor.RED + "You can use your ability in " + df.format(cooldown) + " seconds.");
 				return;
 			}
-			final double cooldown = pm.getActiveAbilityCooldown().longValue() / 1000.0D;
-			p.sendMessage(ChatColor.RED + "You can use your ability in " + df.format(cooldown) + " seconds.");
+			pm.applyAbilityCooldown();
+			final Arrow arrow = p.launchProjectile(Arrow.class, p.getLocation().getDirection().multiply(3.0D));
+			arrow.setMetadata("batHook", new FixedMetadataValue(this.plugin, Boolean.valueOf(true)));
+			arrow.spigot().setDamage(0.0D);
 		}
 	}
 

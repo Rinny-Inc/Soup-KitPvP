@@ -79,6 +79,7 @@ public class Spider extends Abilities implements Listener {
 			Block block = ball.getLocation().getBlock();
 			if (event.getHitEntity() != null) {
 				block = event.getHitEntity().getLocation().getBlock();
+				block.getLocation().setY(ball.getLocation().getY());
 			}
 			final List<Block> webs = new ArrayList<Block>();
 			for (int x = -1; x <= 1; x++) {
