@@ -21,7 +21,7 @@ import io.noks.kitpvp.managers.PlayerManager;
 public class Reaper extends Abilities implements Listener {
 	private Main plugin;
 	public Reaper(Main main) {
-		super("Reaper", new ItemStack(Material.WOOD_HOE), Rarity.RARE, 0L, new String[] { ChatColor.AQUA + "20% chance to give wither II", ChatColor.AQUA + "to your opponents" });
+		super("Reaper", new ItemStack(Material.WOOD_HOE), Rarity.RARE, 0L, new String[] { ChatColor.AQUA + "20% chance to give wither I/II", ChatColor.AQUA + "to your opponents" });
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}
@@ -42,12 +42,13 @@ public class Reaper extends Abilities implements Listener {
 			if (((Player)event.getDamager()).getItemInHand().getType() != Material.WOOD_HOE) {
 				return;
 			}
-			final int rand = new Random().nextInt(100);
+			final Random random = new Random();
+			final int rand = random.nextInt(100);
 			if (rand > 20) {
 				return;
 			}
 			final LivingEntity living = (LivingEntity) event.getEntity();
-			living.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 100, (new Random()).nextInt(1)));
+			living.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 150, random.nextInt(1)));
 		}
 	}
 }

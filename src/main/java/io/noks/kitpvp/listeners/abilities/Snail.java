@@ -21,7 +21,7 @@ public class Snail extends Abilities implements Listener {
 	private Main plugin;
 
 	public Snail(Main main) {
-		super("Snail", new ItemStack(Material.POTION, 1, (short) 16426), Rarity.RARE, 0L, new String[] { ChatColor.AQUA + "20% chance to give slowness II", ChatColor.AQUA + "to your opponents" });
+		super("Snail", new ItemStack(Material.POTION, 1, (short) 16426), Rarity.RARE, 0L, new String[] { ChatColor.AQUA + "20% chance to give slowness I/II", ChatColor.AQUA + "to your opponents" });
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}
@@ -29,12 +29,13 @@ public class Snail extends Abilities implements Listener {
 	@EventHandler
 	public void onDamage(EntityDamageByEntityEvent event) {
 		if (event.getDamager() instanceof org.bukkit.entity.Player && event.getEntity() instanceof org.bukkit.entity.Player && PlayerManager.get(event.getDamager().getUniqueId()).hasAbility(this)) {
-			final int rand = new Random().nextInt(100);
+			final Random random = new Random();
+			final int rand = random.nextInt(100);
 			if (rand > 20) {
 				return;
 			}
 			final LivingEntity living = (LivingEntity) event.getEntity();
-			living.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100, (new Random()).nextInt(1)));
+			living.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100, random.nextInt(1)));
 		}
 	}
 }

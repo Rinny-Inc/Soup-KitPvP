@@ -21,7 +21,7 @@ public class Viper extends Abilities implements Listener {
 	private Main plugin;
 
 	public Viper(Main main) {
-		super("Viper", new ItemStack(Material.POTION, 1, (short) 16388), Rarity.RARE, 0L, new String[] { ChatColor.AQUA + "20% chance to give poison II", ChatColor.AQUA + "to your opponents" });
+		super("Viper", new ItemStack(Material.POTION, 1, (short) 16388), Rarity.RARE, 0L, new String[] { ChatColor.AQUA + "20% chance to give poison I/II", ChatColor.AQUA + "to your opponents" });
 		this.plugin = main;
 		this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
 	}
@@ -29,12 +29,13 @@ public class Viper extends Abilities implements Listener {
 	@EventHandler
 	public void Damage(EntityDamageByEntityEvent event) {
 		if (event.getDamager() instanceof org.bukkit.entity.Player && event.getEntity() instanceof org.bukkit.entity.Player && PlayerManager.get(event.getDamager().getUniqueId()).hasAbility(this)) {
-			final int rand = new Random().nextInt(100);
+			final Random random = new Random();
+			final int rand = random.nextInt(100);
 			if (rand > 20) {
 				return;
 			}
 			final LivingEntity living = (LivingEntity) event.getEntity();
-			living.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, (new Random()).nextInt(1)));
+			living.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, random.nextInt(1)));
 		}
 	}
 }
