@@ -153,7 +153,7 @@ public class PlayerManager extends Ability {
 			if (hasCombatTag()) {
 				this.combatTag = null;
 			}
-			if (this.player.getLastDamage() > 1.5D) {
+			if (this.player.getLastDamage() > 1.5D && this.hasAbility()) {
 				stats.addDeaths();
 			}
 			refreshScoreboardLine(RefreshType.DEATHS, RefreshType.KILLSTREAK);
