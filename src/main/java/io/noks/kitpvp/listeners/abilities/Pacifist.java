@@ -1,5 +1,6 @@
 package io.noks.kitpvp.listeners.abilities;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -18,7 +19,7 @@ import io.noks.kitpvp.managers.PlayerManager;
 public class Pacifist extends Abilities implements Listener {
 
 	public Pacifist(Main main) {
-		super("Pacifist", new ItemStack(Material.RED_ROSE, 1, (short) 8), Rarity.BETA, 0L, new String[] {"When any inventory is open, take half damage"});
+		super("Pacifist", new ItemStack(Material.RED_ROSE, 1, (short) 8), Rarity.BETA, 0L, new String[] {ChatColor.AQUA + "When any inventory is open, take half damage"});
 		main.getServer().getPluginManager().registerEvents(this, main);
 	}
 	

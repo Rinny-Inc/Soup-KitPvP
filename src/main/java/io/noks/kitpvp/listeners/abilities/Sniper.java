@@ -21,7 +21,7 @@ public class Sniper extends Abilities implements Listener {
 	private Main main;
 	
 	public Sniper(Main main) {
-		super("Sniper", new ItemStack(Material.BOW), Rarity.COMMON, 0L, new String[] { "(Distance x 1.3) = damage" });
+		super("Sniper", new ItemStack(Material.BOW), Rarity.COMMON, 0L, new String[] { ChatColor.AQUA + "(Distance x 1.3) = damage" });
 		this.main = main;
 		main.getServer().getPluginManager().registerEvents(this, main);
 	}
