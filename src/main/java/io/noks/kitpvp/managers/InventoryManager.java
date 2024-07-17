@@ -1,6 +1,7 @@
 package io.noks.kitpvp.managers;
 
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -50,8 +51,9 @@ public class InventoryManager {
 			inventories[0].setItem(9, new ItemStack(Main.getInstance().getItemStack(new ItemStack(Material.ARROW, page + 1), ChatColor.YELLOW + "Next page", null)));
 			inventories[1].setItem(17, new ItemStack(Main.getInstance().getItemStack(new ItemStack(Material.ARROW, page - 1), ChatColor.YELLOW + "Previous page", null)));
 		}
-		if (rarity != null)
+		if (rarity != null) {
 			inventories[0].setItem(inventories[0].getSize() - 9, new ItemStack(Main.getInstance().getItemMaterial(Material.PAPER, 0, ChatColor.YELLOW + "Your whole abilities")));
+		}
 		return inventories[page - 1];
 	}
 
@@ -106,29 +108,19 @@ public class InventoryManager {
 
 	@NotNull
 	private ChatColor formatIntToColor(int colorInt) {
-		switch (colorInt) {
-		case 0:
-			return ChatColor.BLACK;
-		case 1:
-			return ChatColor.DARK_BLUE;
-		case 2:
-			return ChatColor.DARK_GREEN;
-		case 3:
-			return ChatColor.DARK_AQUA;
-		case 4:
-			return ChatColor.RED;
-		case 5:
-			return ChatColor.DARK_PURPLE;
-		case 6:
-			return ChatColor.GOLD;
-		case 7:
-			return ChatColor.GRAY;
-		case 8:
-			return ChatColor.DARK_GRAY;
-		case 9:
-			return ChatColor.BLUE;
-		}
-		return ChatColor.RESET;
+		return switch (colorInt) {
+			case 0 -> ChatColor.BLACK;
+			case 1 -> ChatColor.DARK_BLUE;
+			case 2 -> ChatColor.DARK_GREEN;
+			case 3 -> ChatColor.DARK_AQUA;
+			case 4 -> ChatColor.RED;
+			case 5 -> ChatColor.DARK_PURPLE;
+			case 6 -> ChatColor.GOLD;
+			case 7 -> ChatColor.GRAY;
+			case 8 -> ChatColor.DARK_GRAY;
+			case 9 -> ChatColor.BLUE;
+			default -> ChatColor.RESET;
+		};
 	}
 
 	public void openRecraftInventory(Player player) {
@@ -167,7 +159,7 @@ public class InventoryManager {
 		}
 		inventory.setItem(7, Main.getInstance().getItemMaterial(Material.WATCH, 0, ChatColor.YELLOW + "Random Abilities"));
 		int rarityStartSlot = 10;
-		for (Rarity rarity : Rarity.values()) {
+		for (Rarity rarity : EnumSet.allOf(Rarity.class)) {
 			if (rarity != Rarity.USELESS) {
 				boolean hasPermission = (player.hasPermission(rarity.getPermission()) || player.hasPermission("kit.*"));
 				inventory.setItem(rarityStartSlot, Main.getInstance().getItemMaterial(Material.STAINED_GLASS_PANE, hasPermission ? rarity.getColorId() : 14, (hasPermission ? rarity.getColor() : ChatColor.RED) + rarity.getName()));

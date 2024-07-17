@@ -1,5 +1,7 @@
 package io.noks.kitpvp.enums;
 
+import java.util.EnumSet;
+
 import org.bukkit.inventory.ItemStack;
 
 public enum PerksEnum {
@@ -60,7 +62,7 @@ public enum PerksEnum {
 	}
 	
 	public static PerksEnum getPerksFromName(String name) {
-		for (PerksEnum perk : values()) {
+		for (PerksEnum perk : EnumSet.allOf(PerksEnum.class)) {
 			if (perk.getName().toLowerCase().equals(name.toLowerCase())) {
 				return perk;
 			}

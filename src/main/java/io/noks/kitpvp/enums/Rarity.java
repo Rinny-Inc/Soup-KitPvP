@@ -1,5 +1,7 @@
 package io.noks.kitpvp.enums;
 
+import java.util.EnumSet;
+
 import javax.annotation.Nullable;
 
 import org.bukkit.ChatColor;
@@ -56,7 +58,7 @@ public enum Rarity {
 	}
 
 	public static Rarity getRarityByName(String name) {
-		for (Rarity rarity : values()) {
+		for (Rarity rarity : EnumSet.allOf(Rarity.class)) {
 			if (rarity.getName().toLowerCase().equals(name.toLowerCase())) {
 				return rarity;
 			}

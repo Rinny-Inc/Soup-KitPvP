@@ -1,5 +1,7 @@
 package io.noks.kitpvp.enums;
 
+import java.util.EnumSet;
+
 public enum GuildRank {
 	CO_LEADER("co_leader", (byte)1),
 	MEMBER("member", (byte)0);
@@ -21,7 +23,7 @@ public enum GuildRank {
 	}
 	
 	public static GuildRank getRankFromName(String name) {
-		for (GuildRank ranks : values()) {
+		for (GuildRank ranks : EnumSet.allOf(GuildRank.class)) {
 			if (ranks.getName().toLowerCase().equals(name)) {
 				return ranks;
 			}
@@ -30,7 +32,7 @@ public enum GuildRank {
 	}
 	
 	public static GuildRank getRankFromPower(byte powr) {
-		for (GuildRank ranks : values()) {
+		for (GuildRank ranks : EnumSet.allOf(GuildRank.class)) {
 			if (ranks.getPower() == powr) {
 				return ranks;
 			}
