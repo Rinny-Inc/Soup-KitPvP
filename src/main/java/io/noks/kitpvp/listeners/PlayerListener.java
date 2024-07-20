@@ -195,6 +195,12 @@ public class PlayerListener implements Listener, SignRotation {
 
 					final Economy killerEconomy = km.getEconomy();
 					killerEconomy.add(((new Random()).nextInt(1) + 1) * (killer.hasPermission("vip.reward") ? 20 : 10));
+					if (km.getStats().getBounty() > 0) {
+						killerEconomy.add(km.getStats().getBounty());
+						this.plugin.getServer().broadcastMessage(killer.getDisplayName() + ChatColor.GRAY + " has claimed the " + ChatColor.DARK_AQUA + km.getStats().getBounty() + ChatColor.GRAY + " credit bounty for " + killed.getDisplayName());
+						km.getStats().clearBounty();
+					}
+					
 					km.refreshScoreboardLine(RefreshType.KILLS, RefreshType.KILLSTREAK, RefreshType.CREDITS);
 				}
 			}
@@ -226,7 +232,7 @@ public class PlayerListener implements Listener, SignRotation {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onRespawn(PlayerRespawnEvent event) {
 		final Player player = event.getPlayer();
 		event.setRespawnLocation(player.getWorld().getSpawnLocation());
