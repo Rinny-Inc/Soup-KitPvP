@@ -25,6 +25,7 @@ import io.noks.Hologram;
 import io.noks.kitpvp.abstracts.AbstractBossTask;
 import io.noks.kitpvp.commands.AbilityListCommand;
 import io.noks.kitpvp.commands.BootCommand;
+import io.noks.kitpvp.commands.BountyCommand;
 import io.noks.kitpvp.commands.BuildCommand;
 import io.noks.kitpvp.commands.EconomyCommand;
 import io.noks.kitpvp.commands.FeastCommand;
@@ -175,6 +176,7 @@ public class Main extends JavaPlugin implements TournamentManager, ItemHelper /*
 		getCommand("shop").setExecutor(new ShopCommand());
 		getCommand("discord").setExecutor(new SocialCommand());
 		new GuildCommand(this);
+		new BountyCommand(this);
 	}
 	
 	private void spawnNPC(World world) {

@@ -16,7 +16,7 @@ commands:
   boot:
     aliases: [ddos]
   balance:
-    aliases: [money]
+    aliases: [money, bal]
   pay:
   feast:
   spawn:
@@ -25,3 +25,4 @@ commands:
   discord:
   guild:
     aliases: [clan, teams, team, clans, guilds, g]
+  bounty:
