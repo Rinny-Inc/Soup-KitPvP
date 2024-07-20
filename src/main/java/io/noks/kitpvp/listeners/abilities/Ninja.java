@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nullable;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -17,7 +15,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -33,7 +30,7 @@ import io.noks.kitpvp.managers.PlayerManager;
 // TODO: doesnt work
 
 public class Ninja extends Abilities {
-	private @Nullable TtlArrayList<UUID> target;
+	private TtlArrayList<UUID> target = new TtlArrayList<>(TimeUnit.SECONDS, 30, 1);
 	public Ninja() {
 		super("Ninja", new ItemStack(Material.WOOL, 1, (short) 15), Rarity.LEGENDARY, 20L, new String[] { ChatColor.AQUA + "Teleport yourself behind your opponent" });
 	}
@@ -90,17 +87,18 @@ public class Ninja extends Abilities {
 	@Override
 	public void onToggleSneak(PlayerToggleSneakEvent event) {
 		final Player player = event.getPlayer();
-		if (target != null && !target.isEmpty()) {
+		if (!target.isEmpty()) {
 			if (!event.isSneaking()) {
 				return;
 			}
 			final PlayerManager pm = PlayerManager.get(player.getUniqueId());
-			final Player target = Bukkit.getPlayer(this.target.getFirst());
+			final Player target = Bukkit.getPlayer(this.target.get(0));
 			if (target == null) {
+				this.target.clear();
 				return;
 			}
 			if (!player.canSee(target) || !target.canSee(player) || !PlayerManager.get(target.getUniqueId()).hasAbility()) {
-				this.target = null;
+				this.target.clear();
 				return;
 			}
 			if (pm.hasActiveAbilityCooldown()) {
@@ -136,9 +134,6 @@ public class Ninja extends Abilities {
 
 			if (dm.hasAbility(this)) {
 				Player damaged = (Player) event.getEntity();
-				if (this.target == null) {
-					this.target = new TtlArrayList<>(TimeUnit.SECONDS, 30, 1);
-				}
 				if (!this.target.isEmpty() && this.target.get(0) == damaged.getUniqueId()) {
 					return;
 				}
@@ -148,7 +143,7 @@ public class Ninja extends Abilities {
 		}
 	}
 
-	@Override
+	/*@Override
 	public void leaveAction(Player player) {
 		final PlayerManager dm = PlayerManager.get(player.getUniqueId());
 		if (dm.hasAbility(this)) {
@@ -164,5 +159,5 @@ public class Ninja extends Abilities {
 				this.target = null;
 			}
 		}
-	}
+	}*/
 }

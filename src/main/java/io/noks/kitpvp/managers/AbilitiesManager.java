@@ -14,10 +14,12 @@ import io.noks.kitpvp.listeners.abilities.Chemist;
 import io.noks.kitpvp.listeners.abilities.CookieMonster;
 import io.noks.kitpvp.listeners.abilities.Fireman;
 import io.noks.kitpvp.listeners.abilities.Fisherman;
+import io.noks.kitpvp.listeners.abilities.Gladiator;
 import io.noks.kitpvp.listeners.abilities.Hulk;
 import io.noks.kitpvp.listeners.abilities.Kangaroo;
 import io.noks.kitpvp.listeners.abilities.Magma;
 import io.noks.kitpvp.listeners.abilities.Monk;
+import io.noks.kitpvp.listeners.abilities.Ninja;
 import io.noks.kitpvp.listeners.abilities.Pacifist;
 import io.noks.kitpvp.listeners.abilities.Phantom;
 import io.noks.kitpvp.listeners.abilities.PvP;
@@ -43,10 +45,10 @@ public class AbilitiesManager {
 		abilitiesBuilder.add(new Boxer());
 		abilitiesBuilder.add(new Fireman(main));
 		abilitiesBuilder.add(new Fisherman(main));
-		//abilitiesBuilder.add(new Gladiator(main)); // Instancied TODO: need to be TESTED
+		abilitiesBuilder.add(new Gladiator(main)); // Instancied TODO: need to be TESTED
 		abilitiesBuilder.add(new Hulk(main));
 		abilitiesBuilder.add(new Kangaroo(main));
-		//abilitiesBuilder.add(new Ninja()); // Instancied
+		abilitiesBuilder.add(new Ninja()); // Instancied TODO: need to be TESTED
 		abilitiesBuilder.add(new Phantom(main));
 		abilitiesBuilder.add(new Reaper(main));
 		abilitiesBuilder.add(new Snail(main));
