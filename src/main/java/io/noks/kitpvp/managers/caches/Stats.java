@@ -86,6 +86,14 @@ public class Stats {
 	public int getBounty() {
 		return this.bounty;
 	}
+	
+	public void addBounty(int num) {
+		this.bounty += num;
+	}
+	
+	public void clearBounty() {
+		this.bounty = 0;
+	}
 
 	@Override
 	public String toString() {
