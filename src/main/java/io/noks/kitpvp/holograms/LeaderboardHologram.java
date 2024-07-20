@@ -1,25 +1,31 @@
 package io.noks.kitpvp.holograms;
 
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
 import io.noks.Hologram;
+import io.noks.kitpvp.Main;
 import io.noks.kitpvp.abstracts.Holograms;
+import io.noks.kitpvp.database.DBUtils;
+import io.noks.kitpvp.enums.RefreshType;
 import net.minecraft.util.com.google.common.collect.Lists;
 
 public class LeaderboardHologram implements Holograms {
 	private List<Hologram> content;
 	
-	public LeaderboardHologram() {
+	private final DBUtils db;
+	public LeaderboardHologram(Main main) {
+		this.db = main.getDataBase();
 		spawn();
 	}
 	
 	@Override
 	public String title() {
-		return "Leaderboard";
+		return "Kill Leaderboard";
 	}
 	
 	@Override
@@ -29,12 +35,12 @@ public class LeaderboardHologram implements Holograms {
 
 	@Override
 	public String header() {
-		return ChatColor.DARK_AQUA.toString() + ChatColor.BOLD + "Leaderboard";
+		return ChatColor.DARK_AQUA.toString() + ChatColor.BOLD + "Kill Leaderboard";
 	}
 
 	@Override
 	public String footer() {
-		return ChatColor.RED + "Coming Soon :)";
+		return ChatColor.RED + "More Coming Soon :)";
 	}
 	
 	public List<Hologram> content() {
@@ -45,9 +51,12 @@ public class LeaderboardHologram implements Holograms {
 	public void spawn() {
 		List<Hologram> holow = Lists.newLinkedList();
 		Hologram parent = Bukkit.getServer().newHologram(location(), header());
-		for (int i = 0; i < 10; i++) {
-			String name = ChatColor.YELLOW.toString() + (i + 1) + ". " + ChatColor.AQUA + "NAME " + ChatColor.GRAY + "- " + ChatColor.YELLOW + "STATS";
-			holow.add(parent = parent.addLineBelow(name));
+		int i = 0;
+		for (Map.Entry<String, Integer> entry : this.db.getLeaderboard(RefreshType.KILLS).entrySet()) {
+			i++;
+			String name = entry.getKey();
+			int kills = entry.getValue();
+			holow.add(parent = parent.addLineBelow(ChatColor.YELLOW.toString() + i + ". " + ChatColor.AQUA + name + " " + ChatColor.GRAY + "- " + ChatColor.YELLOW + kills));
 		}
 		holow.add(parent = parent.addLineBelow(footer()));
 		this.content = holow;

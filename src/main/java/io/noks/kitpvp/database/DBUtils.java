@@ -32,7 +32,7 @@ import io.noks.kitpvp.managers.caches.PlayerSettings.SlotType;
 import io.noks.kitpvp.managers.caches.Stats;
 
 public class DBUtils {
-	private final Map<RefreshType, Map<UUID, Integer>> leaderboard = new HashMap<RefreshType, Map<UUID, Integer>>(RefreshType.values().length - 3);
+	private final Map<RefreshType, Map<String, Integer>> leaderboard = new HashMap<RefreshType, Map<String, Integer>>(RefreshType.values().length - 3);
 	private boolean connected = false;
 
 	private final String address;
@@ -57,6 +57,7 @@ public class DBUtils {
 			}
 			updateLeaderboard(type);
 		}*/
+		updateLeaderboard(RefreshType.KILLS);
 	}
 	public void updateLeaderboard(RefreshType type) {
         this.leaderboard.put(type, scanLeaderboard(type));
@@ -372,15 +373,15 @@ public class DBUtils {
     }
 	
 	// Leaderboard
-	public Map<UUID, Integer> getLeaderboard(RefreshType type){
+	public Map<String, Integer> getLeaderboard(RefreshType type){
 		return this.leaderboard.get(type);
 	}
-	private Map<UUID, Integer> scanLeaderboard(RefreshType type) {
+	private Map<String, Integer> scanLeaderboard(RefreshType type) {
 		if (!isConnected()) {
 			return null;
 		}
-		final Map<UUID, Integer> map = new LinkedHashMap<UUID, Integer>(10);
-		final String selectLine = "SELECT uuid," + type.getName().toLowerCase() + " FROM stats ORDER BY " + type.getName().toLowerCase() + " DESC LIMIT 10";
+		final Map<String, Integer> map = new LinkedHashMap<String, Integer>(10);
+		final String selectLine = "SELECT nickname," + type.getName().toLowerCase() + " FROM stats ORDER BY " + type.getName().toLowerCase() + " DESC LIMIT 10";
 		CompletableFuture.runAsync(() -> {
 			Connection connection = null;
 			try {
@@ -388,9 +389,9 @@ public class DBUtils {
 				final PreparedStatement statement = connection.prepareStatement(selectLine);
 				final ResultSet result = statement.executeQuery();
 				while (result.next()) {
-					UUID uuid = UUID.fromString(result.getString("uuid"));
+					String name = result.getString("nickname");
 					int stat = result.getInt(type.getName().toLowerCase());
-					map.put(uuid, stat);
+					map.put(name, stat);
 				}
 				result.close();
 				statement.close();

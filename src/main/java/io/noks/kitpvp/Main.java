@@ -93,7 +93,7 @@ public class Main extends JavaPlugin implements TournamentManager, ItemHelper /*
 		this.registerScoreboard();
 		this.registerListeners();
 		this.registerCommands();
-		this.hologramManager = new HologramManager();
+		this.hologramManager = new HologramManager(this);
 		final Hologram parent = this.getServer().newHologram(new Location(world, 5.5, 102, -5.5), ChatColor.DARK_AQUA.toString() + ChatColor.BOLD + "Active Event");
 		parent.addLineBelow(ChatColor.RED + "Coming Soon :)");
 		this.spawnNPC(world);
