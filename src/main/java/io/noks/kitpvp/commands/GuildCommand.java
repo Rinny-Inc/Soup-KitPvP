@@ -29,19 +29,8 @@ public class GuildCommand implements CommandExecutor {
 			sender.sendMessage(ChatColor.RED + "Coming soon ^^");
 			return false;
 		}
-		String[] msg = {ChatColor.GREEN + "Guild Guide: ",
-				ChatColor.GRAY + "- /guild create",
-				ChatColor.GRAY + "- /guild disband",
-				ChatColor.GRAY + "- /guild leave",
-				ChatColor.GRAY + "- /guild open",
-				ChatColor.GRAY + "- /guild invite <player>",
-				ChatColor.GRAY + "- /guild join <player/guild>",
-				ChatColor.GRAY + "- /guild invite <player>",
-				ChatColor.GRAY + "- /guild kick <player>",
-				ChatColor.GRAY + "- /guild promote <player>",
-				ChatColor.GRAY + "- /guild demote <player>"};
 		if (args.length == 0) {
-			sender.sendMessage(msg);
+			sender.sendMessage(this.guide());
 			return false;
 		}
 		final Player player = (Player) sender;
@@ -54,7 +43,7 @@ public class GuildCommand implements CommandExecutor {
 			return true;
 		}
 		if (args.length != 2) {
-			player.sendMessage(msg);
+			player.sendMessage(this.guide());
 			return false;
 		}
 		if (args[0].equalsIgnoreCase("create")) {
@@ -64,7 +53,7 @@ public class GuildCommand implements CommandExecutor {
 			}
 			final String name = args[1];
 			if (name.length() > 24) {
-				player.sendMessage(ChatColor.RED + "The guild name lenght need to be below or 24 character long!");
+				player.sendMessage(ChatColor.RED + "The guild name length need to be below or 24 character long!");
 				return false;
 			}
 			try {
@@ -125,6 +114,23 @@ public class GuildCommand implements CommandExecutor {
 			// TODO: promote/demote message
 			return true;
 		}
+		player.sendMessage(this.guide());
 		return false;
+	}
+	
+	private String[] guide() {
+		return new String[] {
+			ChatColor.GREEN + "Guild Guide: ",
+			ChatColor.GRAY + "- /guild create",
+			ChatColor.GRAY + "- /guild disband",
+			ChatColor.GRAY + "- /guild leave",
+			ChatColor.GRAY + "- /guild open",
+			ChatColor.GRAY + "- /guild invite <player>",
+			ChatColor.GRAY + "- /guild join <player/guild>",
+			ChatColor.GRAY + "- /guild invite <player>",
+			ChatColor.GRAY + "- /guild kick <player>",
+			ChatColor.GRAY + "- /guild promote <player>",
+			ChatColor.GRAY + "- /guild demote <player>"
+		};
 	}
 }
