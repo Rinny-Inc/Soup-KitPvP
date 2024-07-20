@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import io.noks.collections.TtlArrayList;
 import io.noks.kitpvp.enums.GuildRank;
 
 public class Guild {
@@ -19,15 +21,15 @@ public class Guild {
 	private String tag;
 	private final Economy economy;
 	private boolean open;
-	// TODO invite
+	private TtlArrayList<UUID> invites = new TtlArrayList<>(TimeUnit.SECONDS, 30L);
 	
 	public Guild(String name, UUID leaderUUID) {
 		this.name = name;
 		this.leaderUuid = leaderUUID;
 		this.motd = "New Guild";
 		this.membersUUIDList = new LinkedHashMap<UUID, GuildRank>();
-		this.open = false;
 		this.economy = new Economy();
+		this.open = false;
 		guildList.putIfAbsent(name, this);
 	}
 	public Guild(String name, UUID leaderuuid, String motd, String tag, Map<UUID, GuildRank> membersList, int money, boolean open) {
@@ -89,6 +91,14 @@ public class Guild {
 		if (this.membersUUIDList.containsKey(uuid)) {
 			this.membersUUIDList.remove(uuid);
 		}
+	}
+	
+	public void invite(UUID uuid) {
+		this.invites.add(uuid);
+	}
+	
+	public boolean isInvited(UUID uuid) {
+		return this.invites.contains(uuid);
 	}
 	
 	public boolean isAnyMemberOnline() {
