@@ -141,6 +141,13 @@ public class ServerListener implements Listener, Fillable {
 		event.setCancelled(true);
 	}
 	
+	@EventHandler
+	public void onTntIgnite(BlockIgniteEvent event) {
+		if (event.getCause() == IgniteCause.FLINT_AND_STEEL) {
+			event.setCancelled(true);
+		}
+	}
+	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onSignChange(SignChangeEvent event) {
 		final String[] lines = event.getLines();
