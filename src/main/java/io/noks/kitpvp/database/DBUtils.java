@@ -59,8 +59,10 @@ public class DBUtils {
 		}*/
 		updateLeaderboard(RefreshType.KILLS);
 	}
-	public void updateLeaderboard(RefreshType type) {
-        this.leaderboard.put(type, scanLeaderboard(type));
+	public void updateLeaderboard(RefreshType... rtype) {
+		for (RefreshType type : rtype) {
+			this.leaderboard.put(type, scanLeaderboard(type));
+		}
     }
 	
 	private void connectDatabase() {
@@ -102,7 +104,7 @@ public class DBUtils {
 			// PERK
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS perks(uuid VARCHAR(36) PRIMARY KEY, firstperk VARCHAR(16), secondperk VARCHAR(20), thirdperk VARCHAR(18), UNIQUE(`uuid`));");
 			// GUILD START
-			statement.executeUpdate("CREATE TABLE IF NOT EXISTS guilds(name VARCHAR(24) PRIMARY KEY, owner VARCHAR(36), motd VARCHAR(48), tag VARCHAR(4), money INT, open TINYINT(1), UNIQUE(`name`));");
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS guilds(name VARCHAR(24) PRIMARY KEY, owner VARCHAR(36), motd VARCHAR(48), tag VARCHAR(4), money INT, open TINYINT(1), UNIQUE(`name`, `tag`));");
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS members(uuid VARCHAR(36) PRIMARY KEY, nickname VARCHAR(16), guild_rank VARCHAR(9), UNIQUE(`uuid`));");
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS guild_members(guild_name VARCHAR(16), member_uuid VARCHAR(36), PRIMARY KEY (`guild_name`, `member_uuid`), "
 																													 + "FOREIGN KEY (guild_name) REFERENCES guilds(name), "
@@ -530,6 +532,42 @@ public class DBUtils {
 		        }
 			}
 		}, executorService);
+	}
+	
+	public boolean isGuildTagAvailable(String tag) {
+		if (!isConnected()) {
+			return true;
+		}
+		final String checkTagQuery = "SELECT COUNT(*) AS count FROM guilds WHERE tag=?";
+		boolean[] available = {true};
+		CompletableFuture.runAsync(() -> {
+			Connection connection = null;
+		    try {
+		        connection = this.hikari.getConnection();
+		        
+	            try (PreparedStatement selectMembersStatement = connection.prepareStatement(checkTagQuery)) {
+	                selectMembersStatement.setString(1, tag);
+	                try (ResultSet resultSet = selectMembersStatement.executeQuery()) {
+	                	if (resultSet.next() && resultSet.getInt("count") > 0) {
+	                		available[0] = false;
+		                }
+	                    resultSet.close();
+	                }
+	                selectMembersStatement.close();
+	            }
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		    } finally {
+		    	if (connection != null) {
+		            try {
+		                connection.close();
+		            } catch (SQLException ex) {
+		                ex.printStackTrace();
+		            }
+		        }
+			}
+		}, executorService).join();
+		return available[0];
 	}
 	
 	private Guild loadGuildByPlayer(UUID playerUUID) {
