@@ -25,7 +25,7 @@ public class LeaderboardHologram implements Holograms {
 	
 	@Override
 	public String title() {
-		return "Kill Leaderboard";
+		return "Leaderboard";
 	}
 	
 	@Override
@@ -45,6 +45,12 @@ public class LeaderboardHologram implements Holograms {
 	
 	public List<Hologram> content() {
 		return this.content;
+	}
+	
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override

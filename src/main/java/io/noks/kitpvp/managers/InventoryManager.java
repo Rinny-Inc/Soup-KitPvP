@@ -87,7 +87,7 @@ public class InventoryManager {
 	}
 	
 	public Inventory loadPerksInventory(PlayerManager pm) {
-		// TODO
+		Inventory inv = Bukkit.createInventory(pm.getPlayer(), 56, ChatColor.DARK_AQUA + "Your Perks");
 		return null;
 	}
 	

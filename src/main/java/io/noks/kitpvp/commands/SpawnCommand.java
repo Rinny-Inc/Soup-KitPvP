@@ -2,14 +2,17 @@ package io.noks.kitpvp.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import io.noks.kitpvp.Main;
+import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.managers.PlayerManager;
 
 public class SpawnCommand implements CommandExecutor {
@@ -83,5 +86,14 @@ public class SpawnCommand implements CommandExecutor {
 			}
 		}.runTaskTimerAsynchronously(this.main, 0, 1);
 		return true;
+	}
+	
+	private void clearInventory(Player player, Abilities ability) {
+		for (ItemStack item : player.getInventory().getContents()) {
+			Material type = item.getType();
+			if (type == ability.specialItem().getType() || type == Material.MUSHROOM_SOUP || type == ability.sword().getType()) {
+				item.setType(null);
+			}
+		}
 	}
 }

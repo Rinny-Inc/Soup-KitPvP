@@ -51,6 +51,7 @@ public class GuildCommand implements CommandExecutor {
 				player.sendMessage(ChatColor.RED + "Already in a guild!");
 				return false;
 			}
+			// TODO: 500 credits to create a guild
 			final String name = args[1];
 			if (name.length() > 24) {
 				player.sendMessage(ChatColor.RED + "The guild name length need to be below or 24 character long!");
@@ -70,11 +71,13 @@ public class GuildCommand implements CommandExecutor {
 			return false;
 		}
 		final Guild guild = Guild.getGuildByPlayer(player.getUniqueId());
-			
+		
+		// TODO: /guild deposit <amount>
 		if (!guild.isMemberOp(player.getUniqueId())) {
 			player.sendMessage("Only Guild Leader and Co-Leader are allowed to do these action!");
 			return false;
 		}
+		// TODO: /guild widraw <amount>
 		final Player target = this.main.getServer().getPlayer(args[1]);
 		if (target == null) {
 			player.sendMessage(ChatColor.RED + "Player's not online! (This will be allowed soon enough)"); // TODO remove and allow offlineplayer promote

@@ -13,6 +13,9 @@ import io.noks.collections.TtlArrayList;
 import io.noks.kitpvp.enums.GuildRank;
 
 public class Guild {
+	
+	// TODO: chat format = TAG (member) | TAG* (co leader) | TAG** (leader) | RANK NAME: MSG
+	
 	public static final Map<String, Guild> guildList = new HashMap<String, Guild>(); 
 	private UUID leaderUuid;
 	private String name;

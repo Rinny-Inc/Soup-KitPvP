@@ -16,5 +16,6 @@ public interface Holograms {
 	
 	public List<Hologram> content();
 	
+	public void update();
 	public void spawn();
 }

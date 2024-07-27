@@ -37,6 +37,7 @@ public class AbilityListCommand implements CommandExecutor {
 		}
 		sender.sendMessage(rarity.toString());
 		sender.sendMessage("List of ability: " + ability.toString());
+		//Main.getInstance().getHologramManager().getLeaderboard().content().get(3).setMessage("test"); // TODO HALF FIXED REMOVE IT FOR NOW
 		return true;
 	}
 }
