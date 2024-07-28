@@ -29,17 +29,24 @@ public class MapTask extends BukkitRunnable {
 			return;
 		}
 		for (PlayerManager players : this.playersInMap) {
-			if (players.ability() != null && players.ability().hasCooldown()) {
-				Abilities ability = players.ability();
-				if (players.hasActiveAbilityCooldown()) {
-					this.updateXpBar(players, ability);
-				} else if (!players.hasReceivedEndAbilityCooldownMessage()) {
-					players.getPlayer().sendMessage(ChatColor.GRAY + "You may now use " + ChatColor.RED + (ability.specialItem() != null ? ability.specialItemName() : ability.getName()));
-					players.updateHasReceivedEndAbilityCooldownMessage();
+			if (players.hasAbility()) {
+				if (players.ability().hasCooldown()) {
+					Abilities ability = players.ability();
+					if (players.hasActiveAbilityCooldown()) {
+						this.updateXpBar(players, ability);
+					} else if (!players.hasReceivedEndAbilityCooldownMessage()) {
+						players.getPlayer().sendMessage(ChatColor.GRAY + "You may now use " + ChatColor.RED + (ability.specialItem() != null ? ability.specialItemName() : ability.getName()));
+						players.updateHasReceivedEndAbilityCooldownMessage();
+					}
 				}
-			}
-			if (players.getPlayer().getScoreboard().getObjective(DisplaySlot.SIDEBAR) != null) {
-				players.refreshScoreboardLine(RefreshType.COMBATTAG);
+				if (this.main.spawnCuboid().isInWithMarge(players.getPlayer().getLocation(), 3)) {
+					this.main.createRedWall(players.getPlayer());
+				} else {
+					this.main.removeRedWall(players.getPlayer());
+				}
+				if (players.getPlayer().getScoreboard().getObjective(DisplaySlot.SIDEBAR) != null) {
+					players.refreshScoreboardLine(RefreshType.COMBATTAG);
+				}
 			}
 		}
 	}

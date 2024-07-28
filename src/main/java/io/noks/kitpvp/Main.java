@@ -219,22 +219,7 @@ public class Main extends JavaPlugin implements TournamentManager, ItemHelper /*
 		return this.spawnCuboid;
 	}
 	
-	public void applySpawnProtection(Player player, boolean remove) {
-		for (Location loc : spawnCuboid.getEdgeLocations()) {
-			if (loc.getY() < 99) {
-				continue;
-			}
-			Block block = loc.getBlock();
-			
-			if (block.getType() != Material.AIR) {
-				continue;
-			}
-			if (!remove) {
-				player.sendBlockChange(loc, Material.STAINED_GLASS.getId(), (byte)14);
-				continue;
-			}
-			player.sendBlockChange(loc, 0, (byte)0);
-		}
+	public void setPlayerInMap(Player player, boolean remove) {
 		if (mapTask == null && !remove) {
 			mapTask = new MapTask(this).startTask();
 			return;
@@ -256,6 +241,22 @@ public class Main extends JavaPlugin implements TournamentManager, ItemHelper /*
 			}
 		}
 	}
+	
+	public void createRedWall(Player player) {
+        for (Location loc : this.spawnCuboid.getEdgeLocations()) {
+        	if (loc.getBlock().getType() != Material.AIR) continue;
+            if (loc.distance(player.getLocation()) <= 6) {
+                player.sendBlockChange(loc, Material.STAINED_GLASS, (byte)14);
+            }
+        }
+    }
+
+    public void removeRedWall(Player player) {
+        for (Location loc : this.spawnCuboid.getEdgeLocations()) {
+        	if (loc.getBlock().getType() != Material.AIR) continue;
+        	player.sendBlockChange(loc, Material.AIR, (byte)0);
+        }
+    }
 	
 	@Override
 	public boolean isTournamentActive() {

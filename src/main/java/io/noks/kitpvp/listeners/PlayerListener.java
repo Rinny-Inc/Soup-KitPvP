@@ -216,7 +216,7 @@ public class PlayerListener implements Listener, SignRotation {
 			for (int i = 0; i < random; i++) {
 				event.getDrops().add(new ItemStack(Material.MUSHROOM_SOUP, 1));
 			}
-			this.plugin.applySpawnProtection(killed, false);
+			this.plugin.setPlayerInMap(killed, false);
 			pm.kill(false);
 			if (this.plugin.isTournamentActive()) {
 				this.plugin.getActiveTournament().killAttendee(pm.getPlayerUUID());
@@ -244,7 +244,7 @@ public class PlayerListener implements Listener, SignRotation {
 		player.setExp(0.0F);
 		player.getInventory().setContents(this.plugin.getSpawnItems(player.getName()));
 		player.updateInventory();
-		this.plugin.applySpawnProtection(player, true);
+		this.plugin.setPlayerInMap(player, true);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -478,7 +478,7 @@ public class PlayerListener implements Listener, SignRotation {
 		if (!pm.hasAbility() && !this.plugin.spawnCuboid().isIn(event.getFrom())) {
 			pm.setAbility((pm.getSelectedAbility().needCloning() ? pm.getSelectedAbility().clone() : pm.getSelectedAbility()));
 			this.plugin.giveEquipment(player, pm.ability());
-			this.plugin.applySpawnProtection(player, false);
+			this.plugin.setPlayerInMap(player, false);
 			return;
 		}
 		if (pm.hasAbility()) {
@@ -497,9 +497,6 @@ public class PlayerListener implements Listener, SignRotation {
 					player.playSound(player.getLocation(), Sound.CHICKEN_EGG_POP, 1.0f, 1.0f);
 				} catch (NumberFormatException e) {}
 				return;
-			}
-			if (this.plugin.spawnCuboid().isIn(event.getTo())) {
-				event.setTo(event.getFrom());
 			}
 		}
 	}

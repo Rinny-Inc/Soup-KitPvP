@@ -5,6 +5,7 @@ import java.util.Arrays;
 import javax.annotation.Nullable;
 
 import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
@@ -13,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.material.MaterialData;
 
 import com.avaje.ebean.validation.NotNull;
 
@@ -75,6 +77,14 @@ public interface ItemHelper {
 		sm.setDisplayName(displayName);
 		i.setItemMeta(sm);
 		return i;
+	}
+	
+	default ItemStack createGlassBlock(DyeColor color) {
+		final ItemStack i = new ItemStack(Material.GLASS);
+		final MaterialData data = i.getData();
+        data.setData(color.getWoolData());
+        i.setData(data);
+        return i;
 	}
 
 	@NotNull

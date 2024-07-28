@@ -74,7 +74,8 @@ public class SpawnCommand implements CommandExecutor {
 						player.getInventory().setContents(main.getSpawnItems(player.getName()));
 						player.getActivePotionEffects().stream().map(PotionEffect::getType).forEach(player::removePotionEffect);
 						player.setHealth(20.0D);
-						main.applySpawnProtection(player, true);
+						main.setPlayerInMap(player, true);
+						main.removeRedWall(player);
 						this.cancel();
 						pm.currentTask = null;
 						return;
