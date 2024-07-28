@@ -247,6 +247,8 @@ public class Main extends JavaPlugin implements TournamentManager, ItemHelper /*
         	if (loc.getBlock().getType() != Material.AIR) continue;
             if (loc.distance(player.getLocation()) <= 6) {
                 player.sendBlockChange(loc, Material.STAINED_GLASS, (byte)14);
+            } else if (loc.distance(player.getLocation()) > 6 && loc.distance(player.getLocation()) <= 8) {
+            	player.sendBlockChange(loc, Material.AIR, (byte)0);
             }
         }
     }
