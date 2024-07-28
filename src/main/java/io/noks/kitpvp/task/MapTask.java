@@ -41,8 +41,12 @@ public class MapTask extends BukkitRunnable {
 				}
 				if (this.main.spawnCuboid().isInWithMarge(players.getPlayer().getLocation(), 3)) {
 					this.main.createRedWall(players.getPlayer());
+					players.wasCloseToSpawn = true;
 				} else {
-					this.main.removeRedWall(players.getPlayer());
+					if (players.wasCloseToSpawn) {
+						this.main.removeRedWall(players.getPlayer());
+						players.wasCloseToSpawn = false;
+					}
 				}
 				if (players.getPlayer().getScoreboard().getObjective(DisplaySlot.SIDEBAR) != null) {
 					players.refreshScoreboardLine(RefreshType.COMBATTAG);

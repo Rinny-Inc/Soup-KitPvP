@@ -38,6 +38,7 @@ public class PlayerManager extends Ability {
 	private @Nullable CombatTag combatTag;
 	public @Nullable BukkitTask currentTask; // TEMP FIX
 	private @Nullable Guild guild;
+	public boolean wasCloseToSpawn = true;
 
 	public PlayerManager(UUID playerUUID) {
 		this.playerUUID = playerUUID;
@@ -165,6 +166,7 @@ public class PlayerManager extends Ability {
 			this.removeAbility();
 		}
 		if (hasUsedSponsor()) setUsedSponsor(false);
+		this.wasCloseToSpawn = true;
 		this.player.eject();
 		this.player.setWalkSpeed(0.2F);
 		this.player.setMaximumNoDamageTicks(20);
