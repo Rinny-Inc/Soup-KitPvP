@@ -19,10 +19,12 @@ import java.util.concurrent.Executors;
 import com.zaxxer.hikari.HikariDataSource;
 
 import io.noks.kitpvp.Main;
+import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.GuildRank;
 import io.noks.kitpvp.enums.PerksEnum;
 import io.noks.kitpvp.enums.RefreshType;
 import io.noks.kitpvp.exceptions.GuildExistenceException;
+import io.noks.kitpvp.listeners.abilities.PvP;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Economy;
 import io.noks.kitpvp.managers.caches.Guild;
@@ -102,7 +104,7 @@ public class DBUtils {
 			// SETTINGS
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS settings(uuid VARCHAR(36) PRIMARY KEY, scoreboard TINYINT(1), swordslot INT, itemslot INT, UNIQUE(`uuid`));");
 			// PERK
-			statement.executeUpdate("CREATE TABLE IF NOT EXISTS perks(uuid VARCHAR(36) PRIMARY KEY, firstperk VARCHAR(16), secondperk VARCHAR(20), thirdperk VARCHAR(18), UNIQUE(`uuid`));");
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS perks(uuid VARCHAR(36) PRIMARY KEY, firstperk TEXT(16), secondperk TEXT(20), thirdperk TEXT(18), selectedAbility TEXT(16), UNIQUE(`uuid`));");
 			// GUILD START
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS guilds(name VARCHAR(24) PRIMARY KEY, owner VARCHAR(36), motd VARCHAR(48), tag VARCHAR(4), money INT, open TINYINT(1), UNIQUE(`name`, `tag`));");
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS members(uuid VARCHAR(36) PRIMARY KEY, nickname VARCHAR(16), guild_rank VARCHAR(9), UNIQUE(`uuid`));");
@@ -156,7 +158,8 @@ public class DBUtils {
 				final Economy eco = this.loadPlayerEconomy(uuid, name, connection);
 				final Perks perks = this.loadPlayerPerks(uuid, connection);
 				final Guild guild = (this.is_Part_Of_A_Guild(uuid) ? this.loadGuildByPlayer(uuid) : null);
-				new PlayerManager(uuid, stats, settings, eco, perks, guild); 
+				final Abilities ab = this.loadPlayerSelectedAbility(uuid, connection);
+				new PlayerManager(uuid, stats, settings, eco, perks, guild, ab); 
 			} catch (SQLException ex) {
 				ex.printStackTrace();
 			} finally {
@@ -169,6 +172,21 @@ public class DBUtils {
 				}
 			}
 		}, executorService);
+	}
+	
+	private Abilities loadPlayerSelectedAbility(final UUID uuid, final Connection connection) throws SQLException {
+		Abilities ab = new PvP();
+		try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM perks WHERE uuid=?")){
+			statement.setString(1, uuid.toString());
+			try (ResultSet result = statement.executeQuery()) {
+                if (result.next()) {
+                    ab = this.main.getAbilitiesManager().getAbilityFromName(result.getString("selectedAbility"));
+                }
+                result.close();
+            }
+			statement.close();
+		}
+		return ab;
 	}
 	
 	private Stats loadPlayerStats(final UUID uuid, final String name, final Connection connection) throws SQLException {
@@ -273,11 +291,12 @@ public class DBUtils {
 	        selectStatement.setString(1, uuid.toString());
 	        try (ResultSet resultSet = selectStatement.executeQuery()) {
 	            if (resultSet.next() && resultSet.getInt("count") == 0) {
-	                try (PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO perks VALUES(?, ?, ?, ?)")) {
+	                try (PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO perks VALUES(?, ?, ?, ?, ?)")) {
 	                    insertStatement.setString(1, uuid.toString());
 	                    insertStatement.setString(2, "none");
 	                    insertStatement.setString(3, "none");
 	                    insertStatement.setString(4, "none");
+	                    insertStatement.setString(5, "PvP");
 	                    insertStatement.executeUpdate();
 	                    insertStatement.close();
 	                }
@@ -313,7 +332,7 @@ public class DBUtils {
 				this.savePlayerStats(uuid, name, pm.getStats(), connection);
 				this.savePlayerSettings(uuid, pm.getSettings(), connection);
 				this.savePlayerEconomy(uuid, name, pm.getEconomy(), connection);
-				this.savePlayerPerks(uuid, pm.getActivePerks(), connection);
+				this.savePlayerPerks(uuid, pm.getActivePerks(), pm.getSelectedAbility(), connection);
 				if (pm.isPartOfAGuild()) {
 					this.try_Unload_N_Save_Guild(pm.getGuild());
 				}
@@ -363,12 +382,13 @@ public class DBUtils {
             statement.close();
         }
     }
-	private void savePlayerPerks(final UUID uuid, final Perks perks, final Connection connection) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement("UPDATE perks SET firstperk=?, secondperk=?, thirdperk=? WHERE uuid=?")) {
+	private void savePlayerPerks(final UUID uuid, final Perks perks, final Abilities selected, final Connection connection) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement("UPDATE perks SET firstperk=?, secondperk=?, thirdperk=?, selectedAbility=? WHERE uuid=?")) {
             statement.setString(1, "none");
             statement.setString(2, "none");
             statement.setString(3, "none");
-            statement.setString(4, uuid.toString());
+            statement.setString(4, selected.getName());
+            statement.setString(5, uuid.toString());
             statement.executeUpdate();
             statement.close();
         }

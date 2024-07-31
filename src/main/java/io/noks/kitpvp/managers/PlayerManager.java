@@ -16,6 +16,7 @@ import com.avaje.ebean.validation.NotNull;
 import com.google.common.collect.Maps;
 
 import io.noks.kitpvp.Main;
+import io.noks.kitpvp.abstracts.Abilities;
 import io.noks.kitpvp.enums.RefreshType;
 import io.noks.kitpvp.managers.caches.Ability;
 import io.noks.kitpvp.managers.caches.CombatTag;
@@ -53,7 +54,7 @@ public class PlayerManager extends Ability {
 		//this.applyScoreboard();
 	}
 	
-	public PlayerManager(UUID playerUUID, Stats stats, PlayerSettings settings, Economy economy, Perks perks, Guild guild) {
+	public PlayerManager(UUID playerUUID, Stats stats, PlayerSettings settings, Economy economy, Perks perks, Guild guild, Abilities ab) {
 		this.playerUUID = playerUUID;
 		this.player = Bukkit.getPlayer(this.playerUUID);
 		this.perks = perks;
@@ -63,6 +64,7 @@ public class PlayerManager extends Ability {
 		this.settings = settings;
 		this.economy = economy;
 		this.guild = guild;
+		this.setSelectedAbility(ab);
 		players.putIfAbsent(playerUUID, this);
 		if (!settings.hasScoreboardEnabled()) {
 			return;

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.bukkit.AxisAlignedBB;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -23,7 +22,7 @@ public class Cuboid {
     private final double yMinCentered, yMaxCentered;
     private final double zMinCentered, zMaxCentered;
     private @NotNull final World world;
-    private @NotNull final Set<Location> cachedEdgeLocations;
+    private @NotNull final Set<Location> cachedEdgeLocations; // TODO: need to get faces SOUTH, NORTH, EAST, WEST! less things to loop
 
     public Cuboid(final Location point1, final Location point2) {
         this.xMin = Math.min(point1.getBlockX(), point2.getBlockX());
@@ -117,10 +116,6 @@ public class Cuboid {
 
     public boolean isIn(final Player player) {
         return isIn(player.getLocation());
-    }
-    
-    public boolean isIn(AxisAlignedBB boundingBox) {
-        return boundingBox.getMinX() >= this.xMin && boundingBox.getMaxX() <= this.xMax && boundingBox.getMinY() >= this.yMin && boundingBox.getMaxY() <= this.yMax && boundingBox.getMinZ() >= this.zMin && boundingBox.getMaxZ() <= this.zMax;
     }
 
     public boolean isInWithMarge(final Location loc, final double marge) {

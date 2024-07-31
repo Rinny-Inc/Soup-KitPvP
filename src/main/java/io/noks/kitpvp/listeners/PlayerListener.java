@@ -498,6 +498,14 @@ public class PlayerListener implements Listener, SignRotation {
 				} catch (NumberFormatException e) {}
 				return;
 			}
+			final Location to = event.getTo();
+			if (this.plugin.spawnCuboid().isInWithMarge(to, 5) && this.plugin.spawnCuboid().isIn(to)) {
+				final Location from = event.getFrom();
+				final Vector vector = from.toVector().subtract(to.toVector()).normalize();
+				vector.multiply(1.5);
+				
+				player.setVelocity(vector);
+			}
 		}
 	}
 }
