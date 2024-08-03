@@ -7,6 +7,7 @@ import com.avaje.ebean.validation.NotNull;
 public class Messages {
 	public final @NotNull String[] WELCOME_MESSAGE;
 	public final @NotNull String NO_PERMISSION;
+	public final @NotNull String PLAYER_NOT_EXIST;
 	public final @NotNull String PLAYER_NOT_ONLINE;
 	public final @NotNull String YOU_ARENT_IN_THE_SPAWN;
 	
@@ -23,6 +24,7 @@ public class Messages {
 				ChatColor.DARK_GRAY.toString() + ChatColor.STRIKETHROUGH + "-------------------------------------------------" };
 		NO_PERMISSION = "No permission.";
 		PLAYER_NOT_ONLINE = ChatColor.RED + "This player is not online.";
+		PLAYER_NOT_EXIST = ChatColor.RED + "This player doesn't exist in our databse.";
 		YOU_ARENT_IN_THE_SPAWN = ChatColor.RED + "You are not in the spawn!";
 	}
 }

@@ -394,6 +394,38 @@ public class DBUtils {
         }
     }
 	
+	public Stats getOfflinePlayerStats(String name) {
+		if (!isConnected()) {
+			return null;
+		}
+		Stats[] stats = {null};
+		final String selectLine = "SELECT * FROM stats WHERE nickname=?";
+		CompletableFuture.runAsync(() -> {
+			Connection connection = null;
+			try {
+				connection = this.hikari.getConnection();
+				final PreparedStatement statement = connection.prepareStatement(selectLine);
+				final ResultSet result = statement.executeQuery();
+				if (result.next()) {
+					stats[0] = new Stats(result.getInt("kills"), result.getInt("death"), result.getInt("bestks"), result.getInt("bounty"));
+				}
+				result.close();
+				statement.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				if (connection != null) {
+					try {
+						connection.close();
+					} catch (SQLException ex) {
+						ex.printStackTrace();
+					}
+				}
+			}
+		}, executorService).join();
+		return stats[0];
+	}
+	
 	// Leaderboard
 	public Map<String, Integer> getLeaderboard(RefreshType type){
 		return this.leaderboard.get(type);

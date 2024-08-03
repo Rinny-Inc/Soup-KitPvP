@@ -1,6 +1,5 @@
 package io.noks.kitpvp.commands;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -28,13 +27,16 @@ public class StatisticCommand implements CommandExecutor {
 		}
 
 		if (args.length == 1) {
-			final Player target = Bukkit.getPlayer(args[0]);
-			if (target == null) {
-				sender.sendMessage(this.main.getMessages().PLAYER_NOT_ONLINE);
-				return false;
+			final String name = args[0];
+			Stats stats = PlayerManager.get(this.main.getServer().getPlayer(name).getUniqueId()).getStats();
+			if (stats == null) {
+				stats = this.main.getDataBase().getOfflinePlayerStats(name);
+				if (stats == null) {
+					sender.sendMessage(this.main.getMessages().PLAYER_NOT_EXIST);
+					return false;
+				}
 			}
-			final Stats stats = PlayerManager.get(target.getUniqueId()).getStats();
-			sender.sendMessage(ChatColor.GOLD + target.getName() + ChatColor.GRAY + "'s Statistics:");
+			sender.sendMessage(ChatColor.GOLD + name + ChatColor.GRAY + "'s Statistics:");
 			sender.sendMessage(stats.toString());
 			return true;
 		}
