@@ -29,12 +29,9 @@ public class StatisticCommand implements CommandExecutor {
 		if (args.length == 1) {
 			final String name = args[0];
 			Stats stats = PlayerManager.get(this.main.getServer().getPlayer(name).getUniqueId()).getStats();
-			if (stats == null) {
-				stats = this.main.getDataBase().getOfflinePlayerStats(name);
-				if (stats == null) {
-					sender.sendMessage(this.main.getMessages().PLAYER_NOT_EXIST);
-					return false;
-				}
+			if (stats == null && (stats = this.main.getDataBase().getOfflinePlayerStats(name)) == null) {
+				sender.sendMessage(this.main.getMessages().PLAYER_NOT_EXIST);
+				return false;
 			}
 			sender.sendMessage(ChatColor.GOLD + name + ChatColor.GRAY + "'s Statistics:");
 			sender.sendMessage(stats.toString());

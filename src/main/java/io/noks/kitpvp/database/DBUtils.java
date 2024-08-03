@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -24,6 +23,7 @@ import io.noks.kitpvp.enums.GuildRank;
 import io.noks.kitpvp.enums.PerksEnum;
 import io.noks.kitpvp.enums.RefreshType;
 import io.noks.kitpvp.exceptions.GuildExistenceException;
+import io.noks.kitpvp.interfaces.database.FetchLeaderboard;
 import io.noks.kitpvp.listeners.abilities.PvP;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.Economy;
@@ -33,7 +33,7 @@ import io.noks.kitpvp.managers.caches.PlayerSettings;
 import io.noks.kitpvp.managers.caches.PlayerSettings.SlotType;
 import io.noks.kitpvp.managers.caches.Stats;
 
-public class DBUtils {
+public class DBUtils implements FetchLeaderboard {
 	private final Map<RefreshType, Map<String, Integer>> leaderboard = new HashMap<RefreshType, Map<String, Integer>>(RefreshType.values().length - 3);
 	private boolean connected = false;
 
@@ -63,9 +63,12 @@ public class DBUtils {
 	}
 	public void updateLeaderboard(RefreshType... rtype) {
 		for (RefreshType type : rtype) {
-			this.leaderboard.put(type, scanLeaderboard(type));
+			this.leaderboard.put(type, scanLeaderboard(type, this.isConnected(), this.hikari, this.executorService));
 		}
     }
+	public Map<String, Integer> getLeaderboard(RefreshType type){
+		return this.leaderboard.get(type);
+	}
 	
 	private void connectDatabase() {
 		try {
@@ -424,44 +427,6 @@ public class DBUtils {
 			}
 		}, executorService).join();
 		return stats[0];
-	}
-	
-	// Leaderboard
-	public Map<String, Integer> getLeaderboard(RefreshType type){
-		return this.leaderboard.get(type);
-	}
-	private Map<String, Integer> scanLeaderboard(RefreshType type) {
-		if (!isConnected()) {
-			return null;
-		}
-		final Map<String, Integer> map = new LinkedHashMap<String, Integer>(10);
-		final String selectLine = "SELECT nickname," + type.getName().toLowerCase() + " FROM stats ORDER BY " + type.getName().toLowerCase() + " DESC LIMIT 10";
-		CompletableFuture.runAsync(() -> {
-			Connection connection = null;
-			try {
-				connection = this.hikari.getConnection();
-				final PreparedStatement statement = connection.prepareStatement(selectLine);
-				final ResultSet result = statement.executeQuery();
-				while (result.next()) {
-					String name = result.getString("nickname");
-					int stat = result.getInt(type.getName().toLowerCase());
-					map.put(name, stat);
-				}
-				result.close();
-				statement.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			} finally {
-				if (connection != null) {
-					try {
-						connection.close();
-					} catch (SQLException ex) {
-						ex.printStackTrace();
-					}
-				}
-			}
-		}, executorService).join();
-		return map.isEmpty() ? Collections.emptyMap() : map;
 	}
 	
 	// GUILDS
