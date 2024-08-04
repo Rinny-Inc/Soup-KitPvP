@@ -402,7 +402,7 @@ public class DBUtils implements FetchLeaderboard {
 			return null;
 		}
 		Stats[] stats = {null};
-		final String selectLine = "SELECT * FROM stats WHERE nickname=?";
+		final String selectLine = "SELECT * FROM stats WHERE nickname=" + name;
 		CompletableFuture.runAsync(() -> {
 			Connection connection = null;
 			try {
@@ -411,6 +411,38 @@ public class DBUtils implements FetchLeaderboard {
 				final ResultSet result = statement.executeQuery();
 				if (result.next()) {
 					stats[0] = new Stats(result.getInt("kills"), result.getInt("death"), result.getInt("bestks"), result.getInt("bounty"));
+				}
+				result.close();
+				statement.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				if (connection != null) {
+					try {
+						connection.close();
+					} catch (SQLException ex) {
+						ex.printStackTrace();
+					}
+				}
+			}
+		}, executorService).join();
+		return stats[0];
+	}
+	
+	public int getOfflinePlayerStats(String name, String stat) {
+		if (!isConnected()) {
+			return -1;
+		}
+		int[] stats = {-1};
+		final String selectLine = "SELECT " + stat + " FROM stats WHERE nickname=" + name;
+		CompletableFuture.runAsync(() -> {
+			Connection connection = null;
+			try {
+				connection = this.hikari.getConnection();
+				final PreparedStatement statement = connection.prepareStatement(selectLine);
+				final ResultSet result = statement.executeQuery();
+				if (result.next()) {
+					stats[0] = result.getInt(stat);
 				}
 				result.close();
 				statement.close();

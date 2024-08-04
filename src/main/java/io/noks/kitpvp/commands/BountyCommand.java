@@ -1,6 +1,5 @@
 package io.noks.kitpvp.commands;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -35,7 +34,7 @@ public class BountyCommand implements CommandExecutor {
 			player.sendMessage(ChatColor.GRAY + "You have a Bounty of " + ChatColor.YELLOW + ps.getBounty() + ChatColor.GRAY + " credits.");
 			return true;
 		}
-		final Player target = Bukkit.getPlayer(args[0]);
+		final Player target = this.main.getServer().getPlayer(args[0]);
 		if (target == null) {
 			player.sendMessage(ChatColor.RED + "Player's not connected!"); // TODO: allow offline bounty
 			return false;
