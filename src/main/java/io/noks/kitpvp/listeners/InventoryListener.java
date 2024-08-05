@@ -181,6 +181,10 @@ public class InventoryListener implements Listener, SignRotation {
 						player.getInventory().addItem(event.getCurrentItem());
 						return;
 					}
+					case 8 -> {
+						final PlayerManager pm = PlayerManager.get(player.getUniqueId());
+						player.openInventory(this.plugin.getInventoryManager().loadPerksInventory(pm));
+					}
 				}
 			}
 			case "your settings" -> {
@@ -213,6 +217,10 @@ public class InventoryListener implements Listener, SignRotation {
 					player.openInventory(this.plugin.getInventoryManager().loadSlotsInventory(player, name));
 					return;
 				}
+			}
+			case "your perks" -> {
+				event.setCancelled(true);
+				// TODO
 			}
 		}
 	}

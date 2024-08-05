@@ -332,7 +332,7 @@ public class PlayerListener implements Listener, SignRotation {
 				case "ability selector" -> player.openInventory(this.plugin.getInventoryManager().loadKitsInventory(player));
 				case "settings" -> player.openInventory(this.plugin.getInventoryManager().loadSettingsInventory(player));
 				case "stats" -> player.performCommand("stats");
-				case "perk selector" -> player.sendMessage(ChatColor.RED + "Coming soon :)");
+				case "perk selector" -> player.openInventory(this.plugin.getInventoryManager().loadPerksInventory(pm));
 				case "shop" -> player.openInventory(this.plugin.getInventoryManager().openShopInventory());
 			}
 		}

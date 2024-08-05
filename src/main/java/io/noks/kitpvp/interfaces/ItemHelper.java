@@ -19,6 +19,7 @@ import org.bukkit.material.MaterialData;
 import com.avaje.ebean.validation.NotNull;
 
 import io.noks.kitpvp.abstracts.Abilities;
+import io.noks.kitpvp.listeners.abilities.Chemist;
 import io.noks.kitpvp.managers.PlayerManager;
 import io.noks.kitpvp.managers.caches.PlayerSettings;
 import io.noks.kitpvp.managers.caches.PlayerSettings.SlotType;
@@ -118,7 +119,7 @@ public interface ItemHelper {
 		final PlayerSettings settings = PlayerManager.get(player.getUniqueId()).getSettings();
 		inv.setItem(settings.getSlot(SlotType.SWORD), ability.sword());
 		if (ability.specialItem().getType() != Material.MUSHROOM_SOUP) {
-			inv.setItem(settings.getSlot(SlotType.ITEM), getItemStack(ability.specialItem(), ChatColor.RED + ability.specialItemName(), null));
+			inv.setItem(settings.getSlot(SlotType.ITEM), (ability instanceof Chemist ? ability.specialItem() : getItemStack(ability.specialItem(), ChatColor.RED + ability.specialItemName(), null)));
 		}
 		switch(ability.getName().toLowerCase()) {
 			case "jesus": {

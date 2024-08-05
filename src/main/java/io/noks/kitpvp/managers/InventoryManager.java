@@ -61,7 +61,8 @@ public class InventoryManager {
 	public Inventory loadSettingsInventory(Player player) {
 		Inventory inv = Bukkit.createInventory(player, 27, ChatColor.DARK_AQUA + "Your Settings");
 		inv.clear();
-		for (int i = 0; i < inv.getSize(); i++) {
+		final int size = inv.getSize();
+		for (int i = 0; i < size; i++) {
 			inv.setItem(i, Main.getInstance().getItemMaterial(Material.STAINED_GLASS_PANE, 15, " "));
 		}
 		inv.setItem(0, Main.getInstance().getItemMaterial(Material.ARROW, ChatColor.YELLOW + "Previous page"));
@@ -76,7 +77,8 @@ public class InventoryManager {
 	public Inventory loadSlotsInventory(Player player, String slots) {
 		Inventory inv = Bukkit.createInventory(player, 9, ChatColor.DARK_AQUA + slots + " Slot");
 		inv.clear();
-		for (int i = 0; i < inv.getSize(); i++) {
+		final int size = inv.getSize();
+		for (int i = 0; i < size; i++) {
 			int correctedI = i + 1;
 			inv.setItem(i, Main.getInstance().getItemMaterial(Material.STAINED_GLASS_PANE, correctedI, formatIntToColor(correctedI).toString() + correctedI));
 		}
@@ -87,8 +89,16 @@ public class InventoryManager {
 	}
 	
 	public Inventory loadPerksInventory(PlayerManager pm) {
-		Inventory inv = Bukkit.createInventory(pm.getPlayer(), 56, ChatColor.DARK_AQUA + "Your Perks");
-		return null;
+		Inventory inv = Bukkit.createInventory(pm.getPlayer(), 54, ChatColor.DARK_AQUA + "Your Perks");
+		final int size = inv.getSize();
+		// TODO: load Perks list here
+		for (int i = 0; i < size; i++) {
+			inv.setItem(i, Main.getInstance().getItemMaterial(Material.STAINED_GLASS_PANE, 15, " "));
+		}
+		inv.setItem(11, Main.getInstance().getItemMaterial(Material.STAINED_GLASS_PANE, 14, ChatColor.RED + "None"));
+		inv.setItem(13, Main.getInstance().getItemMaterial(Material.STAINED_GLASS_PANE, 14, ChatColor.RED + "None"));
+		inv.setItem(15, Main.getInstance().getItemMaterial(Material.STAINED_GLASS_PANE, 14, ChatColor.RED + "None"));
+		return inv;
 	}
 	
 	private void initShopInventory() {
@@ -98,7 +108,7 @@ public class InventoryManager {
 		stick.addUnsafeEnchantment(Enchantment.KNOCKBACK, 2);
 		this.shopInventory.setItem(2, Main.getInstance().getItemStack(stick, ChatColor.GREEN + "GrandPa Stick", new String[] { "", ChatColor.GRAY + "GrandPa's knockback 2 stick", "", ChatColor.WHITE + "Status: " + ChatColor.GREEN + "In Stock", ChatColor.WHITE + "Cost: " + ChatColor.GOLD + "25 Credits", "", ChatColor.YELLOW + "Click to purchase the GrandPa Stick!" }));
 		
-		this.shopInventory.setItem(8, Main.getInstance().getItemStack(new ItemStack(Material.CHEST), ChatColor.DARK_AQUA + "Perk Shop", new String[] { ChatColor.GRAY + "Click here to go to the perk shop", "", ChatColor.RED + "Coming Soon :)"}));
+		this.shopInventory.setItem(8, Main.getInstance().getItemStack(new ItemStack(Material.CHEST), ChatColor.DARK_AQUA + "Perk Shop", new String[] { ChatColor.GRAY + "Click here to go to the perk shop"}));
 	}
 	
 	@NotNull
